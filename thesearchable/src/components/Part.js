@@ -26,7 +26,7 @@
 import React from "react";
 import {Route, Link, Router, Routes, useParams} from 'react-router-dom';
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
-import SingleEntry from "./SingleEntry";
+
 export default function Part(props){
 
     const [displayEntry, setDisplayEntry] = React.useState(false)
@@ -34,7 +34,7 @@ export default function Part(props){
     const entry = props.relatedEntries.map(theentry => {
         const [entryName,setEntryName] = React.useState('')
         const url = `/entry/${theentry}`
-        console.log(url)
+
         fetch('/entries/' + theentry)
         .then(res => res.json())
         .then(data => {
@@ -42,9 +42,9 @@ export default function Part(props){
         })
         return(
             <MenuItem style={{color:'black', textDecorationLine: 'underline',overflow: 'hidden'}}>
-           <a style={{color:'black'}} href={url}>
+           <Link key={theentry} style={{color:'black'}} to={url}>
              {entryName}
-             </a>
+             </Link>
        </MenuItem>
         )
     })
@@ -55,11 +55,23 @@ export default function Part(props){
     const styles = {
         display: displayEntry ? 'block': 'none'
     }
-
- 
-       return(
-            <SubMenu style={{fontSize:'16px',fontWeight:'700',color:'red',overflow: 'hidden'}} label={props.name}>
+    const partName = `${props.name}`
+    console.log(partName)
+    if (props.name[0]== 'v' && props.name[1] == 'o' && props.name[2] == 'i' && props.name[3] == 'd'){
+        console.log('equalv')
+        return(
+            <div>
                 {entry}
-            </SubMenu>
+                </div>
        )
+    }
+    else{
+       return(
+            <SubMenu style={{paddingRight:'10px',fontSize:'16px',fontWeight:'700',color:'#087cc4',overflow: 'hidden'}} label={props.name}>
+                {entry}
+           
+            </SubMenu>
+       
+       )
+    }
 }

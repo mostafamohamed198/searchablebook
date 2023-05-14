@@ -1,14 +1,79 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html dir="rtl" lang="ar">
     
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <head>
         <style>
+      @import url('https://fonts.googleapis.com/css2?family=Lateef:wght@400;500;600;700;800&display=swap');
             @media print {
   body {
+    font-family: sakkal;
     background-color:'blue';
   }
 }
+body{
+    font-family:'Lateef';
+    font-size: 26px;
+}
+.DP--TC{
+    width:60%
+}
+.DP--logo{
+  text-align: right; 
+  font-size:30px;
+   Height:90px; 
+   color:rgb(81, 81, 81)
+}
+
+.DP--content{
+  text-align:right;
+  width: 95%;
+
+}
+
+.DP--title{
+  text-align:right;
+width: 95%;
+   margin-bottom: 20px;
+   font-size: 28px;
+   font-weight: 700;
+}
+
+.DP--container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+
+
+}
+
+.DP--bibilography{
+  position:absolute;
+  top: 110px;
+  left:0;
+  width: 35%; 
+  margin-top: 15px;
+  border: solid rgb(219, 219, 219);
+
+}
+.DP--doc--info{
+  background-color: rgb(203, 203, 203);
+  color: white;
+  padding:20px;
+  margin-bottom: 5px;
+  font-size: 28px;
+}
+
+.DP--bib--title{
+  font-size: 24px;
+  padding:5px;
+  color:#656565;
+  font-weight: 700;
+}
+.DP--bib--content{
+  padding: 5px;
+}
+
         </style>
 <script>
     function subst() {
@@ -36,24 +101,34 @@
 
 <body style="text-align: right" onload="subst()"> 
   
-    <div class='wrapper'>
-        <div class='header'>
-            
-        </div>
+    <!-- <div class='wrapper'> -->
+       
         <div>
 
             <div class='details' >
-                <pdf:language name="arabic"/>
-                <div style="text-align: right; font-size:25px; Height:90px; color:rgb(81, 81, 81)">العنوان , اللوجو</div>
-                <hr>
-                
-                <div style ="text-align:right; left:0px; width: 70%; position: relative; top: 0px; font-family: lateef;">{{entrybody | safe}}</div>
-                <div style="position:absolute; top:95px; left:660px; width: 25%; margin-top: 15px;">{{entry.bibiliography}}</div>
+             
+                <div class="DP--logo">العنوان , اللوجو</div>
+                <hr />
+                <div class="DP--container">
+                    <div class="DP--TC">
+                <div class="DP--title">{{entry.title}}</div>
+                <ReactMarkdown class="DP--content">{{entrybody | safe}}</ReactMarkdown>
+                </div>
+                <div class="DP--bibilography">
+                    <div class="DP--doc--info">
+                        معلومات عن المقال: 
+                    </div>
+                    <div>
+                        <div class="DP--bib--title">المرجع: </div>
+                        <div class="DP--bib--content">{{entry.bibiliography}}</div>
+                    </div>
+                </div>
+                </div>
                 
             </div>
             
         </div>
-    </div>
+    <!-- </div> -->
 
    </body>
 

@@ -1,4 +1,11 @@
 import React from "react";
+import {
+    BrowserRouter as Router,
+    Route,
+    Routes,
+    Link,
+    Outlet
+  } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 export default function Chapter(props){
     const[chaptername, setChapterName] = React.useState('')
@@ -11,6 +18,10 @@ export default function Chapter(props){
     const url = `/entry/${props.chapterid}`
     
        return(
-        <MenuItem><a style={{color: 'black'}} href={url}>{chaptername}</a></MenuItem>
+        // <Router>
+        <MenuItem><Link key={props.chapterid} style={{color: 'black'}} to={url}>{chaptername}</Link></MenuItem>
+        // </Router>
+        // <MenuItem><a  style={{color: 'black'}} href={url}>{chaptername}</a></MenuItem>
+        
        )
 }

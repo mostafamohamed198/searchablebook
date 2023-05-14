@@ -8,18 +8,24 @@ import Door from "./Door";
 import Chapter from "./Chapter";
 import Share from "./Share";
 import rehypeRaw from "rehype-raw";
+import reactStringReplace from 'react-string-replace';
 import { ComponentToPrint } from "./ComponentToPrint";
 import ReactToPrint from 'react-to-print';
 import { useReactToPrint } from "react-to-print";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload, faPrint, faShare, faStar } from '@fortawesome/free-solid-svg-icons' 
-import reactStringReplace from 'react-string-replace';
+import { faDownload, faPrint, faShare, faStar as fasolidstar } from '@fortawesome/free-solid-svg-icons' 
+// import { library } from '@fortawesome/fontawesome-svg-core'
+// import { faCoffee as fasrFaCoffee } from '@fortawesome/sharp-regular-svg-icons'import reactStringReplace from 'react-string-replace';
 import Popup from 'reactjs-popup';
 import { ProSidebarProvider } from 'react-pro-sidebar';
-// import Sidebar from './Sidebar'
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import ReactModal from 'react-modal';
+import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
+import PDF from "./PDF";
+
+
+
 
 
 export default function SingleEntry (props){
@@ -40,27 +46,44 @@ export default function SingleEntry (props){
     const [bibilography, setBibilography] = React.useState('')
     const [isOpen, setIsOpen] = React.useState(false);
     const [authors, setAuthors] = React.useState([])
-
-    React.useEffect(function(){
-
+    const [authentication, setAuthentication] = React.useState(false)
+    const [requestUser, setRequestUser] = React.useState('')
+    const [inFavourites ,setInFavourites] = React.useState(false)
+    const [favouriteUsers , setFavouriteUsers] = React.useState([])
+    const [largeWindow, setLargeWindow] = React.useState(true)
+React.useEffect(function(){
+   fetch('/authentication_state' )
+        .then(res => res.json())
+        .then(data => {
+          setAuthentication(data.authentication)
+          setRequestUser(data.userid) 
+        }) 
+   
+      
         fetch('/entries/' + params.entryId)
         .then(res => res.json())
         .then(data => {
         setTheEntry(`${data.body}`)
         setTheTitle(`${data.title}`)
         setBibilography(`${data.bibiliography}`)
+        setFavouriteUsers(data.favouriteusers)
+      
     
-        
+      
         data.entryauthor.map(author => {
             fetch('/author/' + author)
             .then(res => res.json())
             .then(data => {
-                setAuthors(oldArray => [...oldArray, data.name]);
-            })
+                const newData = {
+                    'id': data.id,
+                    'name': data.name
+                }
             
+                setAuthors(oldArray => [...oldArray, newData]);
+            })
         })
-        })
-       
+        }) 
+
         fetch('/thebook/' + params.entryId)
         .then(res => res.json())
         .then(data => {
@@ -68,14 +91,15 @@ export default function SingleEntry (props){
         setTheBookName(data.name)
         setContainsDoors(data.containsDoors)
         setContainsParts(data.containsParts)
+        console.log(data)
         
         if (data.containsParts && !data.containsDoors){
           
             data.relatedParts.map(part =>{
-                fetch('/thepart/' + part)
+                fetch('/thepart/' + part.id)
                 .then(res => res.json())
                 .then(data => {
-                    console.log(`thepart is ${data.relatedEntries}`)
+                   
                     let newpart = {
                         name: data.name,
                         relatedEntries: data.relatedEntries
@@ -106,9 +130,30 @@ export default function SingleEntry (props){
         }
        }) 
        
+       
      },[])
-    console.log(authors)
-const returnedParts = parts.map(thepart => {
+    React.useEffect(function(){
+        fetch('/entries/' + params.entryId)
+        .then(res => res.json())
+        .then(data => {
+        setTheEntry(`${data.body}`)
+        setTheTitle(`${data.title}`)
+        setBibilography(`${data.bibiliography}`)
+        setFavouriteUsers(data.favouriteusers)})
+      
+    }, [params.entryId])
+     React.useEffect(()=>{
+        const fetchData = async () =>{
+            setInFavourites(false)
+                favouriteUsers.map(user =>{
+                    if(user == requestUser) { setInFavourites(true) }
+                })
+            
+        }
+        fetchData()
+     },[requestUser, favouriteUsers, params.entryId])
+    const returnedParts = parts.map(thepart => {
+        console.log(thepart)
         return (
             <Part relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )
@@ -131,6 +176,7 @@ function finalreturned(){
         return(returnedDoors)
     }
     else if (!containsDoors && containsParts){
+        console.log('containsParts')
         return(returnedParts)
     }
     else {
@@ -143,6 +189,7 @@ const handleChange = (event) => {
   };
 
   const handleSubmit = (event) => {
+    event.preventDefault();
     if (value != '') {
         
       setList(list.concat(value));
@@ -157,8 +204,30 @@ const handleChange = (event) => {
            ));
      setTheSearchedEntry(ccc.join(""));
     setValue('')
-    event.preventDefault();
+  
   };
+// const handleChange = (event) => {
+//     setValue(event.target.value);
+//   };
+
+//   const handleSubmit = (event) => {
+//     event.preventDefault()
+//     if (value != '') {
+        
+//       setList(list.concat(value));
+//       setSearched(true)
+//     }
+//     else{
+//         setSearched(false)
+//     }
+
+//         const ccc= reactStringReplace(theEntry, value, (match, i) => (
+//             `<mark>${match}</mark>`
+//            ));
+//      setTheSearchedEntry(ccc.join(""));
+//     setValue('')
+//     // event.preventDefault();
+//   };
 
   const { collapseSidebar, rtl } = useProSidebar();
 
@@ -190,25 +259,105 @@ const customStyles = {
       padding: '0'
     },
   };
+
+
+
+//   const iconStar = () => {
+//     inFavourites ? <i class="fa-regular fa-star"></i> :  <i class="fa-solid fa-star"></i>
+//   }
+
+function changeFavourites(){
+    setInFavourites(!inFavourites);
+    fetch('/putFavourites/' + params.entryId, {
+        method: 'PUT',
+        body: JSON.stringify({
+            'fav' : inFavourites
+        })
+    }
+    )   
+}
+
+function iconStar(){
+    if (inFavourites){
+        return(
+            <i onClick={changeFavourites} class="fa-regular fa-star"></i>
+        )
+    }
+    else{
+        return(
+            <i onClick={changeFavourites} class="fa-solid fa-star"></i>
+        )
+    }
+}
+  
+
+  const styles = StyleSheet.create({
+    page: {
+      flexDirection: 'row',
+      backgroundColor: '#E4E4E4'
+    },
+    section: {
+      margin: 10,
+      padding: 10,
+      flexGrow: 1
+    }
+  });
+
+  
  
   const theauthors = authors.map(author =>{
+    const redirect = `/authordetails/${author.id}`
     return(
-        <div className="SE--author">{author}</div>
+        <a href={redirect} style={{textDecoration:'none', color:'#087cc4'}}><div className="SE--author">{author.name}</div></a>
     )
   })
-    return (
+
+  function collapsedWidth(){
+    const windowWidth = React.useRef(window.innerWidth);
+    if (windowWidth.current >= 390){
+            return(false)  
+    }
+    else{
+  return(true)
+    }
+  }
+
+ return (
         
     	<div className="SE">
-
-    
-            <div className='SE--markdown'>
-                <div className="SE--markdown--title">{theTitle}</div>
+                 <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
+               
+<Menu>
+       <MenuItem
+            icon={<MenuOutlinedIcon />}
+            onClick={() => {
+              collapseSidebar();
+            }}
+            style={{ textAlign: "center" }}
+          >
+            {" "}
+         
+          </MenuItem>
+         
+      <div className="SE--bookName">{theBookName}</div>
+                <div  className="SE--input--div">
+                    <form  className="SE--input">
+                            <input value={value} onChange={handleChange} type="search" placeholder="ابحث..." />
+                            <button onClick={handleSubmit}>Search</button>
+                    </form>
+                </div>
+            {finalreturned()}
+ 
+        </Menu>
+        
    
+      </Sidebar>
+             
+            <div className='SE--markdown'>
+                {/* <div>{windowWidth}</div> */}
+                <div className="SE--markdown--title">{theTitle}</div>
                 <div className="SE--icons">
-                
-                
                 <a href={downloadLink} ><FontAwesomeIcon icon={faDownload} /></a>
-      
                 <div>
                     <a onClick={openpop}><FontAwesomeIcon icon={faShare} /></a>
                     <ReactModal isOpen={isOpen} contentLabel='Example Modal' style={customStyles} onRequestClose={closeModal}>
@@ -222,7 +371,7 @@ const customStyles = {
       />
           <ComponentToPrint className='SE--printing' ref={componentRef} title={theTitle} content={theEntry} bibilography={bibilography}/>
     </div>
-    <a><FontAwesomeIcon icon={faStar} /></a>
+    <a>{iconStar()}</a>
                 </div>
                 <div className="SE--docInfo--container">
                 <div className="SE--document--info">
@@ -238,40 +387,11 @@ const customStyles = {
                 <ReactMarkdown className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry} remarkPlugins={[remarkGfm]} />
             </div>
 
-            
-
-       <div className="SE--side--container" >
-     <Sidebar  rtl={true} style={{ width:'350px', zIndex:0}}>
-     <Menu>
-       <MenuItem
-            icon={<MenuOutlinedIcon />}
-            onClick={() => {
-              collapseSidebar();
-            }}
-            style={{ textAlign: "center" }}
-          >
-            {" "}
-         
-          </MenuItem>
-        </Menu>
-      <div className="SE--bookName">{theBookName}</div>
-                <div  className="SE--input--div">
-                    <form  className="SE--input">
-                            <input value={value} onChange={handleChange} type="search" placeholder="Search..." />
-                            <button onClick={handleSubmit}>Search</button>
-                    </form>
-                </div>
-
-        <Menu style={{width:'350px'}}>
-        
-            {finalreturned()}
-        </Menu>
-        
-   
-      </Sidebar>
-      
-    </div>
+  
         </div>
 
     )
-}
+        }
+
+
+

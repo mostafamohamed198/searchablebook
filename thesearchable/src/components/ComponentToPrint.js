@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import ReactMarkdown from "react-markdown";
 
 export const ComponentToPrint = React.forwardRef((props, ref) => {
-    console.log(props.biblography)
+
     return (
       <div className="CTP--div" ref={ref}>
        

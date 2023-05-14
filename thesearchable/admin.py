@@ -8,4 +8,6 @@ admin.site.register(classification)
 admin.site.register(door)
 admin.site.register(part)
 admin.site.register(book)
-admin.site.register(BlogPost)
+admin.site.register(countries)
+admin.site.register(userInfo)
+

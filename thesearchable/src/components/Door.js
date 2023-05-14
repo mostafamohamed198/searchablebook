@@ -33,12 +33,23 @@ React.useEffect(function(){
     const styles = {
         display : theDisplay ? 'block' : 'none'
     }
-const name= 'مصطفي'
-       return(
+    if (props.name[0]== 'v' && props.name[1] == 'o' && props.name[2] == 'i' && props.name[3] == 'd'){
+        console.log('equalv')
+        return(
+          
+               returnedDoorParts
+             
+       )
+    }
+    else{
+        return(
 
-            <SubMenu style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden'}}label={props.name}>
+            <SubMenu style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden'}} defaultOpen={true} label={props.name}>
               {returnedDoorParts}
             </SubMenu>
          
        )
+    }
+
+      
 }
