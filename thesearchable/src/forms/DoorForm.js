@@ -67,13 +67,27 @@ export default function DoorForm (props){
     // }
     let handleSubmit = (event) => {
         event.preventDefault();
-        alert(JSON.stringify(formValues));
+        
     
-        fetch(`/adddoor/${props.id}/`, {
-            method: 'POST',
-            body: JSON.stringify({
-       content: formValues
-     })})
+    //     fetch(`/adddoor/${props.id}/`, {
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //    content: formValues
+    //  })})
+    formValues.map(value => {
+          
+ 
+      let form_data = new FormData();
+      form_data.append('name', value.name);
+      form_data.append('relatedParts', value.relatedParts)
+      axios.post(`/adddoor/${props.id}/`, form_data, {
+      }).then(res => {
+          console.log(res)
+      }).catch(err => {
+          console.log(err.response.data);
+      })
+            })
+      
      setDoorDisplay(false)
      setSubmittedDisplay(true)
 
@@ -123,7 +137,7 @@ export default function DoorForm (props){
             <div className="form-inline" key={index}>
               <label className="inputLabel">اسم الباب:</label>
               <input className="inputForm" type="text" name="name" value={element.name || ""} onChange={e => handleChange(index, e)} />
-              <h3>الأجزاء الموجوده داخل الباب:</h3>
+              <h3>الأجزاء الموجودهx داخل الباب:</h3>
               <Select
                 isMulti
                 name="relatedParts"

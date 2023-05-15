@@ -96,10 +96,11 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
           authArray.push(option.value)
         })
             let form_data = new FormData();
+            console.log('l')
             console.log(data.containsParts)
         form_data.append('cover', data.cover[0], data.cover[0].name);
         form_data.append('name', data.name);
-        form_data.append('conatainsParts', data.containsParts);
+        form_data.append('containsParts', data.containsParts);
         form_data.append('containsDoors', data.containsDoors);
         form_data.append('author', authArray);
         form_data.append('publicationDate', data.publicationDate);

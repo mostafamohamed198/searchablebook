@@ -41,7 +41,7 @@ export default function PartForm (props){
     
     let handleSubmit = (event) => {
         event.preventDefault();
-        alert(JSON.stringify(formValues));
+        
         formValues.map(value => {
           
  
@@ -56,6 +56,7 @@ export default function PartForm (props){
         console.log(err.response.data);
     })
           })
+          alert('posted');
           setPartDisplay(false)
           props.containsDoors ? setDoorDisplay(true) : setSubmittedDisplay(true)
     }

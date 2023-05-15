@@ -493,21 +493,39 @@ class addDoorViewSet(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, pk, format=None):
-        print(request.body)
-        data = json.loads(request.body)
-        content = data.get('content')
-        for one in content:
-            print('working')
-            serializer = DoorSerializer(data=one)
-            if serializer.is_valid():
-                serializer.save()
-                first_value = list(serializer.data.values())[0]
-                print(first_value)
-                relatedbook = book.objects.get(id=pk)
-                relatedbook.relatedDoors.add(int(first_value))
-                return Response(serializer.data,status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        print(request.data)
+        serializer = DoorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            first_value = list(serializer.data.values())[0]
+            # print(first_value)
+            relatedbook = book.objects.get(id=pk)
+            # print(f'the book is {relatedbook.id}')
+            
+            relatedbook.relatedDoors.add(int(first_value))
+            relatedbook.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    # def post(self, request, pk, format=None):
+    #     # print(request.body)
+    #     data = json.loads(request.body)
+    #     content = data.get('content')
+    #     # print(list(data.values())[0])
+    #     #             print('ok')
+    #     # for one in list(data.values())[0]:
+    #     for one in list(data.values())[0]:
+    #         print('working')
+    #         serializer = DoorSerializer(data=one)
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #         #     first_value = list(serializer.data.values())[0]
+    #         #     print(first_value)
+    #         #     relatedbook = book.objects.get(id=pk)
+    #         #     relatedbook.relatedDoors.add(int(first_value))
+    #         #     return Response(serializer.data,status=status.HTTP_201_CREATED)
+    #         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #         return Response('working')
 
 wkhtml_to_pdf = os.path.join(
     settings.BASE_DIR, "wkhtmltopdf.exe")
