@@ -1,13 +1,13 @@
 from django.shortcuts import render
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from .models import *
 from markdown2 import markdown
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
-import markdown as md
+# import markdown as md
 from django.contrib.auth import authenticate, login, logout
-from django import template
+# from django import template
 from django.template.defaultfilters import stringfilter
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -17,56 +17,56 @@ from django.urls import reverse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import generics
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+# from rest_framework_simplejwt.views import TokenObtainPairView
+# from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .utils import render_to_pdf
+# from .utils import render_to_pdf
 import io
-from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer,PageBreak
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.pdfbase import pdfmetrics
-import reportlab
-from reportlab.pdfbase.ttfonts import TTFont
-from rest_framework.viewsets import ModelViewSet
-import arabic_reshaper
-from bidi.algorithm import get_display
+# from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
+# from django.http import FileResponse
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.styles import getSampleStyleSheet
+# from reportlab.lib.pagesizes import letter
+# from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer,PageBreak
+# from reportlab.lib.styles import ParagraphStyle
+# from reportlab.pdfbase import pdfmetrics
+# import reportlab
+# from reportlab.pdfbase.ttfonts import TTFont
+# from rest_framework.viewsets import ModelViewSet
+# import arabic_reshaper
+# from bidi.algorithm import get_display
 import io
 from rest_framework.authentication import TokenAuthentication
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
+# from django.http import FileResponse
+# from reportlab.pdfgen import canvas
 import pdfkit
 from django.template.loader import get_template
 from django.conf import settings
 import os
 import json
 from wkhtmltopdf.views import PDFTemplateResponse 
-from django_elasticsearch_dsl_drf.constants import SUGGESTER_COMPLETION, SUGGESTER_PHRASE, SUGGESTER_TERM
-from django_elasticsearch_dsl_drf.filter_backends import SearchFilterBackend, FilteringFilterBackend, SuggesterFilterBackend
-from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
-from .documents import EntryDocument
+# from django_elasticsearch_dsl_drf.constants import SUGGESTER_COMPLETION, SUGGESTER_PHRASE, SUGGESTER_TERM
+# from django_elasticsearch_dsl_drf.filter_backends import SearchFilterBackend, FilteringFilterBackend, SuggesterFilterBackend
+# from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
+# from .documents import EntryDocument
 # from .serializers import EntryDocumentSerializer
-from django_elasticsearch_dsl_drf.constants import (
-    LOOKUP_FILTER_TERMS,
-    LOOKUP_FILTER_RANGE,
-    LOOKUP_FILTER_PREFIX,
-    LOOKUP_FILTER_WILDCARD,
-    LOOKUP_QUERY_IN,
-    LOOKUP_QUERY_EXCLUDE,
-    LOOKUP_QUERY_GT,
-    LOOKUP_QUERY_GTE,
-    LOOKUP_QUERY_LT,
-    LOOKUP_QUERY_LTE,
+# from django_elasticsearch_dsl_drf.constants import (
+#     LOOKUP_FILTER_TERMS,
+#     LOOKUP_FILTER_RANGE,
+#     LOOKUP_FILTER_PREFIX,
+#     LOOKUP_FILTER_WILDCARD,
+#     LOOKUP_QUERY_IN,
+#     LOOKUP_QUERY_EXCLUDE,
+#     LOOKUP_QUERY_GT,
+#     LOOKUP_QUERY_GTE,
+#     LOOKUP_QUERY_LT,
+#     LOOKUP_QUERY_LTE,
     
-)
+# )
 from elasticsearch_dsl import Q
 from django_elasticsearch_dsl_drf.filter_backends import (
     FilteringFilterBackend,
@@ -75,8 +75,8 @@ from django_elasticsearch_dsl_drf.filter_backends import (
     DefaultOrderingFilterBackend,
     SearchFilterBackend,
 )
-from elasticsearch_dsl import Q
-from rest_framework_simplejwt.tokens import RefreshToken
+# from elasticsearch_dsl import Q
+# from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
 def login_view(request):

@@ -1,9 +1,9 @@
 from .models import *
 from rest_framework import serializers
 from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-from.documents import EntryDocument
+# from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+# from rest_framework_simplejwt.views import TokenObtainPairView
+# from.documents import EntryDocument
 
 class EntrySerializer(serializers.ModelSerializer):
     # entryauthor = serializers.SlugRelatedField(

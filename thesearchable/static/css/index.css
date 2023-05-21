@@ -790,8 +790,13 @@ text-align: center;
 }
 
 .slick-prev{
-  color:#000;
-  background-color: #000;
+  /* color:#000;
+  background-color: #000; */
+  display: none
+}
+.pageNumber{
+  text-align: center;
+  color:rgb(166, 166, 166)
 }
 
 /* searchresults.js style */

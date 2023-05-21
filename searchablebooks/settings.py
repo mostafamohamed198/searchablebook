@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
+# import environ
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,7 +31,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+# env = environ.Env()
+# environ.Env.read_env()
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,8 +47,8 @@ INSTALLED_APPS = [
      'wkhtmltopdf',
      'django_elasticsearch_dsl',
      'django_elasticsearch_dsl_drf',
-     'rest_framework_simplejwt.token_blacklist',
      'corsheaders',
+    #  'haystack'
 ]
 
 MIDDLEWARE = [
@@ -85,16 +87,94 @@ WSGI_APPLICATION = 'searchablebooks.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'newwsearchablebooks',
+#         'USER': 'root',
+#         'PASSWORD': '',
+#         'HOST':'localhost',
+#         'PORT':'3306',
+#     }
+# }
+
+# DATABASES['default'] =  dj_database_url.config()
+# SECRET_KEY= env("SECRET_KEY")
 DATABASES = {
+    # 'default': {
+    #    'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'newwsearchablebooks',
+    #     'USER': 'root',
+    #     'PASSWORD': '',
+    #     'HOST':'localhost',
+    #     'PORT':'3306',
+    # },
     'default': {
-       'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'newwsearchablebooks',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST':'localhost',
-        'PORT':'3306',
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "postgres",
+        "USER": "postgres",
+        # "PASSWORD": "root",
+        "HOST": "dab",  # set in docker-compose.yml
+        "PORT": 5432,  # default postgres port
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'NAME': os.getenv('DB_NAME'),
+        # 'USER': os.getenv('DB_USER'),
+        # 'PASSWORD': os.getenv('DB_PASSWORD'),
+        # 'HOST': os.getenv('DB_HOST'),
+        # 'PORT': os.getenv('DB_PORT'),
     }
 }
+# DATABASES = {
+#     'default': {
+#        'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'mydatabase',
+#         'USER': 'root',
+#         'PASSWORD': 'some_password',
+#         'ROOT_PASSWORD':'some_password',
+#         'HOST':'',
+#         'PORT':'3306',
+#     }
+# }
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'db',
+#        'USER': '<database_username>',
+#        'PASSWORD': '<password>',
+#        'HOST': '<database_hostname_or_ip>',
+#        'PORT': '<database_port>',
+#    }
+# }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "postgres",
+#         "USER": "postgres",
+#         "PASSWORD": "postgres",
+#         "HOST": "db",  # set in docker-compose.yml
+#         "PORT": 5432,  # default postgres port
+#     }
+# }
+
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('MYSQL_DATABASE', 'mysql-db'),
+#         'USER': os.environ.get('MYSQL_USER', 'mysql-user'),
+#         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'mysql-password'),
+#         'HOST': os.environ.get('MYSQL_DATABASE_HOST', 'db'),
+#         'PORT': os.environ.get('localhost', 3306),
+#     }
+# }
+
+# - MYSQL_DATABASE='mydatabase'
+#       - MYSQL_USER='root'
+#       - MYSQL_PASSWORD='some_password'
+#       - MYSQL_ROOT_PASSWORD='some_password'
+#       - MYSQL_HOST=''
 
 AUTH_USER_MODEL = "thesearchable.User"
 # Password validation
@@ -141,12 +221,25 @@ MEDIA_URL = 'media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ELASTICSEARCH_DSL={
+# ELASTICSEARCH_DSL={
+#     'default': {
+#         'hosts': 'localhost:9200'
+#     },
+# }
+
+ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'localhost:9200'
+        'hosts': 'es'
     },
 }
 
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
+#         'URL': 'http://127.0.0.1:9200/',
+#         'INDEX_NAME': 'entries',
+#     },
+# }
 # WKHTMLTOPDF_CMD = '/usr/local/bin/wkhtmltopdf'
 
 ELASTICSEARCH_INDEX_NAMES = {

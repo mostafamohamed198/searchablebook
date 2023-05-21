@@ -137,7 +137,7 @@ export default function DoorForm (props){
             <div className="form-inline" key={index}>
               <label className="inputLabel">اسم الباب:</label>
               <input className="inputForm" type="text" name="name" value={element.name || ""} onChange={e => handleChange(index, e)} />
-              <h3>الأجزاء الموجودهx داخل الباب:</h3>
+              <h3>الأجزاء الموجوده داخل الباب:</h3>
               <Select
                 isMulti
                 name="relatedParts"

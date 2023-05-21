@@ -11,9 +11,10 @@ export default function Users(){
     },[])
 
     const allUsers = users.map(user => {
+        const userUrl = `/userinfo/${user.user.id}`
         return(
             <tr>
-                <td className="Users--td">{user.user.username}</td>
+                <td className="Users--td"><a href={userUrl}> {user.user.username}</a></td>
                 <td className="Users--td">{user.user.id}</td>
                 <td className="Users--td">{user.user.email}</td>
             </tr>
@@ -23,6 +24,7 @@ export default function Users(){
 
     return(
         <div>
+          
             <table className="Users--table">
             <tr className="Users--tr">
                 <th className="Users--th">Username</th>

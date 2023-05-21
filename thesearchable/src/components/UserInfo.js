@@ -85,6 +85,7 @@ export default function UserInfo(){
             </div>
         )
     })
+    const editUrl = `/useredit/${userDetails.user?.id}`
     return (
         <div>
             <div>
@@ -114,6 +115,7 @@ export default function UserInfo(){
                 <div className='UI--searchhistory' onClick={() => {setCollapseViewed(!collapseViewed)}}><h3>المقالات التي تم عرضها: </h3></div>
                 <div style={{display : collapseViewed? 'block': 'none' }}>{viewedEntries}</div>
             </div>
+            <a href={editUrl}>تعديل بيانات المستخدم</a>
         </div>
     )
 }

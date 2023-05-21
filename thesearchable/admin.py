@@ -10,4 +10,5 @@ admin.site.register(part)
 admin.site.register(book)
 admin.site.register(countries)
 admin.site.register(userInfo)
+admin.site.register(User)
 

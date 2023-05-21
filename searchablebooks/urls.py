@@ -20,7 +20,7 @@ from rest_framework import routers
 from rest_framework import routers
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework_simplejwt import views as jwt_views
+# from rest_framework_simplejwt import views as jwt_views
 # router = routers.SimpleRouter(trailing_slash=False)
 # router.register(r'entry-search', EntryDocumentView, basename='entry-search')
 
