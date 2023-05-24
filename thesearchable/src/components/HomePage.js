@@ -118,23 +118,23 @@ return(
         <div className="dropdown">
             <span className="dropdown-title"> كتب قانونية و موسوعات</span> <i class="fa-solid fa-angle-down"></i>
             <div className="dropdown-content">
-              <a href="/category/4"><p className="dropdown-element">كتب قانونية</p></a>
+              <a href="/category/1"><p className="dropdown-element">كتب قانونية</p></a>
               {/* <Link to="/category/4"><p className="dropdown-element">aكتب قانونية</p></Link> */}
-              <a href="/category/3"><p className="dropdown-element"> موسوعات</p></a>
+              <a href="/category/2"><p className="dropdown-element"> موسوعات</p></a>
             </div>
           </div>
           </li>
     
           <li>
-            <a >مجلات قانونية</a>
+            <a href="/category/4">مجلات قانونية</a>
           </li>
 
           <li>
           <div className="dropdown">
             <span className="dropdown-title">رسائل</span> <i class="fa-solid fa-angle-down"></i>
             <div className="dropdown-content">
-            <a href="/category/1"><p className="dropdown-element">رسائل ماجستير</p></a>
-              <a href="/category/2"><p className="dropdown-element"> رسائل دكتوراه</p></a>
+            <a href="/category/5"><p className="dropdown-element">رسائل ماجستير</p></a>
+              <a href="/category/3"><p className="dropdown-element"> رسائل دكتوراه</p></a>
             </div>
           </div>
           </li>
