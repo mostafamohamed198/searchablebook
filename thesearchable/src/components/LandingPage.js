@@ -117,9 +117,9 @@ const handleChange = (event) => {
       </div>
       <div className='LP--SS'>
       <h2>أحدث الكتب</h2>
-      <SimpleSlider catid={4} />
+      <SimpleSlider catid={1} />
       <h2>أحدث المقالات</h2>
-      <SimpleSlider catid={2} />
+      <SimpleSlider catid={4} />
       </div>
       </div>
     

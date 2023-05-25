@@ -76,8 +76,7 @@ services:
       # volumes:
       #   - ./frontend:/frontend
       command : npm run dev
-      networks:
-        - heritage-network
+
       depends_on:
         - web
       restart: always
