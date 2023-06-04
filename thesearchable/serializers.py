@@ -222,9 +222,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 
 class EntryFormSerializer(serializers.ModelSerializer):
-    # submittedUser = serializers.HiddenField(
-    # default=serializers.CurrentUserDefault()
-    # )
+    
     entryCover = serializers.ImageField(required=False)
     class Meta:
         model = entry

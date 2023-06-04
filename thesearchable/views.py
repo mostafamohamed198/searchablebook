@@ -363,7 +363,7 @@ class EntryFormViewSet(APIView):
     # authentication_classes = [ BasicAuthentication, TokenAuthentication]
     # permission_classes = [AllowAny]
     permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
+    authentication_classes = [TokenAuthentication, BasicAuthentication]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, format=None):
