@@ -61,6 +61,7 @@ React.useEffect(function(){
    
       
         fetch('/entries/' + params.entryId)
+        // fetch('/entries/' + 4)
         .then(res => res.json())
         .then(data => {
         setTheEntry(`${data.body}`)
@@ -91,8 +92,6 @@ React.useEffect(function(){
         setTheBookName(data.name)
         setContainsDoors(data.containsDoors)
         setContainsParts(data.containsParts)
-        console.log(data)
-        
         if (data.containsParts && !data.containsDoors){
           
             data.relatedParts.map(part =>{
@@ -140,7 +139,9 @@ React.useEffect(function(){
         setTheTitle(`${data.title}`)
         setBibilography(`${data.bibiliography}`)
         setFavouriteUsers(data.favouriteusers)})
-      
+      setSearched(false)
+ 
+
     }, [params.entryId])
      React.useEffect(()=>{
         const fetchData = async () =>{
@@ -151,6 +152,7 @@ React.useEffect(function(){
             
         }
         fetchData()
+        
      },[requestUser, favouriteUsers, params.entryId])
     const returnedParts = parts.map(thepart => {
         console.log(thepart)
@@ -200,7 +202,7 @@ const handleChange = (event) => {
     }
 
         const ccc= reactStringReplace(theEntry, value, (match, i) => (
-            `<mark>${match}</mark>`
+            `<mark><a href ="#mark-${i + 2}" id="mark-${i}">${match}</a></mark>`
            ));
      setTheSearchedEntry(ccc.join(""));
     setValue('')
@@ -262,10 +264,6 @@ const customStyles = {
 
 
 
-//   const iconStar = () => {
-//     inFavourites ? <i class="fa-regular fa-star"></i> :  <i class="fa-solid fa-star"></i>
-//   }
-
 function changeFavourites(){
     setInFavourites(!inFavourites);
     fetch('/putFavourites/' + params.entryId, {
@@ -324,7 +322,7 @@ function iconStar(){
 
  return (
         
-    	<div className="SE">
+    	<div id="SEforpdf" className="SE">
                  <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
                
 <Menu>

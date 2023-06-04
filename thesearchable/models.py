@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+from django.core.validators import FileExtensionValidator
 
 
 class User(AbstractUser):
@@ -14,11 +15,15 @@ class author(models.Model):
     picture = models.ImageField(upload_to='authorimage/')
     degree = models.CharField(max_length=300)
     about = models.TextField()
+    submittedUser = models.ForeignKey('User', null=True, blank=True, related_name='SubmittedAuthorUser', on_delete=models.CASCADE)
     def __str__ (self):
         return self.name
     @property
     def author_dictionary(self):
         return {'id' : self.id, 'name': self.name}
+    @property
+    def authors_dictionary(self):
+        return {'label':self.name , 'value': self.id}
 
 
 class categories(models.Model):
@@ -28,11 +33,24 @@ class categories(models.Model):
     @property
     def categories_dictionary(self):
         return {'id':self.id , 'thecategory': self.thecategory}
+    @property
+    def categories_options_dictionary(self):
+        return {'label':self.thecategory , 'value': self.id}
+
 
 class classification(models.Model):
     theclass = models.CharField(max_length=200) 
     def __str__ (self):
         return self.theclass
+    @property
+    def classification_dictionary(self):
+        return {'label':self.theclass , 'value': self.id}
+
+
+class ocrbook(models.Model):
+    name= models.CharField(max_length=300)
+    pdf = models.FileField(upload_to='books/',null=True, validators=[FileExtensionValidator(allowed_extensions=['pdf'])], blank=True)
+
    
 
 class countries(models.Model):
@@ -42,6 +60,9 @@ class countries(models.Model):
     @property
     def countries_dictionary(self):
         return {'id': self.id, 'country':self.country}
+    @property
+    def countries_options_dictionary(self):
+        return {'label': self.country, 'value':self.id}
     
 class rating(models.Model):
     ratedUser = models.ForeignKey('User', on_delete=models.CASCADE)
@@ -67,7 +88,7 @@ class entry(models.Model):
     views = models.ManyToManyField('User', blank=True, related_name='views')
     favouriteusers = models.ManyToManyField('User', blank=True, related_name='favouriteusers')
     viewsCounts = models.IntegerField(default=0)
-    
+   
     def __str__ (self):
         return self.title
     @property
@@ -103,6 +124,7 @@ class book(models.Model):
     relatedChapters = models.ManyToManyField('entry',  blank=True)
     relatedParts = models.ManyToManyField('part',  blank=True)
     relatedDoors = models.ManyToManyField('door', blank=True)
+    submittedUser = models.ForeignKey('User', null=True, blank=True, related_name='submittedBookUser', on_delete=models.CASCADE)
     def __str__ (self):
         return self.name
     
@@ -120,7 +142,8 @@ class userInfo(models.Model):
     downloadedEntries = models.ManyToManyField('entry',blank=True, related_name='downloadedbooks')
     viewedEntries = models.ManyToManyField('entry',  blank=True, related_name='viewedEntries')
     submittedentries = models.ManyToManyField('entry',blank=True, related_name='submittedentries')
-    
+    submittedBooks = models.ManyToManyField('book', blank=True, related_name='submittedBooks')
+    submittedAuthors = models.ManyToManyField('author', blank=True, related_name='submittedAuthors')
 
 def upload_to(instance, filename):
     return 'images/{filename}'.format(filename=filename)

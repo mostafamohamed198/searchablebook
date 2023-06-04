@@ -41,7 +41,6 @@ const handleChange = (event) => {
 <div className="LP">
 
       <div className="LP--search--div">
-
         <div className="LP--search--title">العنوان</div>
         <div className="LP--search--slogan">هذه هي الجمله التي سوف تكون تحت العنوان</div>
       <form onSubmit={handleSubmit} className="LP--searchBox">

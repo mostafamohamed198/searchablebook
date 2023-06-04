@@ -25,6 +25,7 @@ urlpatterns = [
     path('postbook/',views.BookFormViewSet.as_view()),
     path('entrybookform/', views.EntryBookFormViewSet.as_view()),
     path("entries/<int:pk>/", views.EntryDetail.as_view()),
+    path("entrieseditdata/<int:pk>/", views.EntryEditDetail.as_view()),
     path('author/<int:pk>/', views.AuthorDetail.as_view()),
     path('bookdetail/<int:pk>/', views.BookDetail.as_view()),
     path('categorydetail/<int:pk>/',views.CategoryDetail.as_view()),
@@ -43,8 +44,8 @@ urlpatterns = [
     # path("list/", views.ResultList, name="list"),
     path("userform/", views.userform, name="userform"),
     path('thepdf/<int:id>/', PDFTemplateView.as_view(template_name='frontend/thepdf.html', filename='my_pdf.pdf'), name='pdf'),
-    path('articlepdf/<int:id>/', views.resume_pdf, name="resume-pdf"),
-    # path('articlepdf/<int:id>/', views.index, name="resume-pdf"),
+    # path('articlepdf/<int:id>/', views.resume_pdf, name="resume-pdf"),
+    path('articlepdf/<int:id>/', views.get_generated_problems_in_pdf, name="resume-pdf"),
     # path('product_search/<str:query>/', views.EntryyDocumentView.as_view())
     path('catentries/<int:catid>/', views.categoriezed_entries, name='catentries'),
     path('auth_info/<int:authid>/', views.author_info),
@@ -63,7 +64,16 @@ urlpatterns = [
     # path('api/posts/', views.PostView.as_view(), name= 'posts_list'),
     path('bookform', views.formsPage, name='bookform'),
     path('entrybookform', views.formsPage, name='entrybookform'),
-     path('authorform', views.formsPage, name='authorform')
+     path('authorform', views.formsPage, name='authorform'),
+     path('editbook/<int:id>', views.index, name="editbook"),
+     path('editauthor/<int:id>', views.index, name="editauthor"),
+    #  path('theocr', views.theocr, name="theocr"),
+     path('bookchange/<int:pk>/', views.book_change.as_view(), name='bookchange'),
+     path('authorchange/<int:pk>/', views.Author_change.as_view()),
+     path('editform/<int:id>', views.index, name="editform"),
+     path('entrychange/<int:pk>/', views.Entry_change.as_view(), name='entrychange'),
+     path('adminPageLinks/', views.usersGroupPage, name="adminPage")
+    #  path('lastpdf/<int:id>/', views.get_generated_problems_in_pdf)
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

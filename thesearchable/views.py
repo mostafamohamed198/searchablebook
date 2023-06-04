@@ -1,7 +1,17 @@
 from django.shortcuts import render
 # from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from .models import *
+import functools
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
+from django.conf import settings
+from django.views.generic import DetailView
+
 from markdown2 import markdown
+from .utils import render_to_pdf
+from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
@@ -23,9 +33,18 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
 # from .utils import render_to_pdf
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
 import io
+import pytesseract
+# import  fitz
+import os
+from PIL import Image
+from docx import *
+from .forms import *
 # from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
 # from django.http import FileResponse
 # from reportlab.pdfgen import canvas
@@ -46,8 +65,9 @@ from rest_framework.authentication import TokenAuthentication
 import pdfkit
 from django.template.loader import get_template
 from django.conf import settings
-import os
+
 import json
+from io import StringIO, BytesIO
 from wkhtmltopdf.views import PDFTemplateResponse 
 # from django_elasticsearch_dsl_drf.constants import SUGGESTER_COMPLETION, SUGGESTER_PHRASE, SUGGESTER_TERM
 # from django_elasticsearch_dsl_drf.filter_backends import SearchFilterBackend, FilteringFilterBackend, SuggesterFilterBackend
@@ -67,18 +87,39 @@ from wkhtmltopdf.views import PDFTemplateResponse
 #     LOOKUP_QUERY_LTE,
     
 # )
-from elasticsearch_dsl import Q
-from django_elasticsearch_dsl_drf.filter_backends import (
-    FilteringFilterBackend,
-    FacetedSearchFilterBackend,
-    OrderingFilterBackend,
-    DefaultOrderingFilterBackend,
-    SearchFilterBackend,
-)
+
 # from elasticsearch_dsl import Q
 # from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
+def get_generated_problems_in_pdf(request,id):
+
+    # queryset
+    theEntry = entry.objects.get(id = id)
+
+    # context passed in the template
+    context = {'entry' : theEntry, 'entrybody': markdown(theEntry.body) }
+
+    # render
+    html_string = render_to_string(
+        'frontend/thepdf.html',context)
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+
+    # http response
+    response = HttpResponse(content_type='application/pdf;')
+    response['Content-Disposition'] = 'inline; filename=problem_list.pdf'
+    response['Content-Transfer-Encoding'] = 'binary'
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        output.write(result)
+        output.flush()
+        output = open(output.name, 'rb')
+        response.write(output.read())
+
+    return response
+
+
+
 def login_view(request):
     if request.method == "POST":
 
@@ -314,15 +355,27 @@ class UserInfoDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = userInfo.objects.all()
     serializer_class = UserInfoSerializer
 
+class EntryEditDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = entry.objects.all()
+    serializer_class = EntryEditFormSerializer
 
 class EntryFormViewSet(APIView):
+    # authentication_classes = [ BasicAuthentication, TokenAuthentication]
+    # permission_classes = [AllowAny]
     permission_classes = [AllowAny]
     authentication_classes = [TokenAuthentication]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, format=None):
-        serializer = EntryFormSerializer(data=request.data)
+        data = request.data
+        print('working')
+        # print(self)
+        print(request.user)
+        # data['entryClassification'] = request.data.get('entryClassification').split(",")
+        # print(data)
+        serializer = EntryFormSerializer(data=data)
         if serializer.is_valid():
+            # print(self.request.user.id)
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -335,7 +388,7 @@ class AuthorFormViewSet(APIView):
     def post(self, request, format=None):
         serializer = AuthorFormSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(submittedUser = request.user.id)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -364,7 +417,7 @@ class EntryBookFormViewSet(APIView):
         # print(theBookAuthors)
         
         # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
-        newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory)
+        newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user.id)
         
         # if newEntry.is_valid():
         # newEntry.save() 
@@ -396,13 +449,76 @@ class BookFormViewSet(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, format=None):
-        serializer = BookFormSerializer(data=request.data)
+        
+        serializer = BookFormSerializer(data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(submittedUser = request.user.id)
             
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+   
+
+class book_change(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = [TokenAuthentication]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    @csrf_exempt
+    def put (self, request, pk):
+        thebook = book.objects.get(pk =pk)
+        thedata = request.data
+        serializer = BookFormSerializer(thebook, data=thedata, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Author_change(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = [TokenAuthentication]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    @csrf_exempt
+    def put(self, request, pk):
+        theauthor = author.objects.get(pk = pk)
+        thedata = request.data
+        serializer = AuthorFormSerializer(theauthor, data=thedata, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Entry_change(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = [TokenAuthentication]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    @csrf_exempt
+    def put(self, request, pk):
+        theentry = entry.objects.get(pk = pk)
+        thedata = request.data
+        serializer = EntryFormSerializer(theentry, data= thedata, partial = True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
+# @csrf_exempt
+# @api_view(['PUT', 'DELETE'])
+# def book_change(request, pk):
+#     try:
+#         thebook = book.objects.get(pk =pk)
+#     except thebook.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
  
+#     if request.method == 'PUT':
+#         serializer = BookSerializer(thebook, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     elif request.method == 'DELETE':
+#         thebook.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
 @api_view(['GET'])
 def required_book(request, id):
     snippet = 0
@@ -527,44 +643,53 @@ class addDoorViewSet(APIView):
     #         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     #         return Response('working')
 
-wkhtml_to_pdf = os.path.join(
-    settings.BASE_DIR, "wkhtmltopdf.exe")
+# wkhtml_to_pdf = os.path.join(
+#     settings.BASE_DIR, "wkhtmltopdf.exe")
 
+wkhtml_to_pdf = os.path.join(settings.BASE_DIR,"wkhtmltopdf-0.9.9-static-amd64.tar.bz2")
+# wkhtml_to_pdf = 'C:/Users/mostafa mohamed/newsearch/searchablebooks/wkhtmltopdf.exe'
 
 def resume_pdf(request,id):
-    # return render(request, 'frontend/index.html')
-    options = {
-        'page-size': 'A4',
-        'page-height': "13in",
-        'page-width': "10in",
-        'margin-top': '0in',
-        'margin-right': '0in',
-        'margin-bottom': '0in',
-        'margin-left': '0in',
-        'encoding': "UTF-8",
-        'no-outline': None
-    }
+    buf = io.BytesIO()
 
-    template_path = 'frontend/thepdf.html'
-    template = get_template(template_path)
+    c = canvas.Canvas(buf, pagesize= letter, bottomup=0)
+    textob = c.beginText()
+    textob.setTextOrigin(inch, inch)
+    textob.setFont("Helvetica", 14)
+
+
+    # options = {
+    #     'page-size': 'A4',
+    #     'page-height': "13in",
+    #     'page-width': "10in",
+    #     'margin-top': '0in',
+    #     'margin-right': '0in',
+    #     'margin-bottom': '0in',
+    #     'margin-left': '0in',
+    #     'encoding': "UTF-8",
+    #     'no-outline': None
+    # }
+
+    # template_path = 'frontend/thepdf.html'
+    # template = get_template(template_path)
     
-    context = {"name": "Areeba Seher"}
-    html = template.render(context)
+    # context = {"name": "Areeba Seher"}
+    # html = template.render(context)
 
-    config = pdfkit.configuration(wkhtmltopdf=wkhtml_to_pdf)
+    # config = pdfkit.configuration(wkhtmltopdf=wkhtml_to_pdf)
 
-    pdf = pdfkit.from_string(html, False, configuration=config, options=options)
+    # pdf = pdfkit.from_string(html, False, configuration=config, options=options)
 
-    # Generate download
-    response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
-    theEntry = entry.objects.get(id= id)
-    context = {'entry' : theEntry, 'entrybody': markdown(theEntry.body) }
-    # print(response.status_code)
-    if response.status_code != 200:
-        return HttpResponse('We had some errors <pre>' + html + '</pre>')
-    # return response
-    return PDFTemplateResponse(request=request, cmd_options={'disable-javascript':True}, template=template, context=context)
+    # # Generate download
+    # response = HttpResponse(pdf, content_type='application/pdf')
+    # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
+    # theEntry = entry.objects.get(id= id)
+    # context = {'entry' : theEntry, 'entrybody': markdown(theEntry.body) }
+    # # print(response.status_code)
+    # if response.status_code != 200:
+    #     return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    # # return response
+    # return PDFTemplateResponse(request=request, cmd_options={'disable-javascript':True}, template=template, context=context)
 
 
 @api_view(['GET'])
@@ -603,7 +728,7 @@ def author_info(request, authid):
               
     # y = list(set(y)) 
     print(y)
-    return Response ({"name": theauthor.name, 'degree':theauthor.degree, 'about': theauthor.about,'picture':theauthor.picture.url, 'relatedEntries':x, 'categories': y})
+    return Response ({"id": theauthor.id, "name": theauthor.name, 'degree':theauthor.degree, 'about': theauthor.about,'picture':theauthor.picture.url, 'relatedEntries':x, 'categories': y})
 
 @api_view(['GET',  'DELETE'])
 def authentication_state(request):
@@ -645,7 +770,52 @@ def userform(request):
         theUserInfo.save()
         return JsonResponse({"message": "User edited successfully."}, status=201)
     
+# def theocr(request):
 
+#     form = BookForm()
+#     pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files\Tesseract-OCR\tesseract.exe"
+#     if request.method == 'POST':
+#         theform = BookForm(request.POST, request.FILES)
+#         if theform.is_valid():
+#             obj = theform.save()
+#             theform.save()
+#             print(obj.id)
+#             document = Document()
+            
+#             pdff= f'.{obj.pdf.url}'
+#             doc = fitz.open(pdff)  # open document
+#             save_to = './media/pagesfolder/'
+#             base_name, _ = os.path.splitext(os.path.basename(doc.name))
+#             directory_to_save = os.path.join(save_to, base_name)
+#             docx_title=f"{doc.name}.docx"
+#             if not os.path.exists(directory_to_save):
+#                 os.makedirs(directory_to_save)
+#             for page in doc:  # iterate through the pages
+#                 pix = page.get_pixmap()  # render page to an image
+#                 filepath_save = os.path.join(directory_to_save, str(page.number) + '-' + str(obj.id) +'-'+ str(obj.name) + '.jpg')
+#                 print(filepath_save)
+#                 pix.save(filepath_save)
+#                 results = pytesseract.image_to_string(Image.open(f'{filepath_save}'), lang='ara')
+#                 # store image as a PNG
+#                 # thepage =pages.objects.create(photo = filepath_save[8:],text = results, number = page.number)
+#                 # # firstpage.save()
+#                 # thepage.save()
+#                 document.add_paragraph(f'{results}')
+#                 document.add_page_break()
+#                 # obj.relatedpages.add(thepage)
+#             f = BytesIO()
+#             document.save(f)
+#             length = f.tell()
+#             f.seek(0)
+#             response = HttpResponse(
+#                 f.getvalue(),
+#                 content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+#             )
+#             response['Content-Disposition'] = 'attachment; filename=' + docx_title
+#             response['Content-Length'] = length
+#             return response
+#             # pages.objects.create(photo = thepic, text = results, number = page.number )
+#     return render(request, 'frontend/ocr.html', {'form': form})
 # class MyModelViewSet(viewsets.ModelViewSet):
 #     queryset = MyModel.objects.all()
 #     serializer_class = MyModelSerializer

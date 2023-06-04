@@ -33,6 +33,28 @@ class BookSerializer(serializers.ModelSerializer):
         read_only = True,
         slug_field='part_dictionary'
     )
+    bookCategory = serializers.SlugRelatedField(
+     
+        read_only = True,
+        slug_field='categories_dictionary'
+    )
+
+    bookClassification = serializers.SlugRelatedField(
+        many=True,
+        read_only = True,
+        slug_field='classification_dictionary'
+    )
+
+    author = serializers.SlugRelatedField(
+        many=True,
+        read_only = True,
+        slug_field= 'authors_dictionary'
+    )
+
+    bookOrigin = serializers.SlugRelatedField(
+        read_only = True,
+        slug_field= 'countries_dictionary'
+    )
     # relatedDoors = serializers.StringRelatedField(many=True, read_only=True)
     class Meta:
         model = book
@@ -76,6 +98,47 @@ class ClassificationSerializer(serializers.ModelSerializer):
         model = classification
         fields = '__all__'
 
+class EntryEditFormSerializer(serializers.ModelSerializer):
+    entryauthor = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='authors_dictionary'
+    )
+    entryCategory = serializers.SlugRelatedField(
+        many=False,
+        read_only = True,
+        slug_field="categories_options_dictionary"
+    )
+    entryClassification = serializers.SlugRelatedField(
+        many = True,
+        read_only = True,
+        slug_field= "classification_dictionary"
+    )
+
+    entryOrigin = serializers.SlugRelatedField(
+        many = False,
+        read_only = True,
+        slug_field= "countries_options_dictionary"
+    )
+
+    class Meta:
+        model = entry
+        fields = (
+            'id',
+            'title',
+            'body',
+            'entryOrigin',
+            'entryauthor',
+            'entryPubDate',
+            'bibiliography',
+            'entryCategory',
+            'entryClassification',
+            'entryCover',
+            'favouriteusers', 
+        )
+        
+
+
 class EntryFavourtiesSerializer(serializers.ModelSerializer):
     entryauthor = serializers.SlugRelatedField(
         many=True,
@@ -87,6 +150,12 @@ class EntryFavourtiesSerializer(serializers.ModelSerializer):
         read_only = True,
         slug_field="categories_dictionary"
     )
+    # entryClassification = serializers.SlugRelatedField(
+    #     many = True,
+    #     read_only = True,
+    #     slug_field= "classification_dictionary"
+    # )
+
     class Meta:
         model = entry
         fields = (
@@ -153,12 +222,18 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 
 class EntryFormSerializer(serializers.ModelSerializer):
-    
+    # submittedUser = serializers.HiddenField(
+    # default=serializers.CurrentUserDefault()
+    # )
     entryCover = serializers.ImageField(required=False)
     class Meta:
         model = entry
-        fields = ['title', 'body', 'entryauthor', 'entryOrigin', 'entryPubDate',  'entryCategory','bibiliography','entryCover', 'entryClassification']
-
+        fields = ['id','title', 'body', 'entryauthor', 'entryOrigin', 'entryPubDate',  'entryCategory','bibiliography','entryCover', 'entryClassification', 'submittedUser']
+    # def to_representation(self, instance):
+    #     self.fields['submittedUser'] =  UserSerializer(read_only=True)
+    #     return super(EntryFormSerializer, self).to_representation(instance)
+    # def save(self):
+    #     user =  self.context['request'].user
 class AuthorFormSerializer(serializers.ModelSerializer):
     
     picture = serializers.ImageField(required=False)
@@ -181,8 +256,7 @@ class BookFormSerializer(serializers.ModelSerializer):
                                                                                                 # publicationDate = models.DateField()
                                                                                                 # cover = models.ImageField(upload_to='bookcover')
                                                                                                 # relatedChapters = models.ManyToManyField('entry',  blank=True)
-                                                                                                # relatedParts = models.ManyToManyField('part',  blank=True)
-                                                                                                # relatedDoors = models.ManyTo
+                                                                                                # relatedParts = models.ManyToManyField('part',  blank=Tr                                                                   # relatedDoors = models.ManyTo
 # class MyModelSerializer(serializers.ModelSerializer):
 
 #     creator = serializers.ReadOnlyField(source='creator.username')

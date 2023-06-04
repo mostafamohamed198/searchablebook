@@ -5,8 +5,9 @@ import LandingPage from "./LandingPage";
 import SearchResults from "./SearchResults";
 import Author from "./Author";
 import UserInfo from "./UserInfo";
+import AdminLinks from "../administration/AdminLinks";
 import UserEdit from "./UserEdit";
-import AuthorForm from "../forms/AuthorForm";
+import AuthorForm from "../forms/submitforms/AuthorForm";
 import {
   BrowserRouter as Router,
   Route,
@@ -14,15 +15,16 @@ import {
   Link,
   Outlet
 } from "react-router-dom";
-import Form from "../forms/Form"
+import Form from "../forms/submitforms/Form"
 import PDF from "./PDF";
 import Category from "./Category";
 import Favourites from "./Favourites";
 import Users from "./Users";
-import BookForm from "../forms/BookForm";
-import EntryBookForm from "../forms/EntryBookForm";
-
-
+import FormEdit from "../forms/editForms/formedit";
+import BookForm from "../forms/submitforms/BookForm";
+import EntryBookForm from "../forms/submitforms/EntryBookForm";
+import BookEditForm from "../forms/editForms/BookEditForm";
+import AuthorEditForm from "../forms/editForms/AuthorEditForm";
 export default function HomePage() {
 
    const [isNavExpanded, setIsNavExpanded] = useState(false)
@@ -162,6 +164,11 @@ return(
           <Route path="bookform" element={<BookForm />}/>
           <Route path="entrybookform" element={<EntryBookForm />}/>
           <Route path="authorform" element={<AuthorForm />}/>
+          <Route path="editbook/:id" element={<BookEditForm />} />
+          <Route path="editauthor/:id" element={<AuthorEditForm />}/>
+          <Route path="editform/:id" element={<FormEdit />} />
+          <Route path="adminPageLinks" element={<AdminLinks />} />
+          
         </Routes>
      
       </Router>

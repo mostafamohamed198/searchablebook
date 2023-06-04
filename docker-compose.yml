@@ -43,8 +43,11 @@ services:
  
       
   web:
-    build: .
+    build: 
+      context: .
+      target: web
     command: python manage.py runserver 0.0.0.0:8000
+    
     ports:
       - "8000:8000"
     environment:
@@ -68,32 +71,20 @@ services:
     #   - es:es
     # networks:
     #   - djangonetwork
+  wkhtmltopdfimg:
+      build: 
+        context: .
+        target: wkhtmltopdfimg
 
   thesearchable:
       build: ./thesearchable
       ports:
         - "3000:3000"
-      # volumes:
-      #   - ./frontend:/frontend
-      command : npm run dev
+      volumes:
+        - ./frontend:/frontend
 
-      depends_on:
-        - web
-      restart: always
-      networks:
-      - heritage-network
-    # command : npm run dev
-    # container_name: thesearchable
-    # build:
-    #   context: ./thesearchable
-    #   dockerfile: Dockerfile
-    # ports:
-    #   - "3000:3000"
-    # stdin_open: true
-    # depends_on:
-    #   - web
-    # networks:
-    #   - heritage-network
+
+
 
 volumes:
   postgres_data:
