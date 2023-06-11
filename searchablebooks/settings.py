@@ -28,9 +28,9 @@ MEDIA_DIR = os.path.join(BASE_DIR,'media')
 SECRET_KEY = 'django-insecure-xczv7#+ow#f$nl&lycm_yl0gwvb$$c-+m+rm98-(==bzpvuy%+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # env = environ.Env()
 # environ.Env.read_env()
@@ -86,32 +86,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'searchablebooks.wsgi.application'
 
+# DEBUG = False
+
+# ALLOWED_HOSTS = ['*']
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'newwsearchablebooks',
-#         'USER': 'root',
-#         'PASSWORD': '',
-#         'HOST':'localhost',
-#         'PORT':'3306',
-#     }
-# }
-
-# DATABASES['default'] =  dj_database_url.config()
-# SECRET_KEY= env("SECRET_KEY")
 DATABASES = {
-    # 'default': {
-    #    'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'newwsearchablebooks',
-    #     'USER': 'root',
-    #     'PASSWORD': '',
-    #     'HOST':'localhost',
-    #     'PORT':'3306',
-    # },
+  
     'default': {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "postgres",
@@ -127,70 +110,11 @@ DATABASES = {
         # 'PORT': os.getenv('DB_PORT'),
     }
 }
-# DATABASES = {
-#     'default': {
-#        'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'mydatabase',
-#         'USER': 'root',
-#         'PASSWORD': 'some_password',
-#         'ROOT_PASSWORD':'some_password',
-#         'HOST':'',
-#         'PORT':'3306',
-#     }
-# }
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': 'db',
-#        'USER': '<database_username>',
-#        'PASSWORD': '<password>',
-#        'HOST': '<database_hostname_or_ip>',
-#        'PORT': '<database_port>',
-#    }
-# }
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "postgres",
-#         "USER": "postgres",
-#         "PASSWORD": "postgres",
-#         "HOST": "db",  # set in docker-compose.yml
-#         "PORT": 5432,  # default postgres port
-#     }
-# }
-
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ.get('MYSQL_DATABASE', 'mysql-db'),
-#         'USER': os.environ.get('MYSQL_USER', 'mysql-user'),
-#         'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'mysql-password'),
-#         'HOST': os.environ.get('MYSQL_DATABASE_HOST', 'db'),
-#         'PORT': os.environ.get('localhost', 3306),
-#     }
-# }
-
-# - MYSQL_DATABASE='mydatabase'
-#       - MYSQL_USER='root'
-#       - MYSQL_PASSWORD='some_password'
-#       - MYSQL_ROOT_PASSWORD='some_password'
-#       - MYSQL_HOST=''
 
 # AUTH_USER_MODEL = "thesearchable.User"
 
 AUTH_USER_MODEL = 'thesearchable.User'
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated',
-#     ),
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.SessionAuthentication',
-#     ),
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -248,14 +172,6 @@ ELASTICSEARCH_DSL = {
     },
 }
 
-# HAYSTACK_CONNECTIONS = {
-#     'default': {
-#         'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-#         'URL': 'http://127.0.0.1:9200/',
-#         'INDEX_NAME': 'entries',
-#     },
-# }
-# WKHTMLTOPDF_CMD = '/usr/local/bin/wkhtmltopdf'
 
 ELASTICSEARCH_INDEX_NAMES = {
     'entries.entry': 'entry',

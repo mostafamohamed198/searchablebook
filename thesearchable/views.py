@@ -28,8 +28,6 @@ from django.urls import reverse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import generics
 from rest_framework.views import APIView
-# from rest_framework_simplejwt.views import TokenObtainPairView
-# from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -47,52 +45,16 @@ from PIL import Image
 from docx import *
 from .forms import *
 
-from django.forms.models import model_to_dict
-# from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
-# from django.http import FileResponse
-# from reportlab.pdfgen import canvas
-# from reportlab.lib.styles import getSampleStyleSheet
-# from reportlab.lib.pagesizes import letter
-# from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer,PageBreak
-# from reportlab.lib.styles import ParagraphStyle
-# from reportlab.pdfbase import pdfmetrics
-# import reportlab
-# from reportlab.pdfbase.ttfonts import TTFont
-# from rest_framework.viewsets import ModelViewSet
-# import arabic_reshaper
-# from bidi.algorithm import get_display
+
 import io
 from rest_framework.authentication import TokenAuthentication
-# from django.http import FileResponse
-# from reportlab.pdfgen import canvas
-import pdfkit
+
 from django.template.loader import get_template
 from django.conf import settings
 
 import json
 from io import StringIO, BytesIO
 from wkhtmltopdf.views import PDFTemplateResponse 
-# from django_elasticsearch_dsl_drf.constants import SUGGESTER_COMPLETION, SUGGESTER_PHRASE, SUGGESTER_TERM
-# from django_elasticsearch_dsl_drf.filter_backends import SearchFilterBackend, FilteringFilterBackend, SuggesterFilterBackend
-# from django_elasticsearch_dsl_drf.viewsets import DocumentViewSet
-# from .documents import EntryDocument
-# from .serializers import EntryDocumentSerializer
-# from django_elasticsearch_dsl_drf.constants import (
-#     LOOKUP_FILTER_TERMS,
-#     LOOKUP_FILTER_RANGE,
-#     LOOKUP_FILTER_PREFIX,
-#     LOOKUP_FILTER_WILDCARD,
-#     LOOKUP_QUERY_IN,
-#     LOOKUP_QUERY_EXCLUDE,
-#     LOOKUP_QUERY_GT,
-#     LOOKUP_QUERY_GTE,
-#     LOOKUP_QUERY_LT,
-#     LOOKUP_QUERY_LTE,
-    
-# )
-
-# from elasticsearch_dsl import Q
-# from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
 
@@ -154,73 +116,7 @@ def get_generated_problems_in_pdf(request,id):
 
     return response
 
-# class UserRegister(APIView):
-# 	permission_classes = (permissions.AllowAny,)
-# 	def post(self, request):
-# 		clean_data = custom_validation(request.data)
-# 		serializer = UserRegisterSerializer(data=clean_data)
-# 		if serializer.is_valid(raise_exception=True):
-# 			user = serializer.create(clean_data)
-# 			if user:
-# 				return Response(serializer.data, status=status.HTTP_201_CREATED)
-# 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
-# class UserLogin(APIView):
-# 	permission_classes = (permissions.AllowAny,)
-# 	authentication_classes = (SessionAuthentication,)
-# 	##
-# 	def post(self, request):
-# 		data = request.data
-# 		assert validate_email(data)
-# 		assert validate_password(data)
-# 		serializer = UserLoginSerializer(data=data)
-# 		if serializer.is_valid(raise_exception=True):
-# 			user = serializer.check_user(data)
-# 			login(request, user)
-# 			return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# class UserLogout(APIView):
-# 	permission_classes = (permissions.AllowAny,)
-# 	authentication_classes = ()
-# 	def post(self, request):
-# 		logout(request)
-# 		return Response(status=status.HTTP_200_OK)
-
-
-# class UserView(APIView):
-# 	permission_classes = (permissions.IsAuthenticated,)
-# 	authentication_classes = (SessionAuthentication,)
-# 	##
-# 	def get(self, request):
-# 		serializer = UserSerializer(request.user)
-# 		return Response({'user': serializer.data}, status=status.HTTP_200_OK)
-
-
-def login_view(request):
-    if request.method == "POST":
-
-        # Attempt to sign user in
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-
-        # Check if authentication successful
-        if user is not None:
-            login(request, user)
-            return HttpResponseRedirect(reverse("landing"))
-        else:
-            return render(request, "frontend/login.html", {
-                "message": "Invalid username and/or password."
-            })
-    else:
-        return render(request, "frontend/login.html")
-
-
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("landing"))
 
 
 def register(request):
@@ -265,105 +161,9 @@ def authordetails(request, theauthid):
 def category(request, catid):
     return render(request, 'frontend/index.html')
 
-def entryPage(request, id):
-    if request.user.is_authenticated:
-        theUser = request.user
-        theUserProfile = userInfo.objects.get(user = theUser.id)
-        theRequestedEntry = entry.objects.get(id = id)
-        if theUserProfile.approved:
-            if theRequestedEntry.entryOrigin in theUserProfile.approvedcountries.all() and theRequestedEntry.entryCategory in theUserProfile.approvedcategories.all():
-                 return render(request, 'frontend/index.html')
-            else: 
-                return render(request, "frontend/login.html", {
-                "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-            })
-        else:
-            return render(request, "frontend/login.html", {
-                "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-            })
-    else:
-        return render(request, "frontend/login.html", {
-                "message": "يجب تسجيل الدخول بحساب مصرح له بعرض المحتوي"
-            })
+
     
-def formsPage(request):
-    if request.user.is_authenticated:
-        theUser = request.user
-        theUserProfile = userInfo.objects.get(user = theUser.id)
-        if theUserProfile.is_admin:
-            return render(request, 'frontend/index.html')
-        else:
-            return render(request, "frontend/login.html", {
-                "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-            })
-       
-    else:
-        return render(request, "frontend/login.html", {
-                "message": "يجب تسجيل الدخول بحساب مصرح له بعرض المحتوي"
-            })
-    
-def usersPage(request,id):
-    if request.user.is_authenticated:
-        if request.user.is_superuser:
-            return render(request, 'frontend/index.html')
-        else:
-            return render(request, "frontend/login.html", {
-                "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-            })
-       
-    else:
-        return render(request, "frontend/login.html", {
-                "message": "يجب تسجيل الدخول بحساب مصرح له بعرض المحتوي"
-            })
-def usersGroupPage(request):
-    if request.user.is_authenticated:
-        if request.user.is_superuser:
-            return render(request, 'frontend/index.html')
-        else:
-            return render(request, "frontend/login.html", {
-                "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-            })
-       
-    else:
-        return render(request, "frontend/login.html", {
-                "message": "يجب تسجيل الدخول بحساب مصرح له بعرض المحتوي"
-            })
-def categoryPage(request, catid):
-    if request.user.is_authenticated:
-        theUser = request.user
-        theUserProfile = userInfo.objects.get(user = theUser.id)
-        theRequestedCategory = categories.objects.get(id = catid)
-        if theUserProfile.approved:
-            if theRequestedCategory in theUserProfile.approvedcategories.all():
-                 return render(request, 'frontend/index.html')
-            else: 
-                return render(request, "frontend/login.html", {
-                "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-            })
-        else:
-            return render(request, "frontend/login.html", {
-                "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-            })
-    else:
-        return render(request, "frontend/login.html", {
-                "message": "يجب تسجيل الدخول بحساب مصرح له بعرض المحتوي"
-            })
-    
-# def resultsPage(request, stringvalue):
-#     if request.user.is_authenticated:
-#         theUser = request.user
-#         theUserProfile = userInfo.objects.get(user = theUser.id)
-#         if theUserProfile.approved:
-#             return render(request, 'frontend/index.html')
-            
-#         else:
-#             return render(request, "frontend/login.html", {
-#                 "message": "ليس مصرح لك بعرض هذا المحتوي قم بتسجيل الدخول بحساب مصرح أو قم بالتواصل مع مسئولي الموقع"
-#             })
-#     else:
-#         return render(request, "frontend/login.html", {
-#                 "message": "يجب تسجيل الدخول بحساب مصرح له بعرض المحتوي"
-#             })
+
 @api_view(['GET',  'DELETE'])
 def resultsPage(request):
     if request.user.is_authenticated:
@@ -439,20 +239,7 @@ class EntryEditDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EntryEditFormSerializer
 
 
-# @api_view(['POST'])
-# def EntryFormViewSet(request):
-#     data = request.data
-#     print('working')
-#     # print(self)
-#     print(request.user)
-#     # data['entryClassification'] = request.data.get('entryClassification').split(",")
-#     # print(data)
-#     serializer = EntryFormSerializer(data=data)
-#     if serializer.is_valid():
-#         # print(self.request.user.id)
-#         serializer.save()
-#         return Response(serializer.data,status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class EntryFormViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -749,47 +536,6 @@ class addDoorViewSet(APIView):
 wkhtml_to_pdf = os.path.join(settings.BASE_DIR,"wkhtmltopdf-0.9.9-static-amd64.tar.bz2")
 # wkhtml_to_pdf = 'C:/Users/mostafa mohamed/newsearch/searchablebooks/wkhtmltopdf.exe'
 
-def resume_pdf(request,id):
-    buf = io.BytesIO()
-
-    c = canvas.Canvas(buf, pagesize= letter, bottomup=0)
-    textob = c.beginText()
-    textob.setTextOrigin(inch, inch)
-    textob.setFont("Helvetica", 14)
-
-
-    # options = {
-    #     'page-size': 'A4',
-    #     'page-height': "13in",
-    #     'page-width': "10in",
-    #     'margin-top': '0in',
-    #     'margin-right': '0in',
-    #     'margin-bottom': '0in',
-    #     'margin-left': '0in',
-    #     'encoding': "UTF-8",
-    #     'no-outline': None
-    # }
-
-    # template_path = 'frontend/thepdf.html'
-    # template = get_template(template_path)
-    
-    # context = {"name": "Areeba Seher"}
-    # html = template.render(context)
-
-    # config = pdfkit.configuration(wkhtmltopdf=wkhtml_to_pdf)
-
-    # pdf = pdfkit.from_string(html, False, configuration=config, options=options)
-
-    # # Generate download
-    # response = HttpResponse(pdf, content_type='application/pdf')
-    # response['Content-Disposition'] = 'attachment; filename="resume.pdf"'
-    # theEntry = entry.objects.get(id= id)
-    # context = {'entry' : theEntry, 'entrybody': markdown(theEntry.body) }
-    # # print(response.status_code)
-    # if response.status_code != 200:
-    #     return HttpResponse('We had some errors <pre>' + html + '</pre>')
-    # # return response
-    # return PDFTemplateResponse(request=request, cmd_options={'disable-javascript':True}, template=template, context=context)
 
 
 @api_view(['GET'])
@@ -856,23 +602,6 @@ class putFavourites(APIView):
         return Response({"message": "bid added successfully."}, status=201)
 
 
-# @csrf_exempt
-# def putFavourites (request, id):
-#     print('recieved')
-#     if request.method == 'PUT':
-#         data = json.loads(request.body)
-#         favouriteEntry = entry.objects.get(id= id)
-#         user = request.user
-#         info = userInfo.objects.get(user= user)
-#         if data.get('fav') == True:
-#             print('true')
-#             favouriteEntry.favouriteusers.remove(user)
-#             info.favouriteEntries.remove(favouriteEntry)
-#         else: 
-#             favouriteEntry.favouriteusers.add(user)
-#             info.favouriteEntries.add(favouriteEntry)
-#             print('false')
-#     return JsonResponse({"message": "bid added successfully."}, status=201)
 
 @csrf_exempt
 def userform(request):
@@ -888,88 +617,3 @@ def userform(request):
         theUserInfo.save()
         return JsonResponse({"message": "User edited successfully."}, status=201)
     
-# def theocr(request):
-
-#     form = BookForm()
-#     pytesseract.pytesseract.tesseract_cmd = r"C:/Program Files\Tesseract-OCR\tesseract.exe"
-#     if request.method == 'POST':
-#         theform = BookForm(request.POST, request.FILES)
-#         if theform.is_valid():
-#             obj = theform.save()
-#             theform.save()
-#             print(obj.id)
-#             document = Document()
-            
-#             pdff= f'.{obj.pdf.url}'
-#             doc = fitz.open(pdff)  # open document
-#             save_to = './media/pagesfolder/'
-#             base_name, _ = os.path.splitext(os.path.basename(doc.name))
-#             directory_to_save = os.path.join(save_to, base_name)
-#             docx_title=f"{doc.name}.docx"
-#             if not os.path.exists(directory_to_save):
-#                 os.makedirs(directory_to_save)
-#             for page in doc:  # iterate through the pages
-#                 pix = page.get_pixmap()  # render page to an image
-#                 filepath_save = os.path.join(directory_to_save, str(page.number) + '-' + str(obj.id) +'-'+ str(obj.name) + '.jpg')
-#                 print(filepath_save)
-#                 pix.save(filepath_save)
-#                 results = pytesseract.image_to_string(Image.open(f'{filepath_save}'), lang='ara')
-#                 # store image as a PNG
-#                 # thepage =pages.objects.create(photo = filepath_save[8:],text = results, number = page.number)
-#                 # # firstpage.save()
-#                 # thepage.save()
-#                 document.add_paragraph(f'{results}')
-#                 document.add_page_break()
-#                 # obj.relatedpages.add(thepage)
-#             f = BytesIO()
-#             document.save(f)
-#             length = f.tell()
-#             f.seek(0)
-#             response = HttpResponse(
-#                 f.getvalue(),
-#                 content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-#             )
-#             response['Content-Disposition'] = 'attachment; filename=' + docx_title
-#             response['Content-Length'] = length
-#             return response
-#             # pages.objects.create(photo = thepic, text = results, number = page.number )
-#     return render(request, 'frontend/ocr.html', {'form': form})
-# class MyModelViewSet(viewsets.ModelViewSet):
-#     queryset = MyModel.objects.all()
-#     serializer_class = MyModelSerializer
-#     parser_classes = (MultiPartParser, FormParser)
-#     permission_classes = [
-#         permissions.IsAuthenticatedOrReadOnly]
-
-#     def perform_create(self, serializer):
-#         serializer.save(creator=self.request.user)
-
-
-# class PostView(APIView):
-#     parser_classes = (MultiPartParser, FormParser)
-
-#     def get(self, request, *args, **kwargs):
-#         posts = Post.objects.all()
-#         serializer = PostSerializer(posts, many=True)
-#         return Response(serializer.data)
-
-#     def post(self, request, *args, **kwargs):
-#         print(request.data)
-#         return Response(request.data)
-        # posts_serializer = PostSerializer(data=request.data)
-        # if posts_serializer.is_valid():
-        #     posts_serializer.save()
-        #     return Response(posts_serializer.data, status=status.HTTP_201_CREATED)
-        # else:
-        #     print('error', posts_serializer.errors)
-        #     return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-# class MyModelViewSet(viewsets.ModelViewSet):
-#     queryset = MyModel.objects.all()
-#     serializer_class = MyModelSerializer
-#     parser_classes = (MultiPartParser, FormParser)
-#     permission_classes = [
-#         permissions.IsAuthenticatedOrReadOnly]
-
-#     def perform_create(self, serializer):
-#         serializer.save(creator=self.request.user)

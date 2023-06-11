@@ -1,6 +1,7 @@
 import React from "react";
 import Pagination from 'rc-pagination';
 import { useContext } from "react";
+import { Link } from "react-router-dom";
 import AuthContext from "../authentication/AuthContext";
 export default function Favourites(){
     let {authTokens} = useContext(AuthContext)

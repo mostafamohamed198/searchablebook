@@ -153,6 +153,7 @@ nav ul li a:hover::before{
 
 .brand-name {
   text-decoration: none;
+  cursor: pointer;
   color: black;
   font-size: 1.3rem;
   padding: 6px;
@@ -3103,5 +3104,5 @@ html {
   text-decoration: underline;
   cursor: pointer;
   font-size: 14px;
-  
+
 }
