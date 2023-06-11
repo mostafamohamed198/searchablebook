@@ -4,9 +4,12 @@ import axios from 'axios';
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Checkbox } from "@material-ui/core";
 import {Route, Link, Routes, useParams} from 'react-router-dom';
+import { useContext } from 'react';
+import AuthContext from '../../authentication/AuthContext';
 
 
 export default function EntryBookEditForm(){
+  let {authTokens} = useContext(AuthContext)
     const params = useParams();
     const [values, setValues] = React.useState({})
     const [inputs, setInputs] = React.useState({part: 0});
@@ -50,8 +53,7 @@ export default function EntryBookEditForm(){
     },[bookId])
     
   const handleBookChange =(selectedOption) =>{
-    console.log('changed')
-    console.log(selectedOption.value)
+
     setBookId(selectedOption.value)
     
   }
@@ -77,7 +79,7 @@ export default function EntryBookEditForm(){
       
       }
 
-      console.log(bookId)
+   
       const { register, handleSubmit,control, watch, formState: { errors } } = useForm({});
 
       const onSubmit = (data) => {
@@ -94,10 +96,9 @@ export default function EntryBookEditForm(){
 
         })
     }).then(res => {
-              console.log(res);
+         
           }).catch(err => {
-              console.log(err.response.data);
-            // console.log('working')
+             
           })
           setFormDisplay(false)
           setSubmittedDisplay(true)

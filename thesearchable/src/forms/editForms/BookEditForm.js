@@ -6,8 +6,11 @@ import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Checkbox } from "@material-ui/core";
 import {Route, Link, Routes, useParams} from 'react-router-dom';
+import { useContext } from 'react';
+import AuthContext from '../../authentication/AuthContext';
 
 export default function BookEditForm(){
+    let {authTokens} = useContext(AuthContext)
     const params = useParams();
     const [values, setValues] = React.useState({})
    const [authorOptions, setAuthorOptions] = React.useState([]);
@@ -110,7 +113,11 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
         })
         axios.put(`/bookchange/${values.id}/`,{
             bookClassification: classArray
-        })
+        },{headers: {
+            // 'Content-Type': 'multipart/form-data',
+            'Authorization':'Bearer ' + String(authTokens.access)
+        }}
+        )
     }
     
     if (data.author != null){ 
@@ -121,9 +128,12 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
         })
         axios.put(`/bookchange/${values.id}/`,{
             author: authArray
-        })
+        }, {headers: {
+            // 'Content-Type': 'multipart/form-data',
+            'Authorization':'Bearer ' + String(authTokens.access)
+        }})
      }
-   console.log(`cover is ${data.cover[0]}`)
+   
          let form_data = new FormData();
         if (data.cover[0] != null){
          form_data.append('cover', data.cover[0], data.cover[0].name);
@@ -147,16 +157,16 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
     if(data.bookOrigin != null){
         form_data.append('bookOrigin', data.bookOrigin.value);
     }
-        console.log(form_data)
+     
             axios.put(`/bookchange/${values.id}/`, form_data, {
-              headers: {
-                  'Content-Type': 'multipart/form-data'
-              }
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization':'Bearer ' + String(authTokens.access)
+                }
           }).then(res => {
-              console.log(res.data);
+             
           }).catch(err => {
-              console.log(err.response.data);
-            console.log('working')
+             
           })
         
         //    data.containsParts?  setPartDisplay(true) : setSubmittedDisplay(true)

@@ -2,7 +2,41 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 from django.core.validators import FileExtensionValidator
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
+
+# class AppUserManager(BaseUserManager):
+# 	def create_user(self, email, password=None):
+# 		if not email:
+# 			raise ValueError('An email is required.')
+# 		if not password:
+# 			raise ValueError('A password is required.')
+# 		email = self.normalize_email(email)
+# 		user = self.model(email=email)
+# 		user.set_password(password)
+# 		user.save()
+# 		return user
+# 	def create_superuser(self, email, password=None):
+# 		if not email:
+# 			raise ValueError('An email is required.')
+# 		if not password:
+# 			raise ValueError('A password is required.')
+# 		user = self.create_user(email, password)
+# 		user.is_superuser = True
+# 		user.save()
+# 		return user
+
+
+# class AppUser(AbstractBaseUser, PermissionsMixin):
+# 	user_id = models.AutoField(primary_key=True)
+# 	email = models.EmailField(max_length=50, unique=True)
+# 	username = models.CharField(max_length=50 )
+# 	USERNAME_FIELD = 'email'
+# 	REQUIRED_FIELDS = ['username']
+# 	objects = AppUserManager()
+# 	def __str__(self):
+# 		return self.username
 
 class User(AbstractUser):
     pass
@@ -20,7 +54,7 @@ class author(models.Model):
         return self.name
     @property
     def author_dictionary(self):
-        return {'id' : self.id, 'name': self.name}
+        return {'id' : self.id, 'name': self.name, 'authorPicture': self.picture.url}
     @property
     def authors_dictionary(self):
         return {'label':self.name , 'value': self.id}
@@ -127,6 +161,10 @@ class book(models.Model):
     submittedUser = models.ForeignKey('User', null=True, blank=True, related_name='submittedBookUser', on_delete=models.CASCADE)
     def __str__ (self):
         return self.name
+    @property
+    def book_dictionary(self):
+        return {'id' : self.id, 'name': self.name, 'bookCover': self.cover.url}
+   
     
 
 

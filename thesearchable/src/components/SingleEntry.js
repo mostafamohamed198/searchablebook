@@ -2,6 +2,8 @@ import React, { Component, useRef }from "react";
 import { useState } from "react";	
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useContext } from "react";
+import AuthContext from "../authentication/AuthContext";
 import {Route, Link, Routes, useParams} from 'react-router-dom';
 import Part from "./part";
 import Door from "./Door";
@@ -22,14 +24,18 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import ReactModal from 'react-modal';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import PDF from "./PDF";
+
+import axios from "axios";
+import LoginPage from "../authentication/LoginPage";
+import { Login } from "@mui/icons-material";
 
 
 
 
 
 export default function SingleEntry (props){
-    const params = useParams();
+
+    // const params = useParams();
     const [theEntry, setTheEntry] = React.useState()
     const [theSearchedEntry, setTheSearchedEntry] = React.useState()
     const [searched, setSearched] = React.useState(false)
@@ -51,111 +57,124 @@ export default function SingleEntry (props){
     const [inFavourites ,setInFavourites] = React.useState(false)
     const [favouriteUsers , setFavouriteUsers] = React.useState([])
     const [largeWindow, setLargeWindow] = React.useState(true)
-React.useEffect(function(){
-   fetch('/authentication_state' )
-        .then(res => res.json())
-        .then(data => {
-          setAuthentication(data.authentication)
-          setRequestUser(data.userid) 
-        }) 
-   
-      
-        fetch('/entries/' + params.entryId)
-        // fetch('/entries/' + 4)
-        .then(res => res.json())
-        .then(data => {
-        setTheEntry(`${data.body}`)
-        setTheTitle(`${data.title}`)
-        setBibilography(`${data.bibiliography}`)
-        setFavouriteUsers(data.favouriteusers)
-      
-    
-      
-        data.entryauthor.map(author => {
-            fetch('/author/' + author)
-            .then(res => res.json())
-            .then(data => {
-                const newData = {
-                    'id': data.id,
-                    'name': data.name
-                }
-            
-                setAuthors(oldArray => [...oldArray, newData]);
-            })
-        })
-        }) 
-
-        fetch('/thebook/' + params.entryId)
-        .then(res => res.json())
-        .then(data => {
-        setTheBook(data.id)
-        setTheBookName(data.name)
-        setContainsDoors(data.containsDoors)
-        setContainsParts(data.containsParts)
-        if (data.containsParts && !data.containsDoors){
-          
-            data.relatedParts.map(part =>{
-                fetch('/thepart/' + part.id)
+    const [loaded, setLoaded] = React.useState(false)
+    const [entryOrigin , setEntryOrigin] = React.useState(0)
+    const [entryCategory, setEntryCategory] = React.useState(0)
+     React.useEffect(function(){
+        //    fetch('/authentication_state' )
+        //         .then(res => res.json())
+        //         .then(data => {
+        //           setAuthentication(data.authentication)
+        //           setRequestUser(data.userid) 
+        //         }) 
+           
+              
+                fetch('/entries/' + props.id)
+                // fetch('/entries/' + 4)
                 .then(res => res.json())
                 .then(data => {
-                   
-                    let newpart = {
-                        name: data.name,
-                        relatedEntries: data.relatedEntries
-                    }
-                    setParts(oldArray => [...oldArray, newpart]);
-                    
-                })
-            })
-        }
-        else if(data.containsDoors && data.containsParts){
-            data.relatedDoors.map(door =>{
-                fetch('/thedoor/' + door)
-                .then(res => res.json())
-                .then(data =>{
-                    let newDoor = {
-                        id: data.id,
-                        name: data.name,
-                        relatedParts: data.relatedParts
-                    }
-                    setDoors(oldArr => [...oldArr, newDoor]);
-                })
-            })
-        }
-        else{
-            data.relatedChapters.map(chapter => {
-                setChapters(oldAr => [...oldAr, chapter])
-            })
-        }
-       }) 
-       
-       
-     },[])
-    React.useEffect(function(){
-        fetch('/entries/' + params.entryId)
-        .then(res => res.json())
-        .then(data => {
-        setTheEntry(`${data.body}`)
-        setTheTitle(`${data.title}`)
-        setBibilography(`${data.bibiliography}`)
-        setFavouriteUsers(data.favouriteusers)})
-      setSearched(false)
- 
-
-    }, [params.entryId])
-     React.useEffect(()=>{
-        const fetchData = async () =>{
-            setInFavourites(false)
-                favouriteUsers.map(user =>{
-                    if(user == requestUser) { setInFavourites(true) }
-                })
+                setTheEntry(`${data.body}`)
+                setTheTitle(`${data.title}`)
+                setEntryCategory(data.entryCategory)
+                setEntryOrigin(data.entryOrigin)
+                setBibilography(`${data.bibiliography}`)
+                setFavouriteUsers(data.favouriteusers)
+                setLoaded(true)
             
-        }
-        fetchData()
+              
+                data.entryauthor.map(author => {
+                    fetch('/author/' + author)
+                    .then(res => res.json())
+                    .then(data => {
+                        const newData = {
+                            'id': data.id,
+                            'name': data.name
+                        }
+                    
+                        setAuthors(oldArray => [...oldArray, newData]);
+                    })
+                })
+                }) 
         
-     },[requestUser, favouriteUsers, params.entryId])
+                fetch('/thebook/' + props.id)
+                .then(res => res.json())
+                .then(data => {
+                setTheBook(data.id)
+                setTheBookName(data.name)
+                setContainsDoors(data.containsDoors)
+                setContainsParts(data.containsParts)
+                if (data.containsParts && !data.containsDoors){
+                  
+                    data.relatedParts.map(part =>{
+                        fetch('/thepart/' + part.id)
+                        .then(res => res.json())
+                        .then(data => {
+                           
+                            let newpart = {
+                                name: data.name,
+                                relatedEntries: data.relatedEntries
+                            }
+                            setParts(oldArray => [...oldArray, newpart]);
+                            
+                        })
+                    })
+                }
+                else if(data.containsDoors && data.containsParts){
+                    data.relatedDoors.map(door =>{
+                        fetch('/thedoor/' + door)
+                        .then(res => res.json())
+                        .then(data =>{
+                            let newDoor = {
+                                id: data.id,
+                                name: data.name,
+                                relatedParts: data.relatedParts
+                            }
+                            setDoors(oldArr => [...oldArr, newDoor]);
+                        })
+                    })
+                }
+                else{
+                    data.relatedChapters.map(chapter => {
+                        setChapters(oldAr => [...oldAr, chapter])
+                    })
+                }
+               }) 
+               
+               
+             },[])
+            React.useEffect(function(){
+                fetch('/entries/' + props.id)
+                .then(res => res.json())
+                .then(data => {
+                setTheEntry(`${data.body}`)
+                setTheTitle(`${data.title}`)
+                setBibilography(`${data.bibiliography}`)
+                setFavouriteUsers(data.favouriteusers)})
+              setSearched(false)
+         
+        
+            }, [props.id])
+             React.useEffect(()=>{
+                const fetchData = async () =>{
+                    setInFavourites(false)
+                        favouriteUsers.map(theuser =>{
+                            if(theuser == user.user_id) { setInFavourites(true) }
+                        })
+                    
+                }
+                fetchData()
+                
+             },[requestUser, favouriteUsers, props.id])
+           
+
+// if (loaded){
+// let {user, authTokens} = useContext(AuthContext)
+// const userApprovedCountires = user.approvedcountries
+// const userApprovedCategories = user.approvedcategories
+// if (userApprovedCategories.includes(entryCategory) && userApprovedCountires.includes(entryOrigin)){
+  
     const returnedParts = parts.map(thepart => {
-        console.log(thepart)
+        
         return (
             <Part relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )
@@ -178,7 +197,7 @@ function finalreturned(){
         return(returnedDoors)
     }
     else if (!containsDoors && containsParts){
-        console.log('containsParts')
+    
         return(returnedParts)
     }
     else {
@@ -233,7 +252,7 @@ const handleChange = (event) => {
 
   const { collapseSidebar, rtl } = useProSidebar();
 
-  const downloadLink = `/articlepdf/${params.entryId}`;
+  const downloadLink = `/articlepdf/${props.id}`;
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -266,13 +285,22 @@ const customStyles = {
 
 function changeFavourites(){
     setInFavourites(!inFavourites);
-    fetch('/putFavourites/' + params.entryId, {
-        method: 'PUT',
-        body: JSON.stringify({
-            'fav' : inFavourites
-        })
-    }
-    )   
+    // fetch('/putFavourites/' + props.id, {
+    //     method: 'PUT',
+    //     headers: {
+    //          'Authorization':'Bearer ' + String(authTokens.access)
+    //     },
+    //     body: {
+    //         'fav' : inFavourites
+    //     }
+    // }
+    // )   
+    axios.put(`/putFavourites/${props.id}`,{
+        'fav' : inFavourites
+    }, {headers: {
+        // 'Content-Type': 'multipart/form-data',
+        'Authorization':'Bearer ' + String(authTokens.access)
+    }})
 }
 
 function iconStar(){
@@ -306,7 +334,7 @@ function iconStar(){
   const theauthors = authors.map(author =>{
     const redirect = `/authordetails/${author.id}`
     return(
-        <a href={redirect} style={{textDecoration:'none', color:'#087cc4'}}><div className="SE--author">{author.name}</div></a>
+        <Link to={redirect} style={{textDecoration:'none', color:'#087cc4'}}><div className="SE--author">{author.name}</div></Link>
     )
   })
 
@@ -389,7 +417,11 @@ function iconStar(){
         </div>
 
     )
-        }
+}
+// else {
+//     return (<LoginPage />)
+//         }
 
 
-
+//     }
+// }

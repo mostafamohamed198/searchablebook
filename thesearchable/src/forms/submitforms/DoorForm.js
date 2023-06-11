@@ -5,9 +5,11 @@ import Select from 'react-select';
 import { faCirclePlus, faCircleMinus } from '@fortawesome/free-solid-svg-icons' 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { style } from "@mui/system";
-
+import { useContext } from "react";
+import AuthContext from "../../authentication/AuthContext";
 
 export default function DoorForm (props){
+  let {authTokens, logoutUser} = useContext(AuthContext)
     const [formValues, setFormValues] = React.useState([{ name: "" , relatedParts: []}])
     const [theParts , settheParts] = React.useState([])
     const [doorDisplay, setDoorDisplay] =React.useState(true)
@@ -20,12 +22,10 @@ export default function DoorForm (props){
 
         const handlePartChange =(index, choice) =>{  
             
-            console.log(index)
-            console.log(choice)
+         
             let choices = []
             choice.map(onechoice => {
-                console.log(onechoice.value)
-                choices.push(onechoice.value)
+                
             })
             let newFormValues = [...formValues];
             newFormValues[index]['relatedParts'] = choices;
@@ -81,44 +81,24 @@ export default function DoorForm (props){
       form_data.append('name', value.name);
       form_data.append('relatedParts', value.relatedParts)
       axios.post(`/adddoor/${props.id}/`, form_data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization':'Bearer ' + String(authTokens.access)
+      }
       }).then(res => {
-          console.log(res)
+    
       }).catch(err => {
-          console.log(err.response.data);
+       
       })
             })
       
      setDoorDisplay(false)
      setSubmittedDisplay(true)
 
-    // let form_data = new FormData();
-    // form_data.append('body',formValues);
-
-    // axios.post(`/adddoor/${props.id}/`, form_data, {
-    // }).then(res => {
-    //     console.log(res);
-    // }).catch(err => {
-    //     console.log(err.response.data);
-    // })
+    
   
     }
-    // let handleSubmit = (event) => {
-    //     event.preventDefault();
-    //     alert(JSON.stringify(formValues));
-    //     formValues.map(value => {
-    //       console.log (value)
- 
-    // let form_data = new FormData();
-    // form_data.append('name', value.name);
-    // form_data.append('relatedParts', value.relatedParts)
-    // axios.post(`/adddoor/${props.id}/`, form_data, {
-    // }).then(res => {
-    //     console.log(res);
-    // }).catch(err => {
-    //     console.log(err.response.data);
-    // })
-    //       })
-    // }
+   
  const styles= {
     door: {
         display: doorDisplay? 'block' : 'none'
@@ -128,7 +108,7 @@ export default function DoorForm (props){
     }
   }
 
-    console.log(formValues)
+  
     return(
         <div style={{margin:'20px'}}>
         <form style={styles.door}  onSubmit={handleSubmit}>

@@ -34,7 +34,7 @@ React.useEffect(function(){
         display : theDisplay ? 'block' : 'none'
     }
     if (props.name[0]== 'v' && props.name[1] == 'o' && props.name[2] == 'i' && props.name[3] == 'd'){
-        console.log('equalv')
+   
         return(
           
                returnedDoorParts

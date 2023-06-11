@@ -5,9 +5,12 @@ import axios from 'axios';
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Checkbox } from "@material-ui/core";
 import {Route, Link, Routes, useParams} from 'react-router-dom';
+import { useContext } from 'react';
+import AuthContext from '../../authentication/AuthContext';
 
 
 export default function FormEdit(){
+    let {authTokens} = useContext(AuthContext)
     const params = useParams();
     const [values,setValues] = React.useState({})
     const [inputs, setInputs] = React.useState({});
@@ -79,28 +82,10 @@ export default function FormEdit(){
   
     }
     
-
-  
-  const handleImageChange = (e) => {
-    console.log(e.target.files[0])
-    let image = e.target.files[0]
-    setInputs(values => ({...values,'entryCover' : image}))
-
-};
-    
-    // console.log('working')
-    const handleChange = (event) => {
-        const name = event.target.name;
-        const value = event.target.value;
-        setInputs(values => ({...values, [name]: value}))
-      
-      }
-
       const { register, handleSubmit,control, watch, formState: { errors } } = useForm({});
     
       const onSubmit = (data) => {
-        console.log(data)
-        console.log(data.entryCover.length)
+        
         if (data.entryClassification != null){
         let classArray = []
         data.entryClassification.map(option => {
@@ -108,7 +93,12 @@ export default function FormEdit(){
         })
         axios.put(`/entrychange/${values.id}/`,{
           entryClassification: classArray
-      })
+      },
+      {headers: {
+        // 'Content-Type': 'multipart/form-data',
+        'Authorization':'Bearer ' + String(authTokens.access)
+    }}
+      )
       }
 
       if (data.entryauthor != null){
@@ -118,10 +108,14 @@ export default function FormEdit(){
         })
         axios.put(`/entrychange/${values.id}/`,{
           entryauthor: authArray
-      })
+      }, 
+      {headers: {
+        // 'Content-Type': 'multipart/form-data',
+        'Authorization':'Bearer ' + String(authTokens.access)
+    }}
+      )
       }
-      console.log(data.title)
-        
+      
 
         let form_data = new FormData();
         if (data.entryCover.length != 0){
@@ -148,18 +142,18 @@ export default function FormEdit(){
         }
         axios.put(`/entrychange/${values.id}/`, form_data, {
           headers: {
-              'Content-Type': 'multipart/form-data'
+              'Content-Type': 'multipart/form-data',
+              'Authorization':'Bearer ' + String(authTokens.access)
           }
       }).then(res => {
-          console.log(res);
+     
           alert('edited')
       }).catch(err => {
-          console.log(err.response.data);
+         
           alert('error')
       })
         
-      console.log('subm')
-      console.log(form_data)
+
       setFormDisplay(false)
       setSubmittedDisplay(true)
       }

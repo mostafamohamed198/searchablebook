@@ -7,9 +7,8 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import PDF from "./PDF";
-import { PDFViewer } from '@react-pdf/renderer';
 
+import { AuthProvider } from "../authentication/AuthContext";
 
 import { ProSidebarProvider } from 'react-pro-sidebar';
 export default class App extends Component {
@@ -21,22 +20,23 @@ export default class App extends Component {
     return (
  
   <div>
-    <React.StrictMode>
+  
+   
+        <Router>
+     
+        <AuthProvider>
+        <React.StrictMode>
       <ProSidebarProvider>
       <div>
- 
         <HomePage />
       </div>
       </ProSidebarProvider>
       </React.StrictMode>
  
-      {/* <Router>
- 
-        <Routes>
-          <Route path='articlepdf/:id' element={<PDF />} />
-         </Routes>
+        </AuthProvider>
      
-      </Router> */}
+      </Router>
+      
       </div>
   
  
@@ -46,5 +46,3 @@ export default class App extends Component {
 
 const appDiv = document.getElementById("app");
 render(<App />, appDiv);
-
-    

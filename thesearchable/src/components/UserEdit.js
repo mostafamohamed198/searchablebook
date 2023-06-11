@@ -22,7 +22,7 @@ export default function UserEdit(){
             setUserEdits(data)
             setIspproved(data.approved)
             setIsAdmin(data.is_admin)
-            console.log(data)
+         
             data.approvedcategories?.map(category => {
                 newCategories.push(category.id)
             })
@@ -75,7 +75,7 @@ export default function UserEdit(){
       }
     const approvedCategories = categories.map(category =>{
         if (approvedCategoriesId.includes(category.id)){
-            console.log(category.id)
+           
             return(
                 <label>
                 <input  type="checkbox" name='theCategories' value={category.id} onChange={handleCategoriesChange} checked={true} />
@@ -97,7 +97,7 @@ export default function UserEdit(){
 
     const approvedCountries = countries.map(country =>{
         if (approvedCountriesId.includes(country.id)){
-            console.log(country.id)
+         
             return(
                 <label>
                 <input type="checkbox" value={country.id} checked={true} onClick={handleCountryChange}/>

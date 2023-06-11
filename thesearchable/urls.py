@@ -1,5 +1,9 @@
 from django.urls import path
 from . import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 from wkhtmltopdf.views import PDFTemplateView
@@ -11,6 +15,8 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [
     path('index', views.index, name='index'),
     path('layout', views.index, name='layout'),
+    path('token/', views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('pdf', views.index, name='pdf'),
     path("entries/", views.EntryList.as_view()),
     path('author/',views.AuthorList.as_view()),
@@ -32,7 +38,8 @@ urlpatterns = [
     path('userinfodetails/<int:pk>/', views.UserInfoDetail.as_view()),
     path('addpart/<int:pk>/', views.addpartViewSet.as_view(), name="addpart" ),
     path('adddoor/<int:pk>/', views.addDoorViewSet.as_view(), name="addpart" ),
-    path('entry/<int:id>/', views.entryPage, name='entry'),
+    # path('entry/<int:id>/', views.entryPage, name='entry'),
+    path('entry/<int:id>/', views.index, name='entry'),
     path('', views.landing, name='landing'),
     path('results/<str:stringvalue>/', views.results, name='results'),
     path('results/', views.landing, name='resultsw'),
@@ -49,22 +56,29 @@ urlpatterns = [
     # path('product_search/<str:query>/', views.EntryyDocumentView.as_view())
     path('catentries/<int:catid>/', views.categoriezed_entries, name='catentries'),
     path('auth_info/<int:authid>/', views.author_info),
-    path('authordetails/<int:theauthid>',views.authordetails, name='authordetails'),
-    path('category/<int:catid>',views.categoryPage, name='category'),
-    path("login/", views.login_view, name="login"),
+    path('authordetails/<int:id>',views.index, name='authordetails'),
+    path('category/<int:id>',views.index, name='category'),
+    # path("login/", views.login_view, name="login"),
+    path("login/", views.landing, name="login"),
     path("logout/", views.logout_view, name="logout"),
+    # path("logout/", views.landing, name="logout"),
     path("register/", views.register, name="register"),
     path("authentication_state", views.authentication_state, name='authentication_state'),
-    path("form", views.formsPage, name="form"),
+    # path("form", views.formsPage, name="form"),
+    path("form", views.landing, name="form"),
     path("favourites/", views.landing, name="favourites"),
-    path("putFavourites/<int:id>", views.putFavourites, name="putFavourites"),
-    path("users", views.usersGroupPage, name="users"),
-    path('userinfo/<int:id>', views.usersPage, name="userinfo"),
-    path('useredit/<int:id>', views.usersPage, name="useredits"),
+    path("putFavourites/<int:id>", views.putFavourites.as_view(), name="putFavourites"),
+    path("users", views.landing, name="users"),
+    path('userinfo/<int:id>', views.index, name="userinfo"),
+    path('useredit/<int:id>', views.index, name="useredits"),
     # path('api/posts/', views.PostView.as_view(), name= 'posts_list'),
-    path('bookform', views.formsPage, name='bookform'),
-    path('entrybookform', views.formsPage, name='entrybookform'),
-     path('authorform', views.formsPage, name='authorform'),
+    # path('bookform', views.formsPage, name='bookform'),
+    # path('entrybookform', views.formsPage, name='entrybookform'),
+    #  path('authorform', views.formsPage, name='authorform'),
+    path('bookform', views.landing, name='bookform'),
+    path('entrybookform', views.landing, name='entrybookform'),
+    path('authorform', views.landing, name='authorform'),
+     
      path('editbook/<int:id>', views.index, name="editbook"),
      path('editauthor/<int:id>', views.index, name="editauthor"),
     #  path('theocr', views.theocr, name="theocr"),
@@ -72,7 +86,8 @@ urlpatterns = [
      path('authorchange/<int:pk>/', views.Author_change.as_view()),
      path('editform/<int:id>', views.index, name="editform"),
      path('entrychange/<int:pk>/', views.Entry_change.as_view(), name='entrychange'),
-     path('adminPageLinks/', views.usersGroupPage, name="adminPage")
+     path('adminPageLinks/', views.landing, name="adminPage"),
+     path('editPageLinks/', views.landing, name="adminPage")
     #  path('lastpdf/<int:id>/', views.get_generated_problems_in_pdf)
 ]
 

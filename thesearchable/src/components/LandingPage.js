@@ -99,7 +99,7 @@ const handleChange = (event) => {
   <div>
   <FontAwesomeIcon icon={faBookOpen} className='iconsoptions'/>
 </div>
-<p class="optionheading">اضطلاع</p>
+<p class="optionheading">اطلاع</p>
 <p class="optionpar">قم بالاضطلاع علي اخر الكتب والمقالات </p>
 </div>
 

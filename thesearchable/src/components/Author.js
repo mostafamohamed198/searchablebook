@@ -26,13 +26,13 @@ export default function Author(){
             setPicture(data.picture)
             setCategories(data.categories)
         })
-    },[])
+    },[params.theauthid])
 
     const categoriesdiv = categories.map(category =>{
         const categoryid = `/category/${category.catid}`
         return(   
             <div >
-                <a href={categoryid}style={{marginLeft:'8px', color:'#087cc4'}}>{category.entryCategory}  </a>
+                <Link to={categoryid}style={{marginLeft:'8px', color:'#087cc4'}}>{category.entryCategory}  </Link>
             </div>
         )
     })
@@ -88,7 +88,7 @@ export default function Author(){
                                     </div>
                                     <div className="Au--entry--info">
                                     <p className="SR--category" style={{textDecoration:'none', color:'rgb(103, 103, 103)', fontWeight:'400'}}>{data.entryCategory.thecategory}</p>
-                                        <a href={direct} style={{textDecoration:'none', color:'#087cc4'}}><div>{data.title}</div></a>
+                                        <Link to={direct} style={{textDecoration:'none', color:'#087cc4'}}><div>{data.title}</div></Link>
                                         <div style={{fontSize:'14px', color:'rgb(103, 103, 103)'}} className="SR--pubdate">
                                         <p className="SR--pubdate--title">تاريخ الإصدار:</p >
                                         <div >{data.entryPubDate}</div>

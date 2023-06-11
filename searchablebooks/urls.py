@@ -19,21 +19,14 @@ from rest_framework import routers
 # from thesearchable.views import EntryDocumentView
 from rest_framework import routers
 from django.conf import settings
+
 from django.conf.urls.static import static
-# from rest_framework_simplejwt import views as jwt_views
-# router = routers.SimpleRouter(trailing_slash=False)
-# router.register(r'entry-search', EntryDocumentView, basename='entry-search')
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('thesearchable.urls')),
-    # path('token/', 
-    #       jwt_views.TokenObtainPairView.as_view(), 
-    #       name ='token_obtain_pair'),
-    #  path('token/refresh/', 
-    #       jwt_views.TokenRefreshView.as_view(), 
-    #       name ='token_refresh')
+     path('markdownx/', include('markdownx.urls')),
    
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

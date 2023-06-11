@@ -63,28 +63,8 @@ services:
     networks:
       - elastic
       - heritage-network
-      # - postdata
-    # env_file:
-    #   - ./searchablebooks/.env
+
   
-    # links:
-    #   - es:es
-    # networks:
-    #   - djangonetwork
-  wkhtmltopdfimg:
-      build: 
-        context: .
-        target: wkhtmltopdfimg
-
-  thesearchable:
-      build: ./thesearchable
-      ports:
-        - "3000:3000"
-      volumes:
-        - ./frontend:/frontend
-
-
-
 
 volumes:
   postgres_data:
@@ -94,8 +74,3 @@ networks:
     driver: bridge
   heritage-network:
     driver: bridge
-  # postdata:
-  #   driver: bridge
-# networks:
-#       djangonetwork:
-#           driver: bridge

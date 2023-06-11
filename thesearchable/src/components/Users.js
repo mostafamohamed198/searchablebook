@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Users(){
     const [users, setUsers] = React.useState([])
@@ -14,7 +15,7 @@ export default function Users(){
         const userUrl = `/userinfo/${user.user.id}`
         return(
             <tr>
-                <td className="Users--td"><a href={userUrl}> {user.user.username}</a></td>
+                <td className="Users--td"><Link to={userUrl}> {user.user.username}</Link></td>
                 <td className="Users--td">{user.user.id}</td>
                 <td className="Users--td">{user.user.email}</td>
             </tr>

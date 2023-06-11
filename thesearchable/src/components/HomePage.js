@@ -1,25 +1,32 @@
 import React, { Component } from "react";
-import SingleEntry from "./SingleEntry";
 import { useState, useEffect } from "react";
 import LandingPage from "./LandingPage";
 import SearchResults from "./SearchResults";
 import Author from "./Author";
-import UserInfo from "./UserInfo";
 import AdminLinks from "../administration/AdminLinks";
 import UserEdit from "./UserEdit";
+import UserInfoPrivateRoute from "../utils/UserInfoPrivateRoute";
+import AdminPrivateRoute from "../utils/AdminPrivateRoute";
+import CategoryPrivateRoute from "../utils/CategoryPrivateRoute";
+import LoginPage from "../authentication/LoginPage";
 import AuthorForm from "../forms/submitforms/AuthorForm";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
   Link,
-  Outlet
+  Outlet,
+  useLocation
 } from "react-router-dom";
+import EntryPrivateRoute from "../utils/EntryPrivateRoute";
+import  AuthContext  from "../authentication/AuthContext";
+import PrivateRoute from "../utils/PrivateRoute";
 import Form from "../forms/submitforms/Form"
-import PDF from "./PDF";
-import Category from "./Category";
+
 import Favourites from "./Favourites";
+import EditLinks from "../administration/EditLinks";
 import Users from "./Users";
+import FormsPrivateRoute from "../utils/FormsPrivateRoute";
 import FormEdit from "../forms/editForms/formedit";
 import BookForm from "../forms/submitforms/BookForm";
 import EntryBookForm from "../forms/submitforms/EntryBookForm";
@@ -36,35 +43,37 @@ React.useEffect(function(){
     setAuthentication(data.authentication)     
   })
 },[])
+let {user, logoutUser} = React.useContext(AuthContext)
+const location = useLocation();
 
 function favouriteButton(){
-  if (authentication){
+  if (user){
     return(
       <li>
-            <a href="/favourites">المفضلة</a>
+            <Link to="/favourites">المفضلة</Link>
             {/* <Link to="/favourites">المفضلة</Link> */}
           </li>
     )
   }
 }
+// let {user, logoutUser} = useContext(AuthContext)
 
 function authenticationButtons (){
-  if (authentication){
+  
+  if (user){
     return(
-      <a href="/logout" className="brand-name">
-      تسجيل الخروج 
-    </a>
+      // <p className="brand-name" >Logout</p>
+
+      <p className="brand-name" onClick={logoutUser}>تسجيل الخروج</p>
+
     )
   }
   else{
 return(
     <div>
       
-      <a href="/login" className="brand-name">
-        <span>
-           تسجيل الدخول.  
-         </span>
-      </a>
+
+      <Link to="/login"className='brand-name' > تسجيل الدخول.</Link>
 
       <a href="/register" className="brand-name">
         <span>
@@ -75,17 +84,15 @@ return(
     )
   }
 }
-  
+const requiresAuthentication = location.pathname !== "/login";
+
     return (
 
-        <div className="container">
-            
-    
-        
+        <div className="container">    
             <div className="logoandtitle">
-             <a href="/" className="brand-name">
+             <Link to="/" className="brand-name">
         العنوان واللوجو 
-      </a>
+      </Link>
       </div>
             <nav className="navigation">
             <button
@@ -120,23 +127,23 @@ return(
         <div className="dropdown">
             <span className="dropdown-title"> كتب قانونية و موسوعات</span> <i class="fa-solid fa-angle-down"></i>
             <div className="dropdown-content">
-              <a href="/category/1"><p className="dropdown-element">كتب قانونية</p></a>
-              {/* <Link to="/category/4"><p className="dropdown-element">aكتب قانونية</p></Link> */}
-              <a href="/category/2"><p className="dropdown-element"> موسوعات</p></a>
+              <Link to="/category/1"><p className="dropdown-element">كتب قانونية</p></Link>
+
+              <Link to="/category/2"><p className="dropdown-element"> موسوعات</p></Link>
             </div>
           </div>
           </li>
     
           <li>
-            <a href="/category/4">مجلات قانونية</a>
+            <Link to="/category/4">مجلات قانونية</Link>
           </li>
 
           <li>
           <div className="dropdown">
             <span className="dropdown-title">رسائل</span> <i class="fa-solid fa-angle-down"></i>
             <div className="dropdown-content">
-            <a href="/category/5"><p className="dropdown-element">رسائل ماجستير</p></a>
-              <a href="/category/3"><p className="dropdown-element"> رسائل دكتوراه</p></a>
+            <Link to="/category/5"><p className="dropdown-element">رسائل ماجستير</p></Link>
+              <Link to="/category/3"><p className="dropdown-element"> رسائل دكتوراه</p></Link>
             </div>
           </div>
           </li>
@@ -146,35 +153,41 @@ return(
 
      
         </nav>
-      
-        <Router>
-    
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path='/entry/:entryId' element={<SingleEntry  />}/>
-          <Route path='results/:resultvalue' element={<SearchResults />} />
-          <Route path='authordetails/:theauthid' element={<Author />} />
-          <Route path='articlepdf/:id' element={<PDF />} />
-          <Route path='category/:catid' element={<Category />} />
-          <Route path="form" element={<Form />} />
-          <Route path="favourites" element={<Favourites />} />
-          <Route path='users' element={<Users />}/>
-          <Route path="userinfo/:id" element={<UserInfo />} />
-          <Route path="useredit/:id" element={<UserEdit />} />
-          <Route path="bookform" element={<BookForm />}/>
-          <Route path="entrybookform" element={<EntryBookForm />}/>
-          <Route path="authorform" element={<AuthorForm />}/>
-          <Route path="editbook/:id" element={<BookEditForm />} />
-          <Route path="editauthor/:id" element={<AuthorEditForm />}/>
-          <Route path="editform/:id" element={<FormEdit />} />
-          <Route path="adminPageLinks" element={<AdminLinks />} />
-          
+
+        <Routes> 
+            <Route exact  element={<PrivateRoute/>}>
+                <Route path='results/:resultvalue' element={<SearchResults />} />
+                <Route path='authordetails/:theauthid' element={<Author />} />
+                <Route path="favourites" element={<Favourites />} />
+            </Route> 
+            <Route path='/entry/:entryId' element={<EntryPrivateRoute  />}/>
+            <Route  path="/" element={<LandingPage />} />
+            <Route  path="/login" element={<LoginPage />} />
+            <Route path='category/:id' element={<CategoryPrivateRoute />} />
+            
+            <Route exact  element={<AdminPrivateRoute/>}>
+                <Route path='users' element={<Users />}/>
+                <Route path="useredit/:id" element={<UserEdit />} />
+                <Route path="adminPageLinks" element={<AdminLinks />} />
+            </Route>
+            <Route exact  element={<FormsPrivateRoute />}>
+                <Route path="bookform" element={<BookForm />}/>
+                <Route path="entrybookform" element={<EntryBookForm />}/>
+                <Route path="authorform" element={<AuthorForm />}/>
+                <Route path="form" element={<Form />} />
+                <Route path="editbook/:id" element={<BookEditForm />} />
+                <Route path="editauthor/:id" element={<AuthorEditForm />}/>
+                <Route path="editform/:id" element={<FormEdit />} />
+                <Route path="editPageLinks" element={<EditLinks />} />
+            </Route>
+            <Route path="userinfo/:id" element={<UserInfoPrivateRoute />} />
+
+
+            
         </Routes>
-     
-      </Router>
-      
-      <Outlet />
+    
       </div >
     );
   }
+
 

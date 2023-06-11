@@ -3,10 +3,13 @@ import React from "react";
 import Select from 'react-select';
 import axios from "axios";
 import PartForm from "./PartForm";
+import { useContext } from "react";
+import AuthContext from "../../authentication/AuthContext";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Checkbox } from "@material-ui/core";
 
 export default function BookForm(){
+    let {authTokens, logoutUser} = useContext(AuthContext)
    const [authorOptions, setAuthorOptions] = React.useState([]);
     const [classificationOptions, setClassificationOptions] = React.useState([])
     const [entryClass, setEntryClass] =React.useState([])
@@ -83,7 +86,7 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
 
 
           const onSubmit= (data) => {
-            console.log(data)
+         
             // event.preventDefault()
 
         let classArray = []
@@ -106,29 +109,32 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
         form_data.append('bookCategory', data.bookCategory.value);
         // form_data.append('bookClassification', classArray);
         form_data.append('bookOrigin', data.bookOrigin.value);
-        console.log(form_data)
+ 
             axios.post('/postbook/', form_data, {
               headers: {
-                  'Content-Type': 'multipart/form-data'
+                  'Content-Type': 'multipart/form-data',
+                  'Authorization':'Bearer ' + String(authTokens.access)
               }
           })
         
           
           .then(res => {
-              console.log(res.data);
+           
               setId(res.data.id)
             //   .then(
                 axios.put(`/bookchange/${res.data.id}/`,{
                   bookClassification: classArray,
                   author: authArray
-              }
+              },{
+              headers: {
+                  'Authorization':'Bearer ' + String(authTokens.access)
+            }}
           
             //   )
        )
 
           }).catch(err => {
-              console.log(err.response.data);
-            console.log('working')
+          
           })
         
         

@@ -8,7 +8,8 @@ from weasyprint import HTML
 import tempfile
 from django.conf import settings
 from django.views.generic import DetailView
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 from markdown2 import markdown
 from .utils import render_to_pdf
 from django.views.generic import View
@@ -45,6 +46,8 @@ import os
 from PIL import Image
 from docx import *
 from .forms import *
+
+from django.forms.models import model_to_dict
 # from django_elasticsearch_dsl_drf.pagination import PageNumberPagination
 # from django.http import FileResponse
 # from reportlab.pdfgen import canvas
@@ -92,13 +95,46 @@ from wkhtmltopdf.views import PDFTemplateResponse
 # from rest_framework_simplejwt.tokens import RefreshToken
 
 # Create your views here.
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        theuserInfo = userInfo.objects.get(user = user)
+        print(theuserInfo.approvedcategories.all())
+       
+        countriesArray = []
+        categoriesArray = []
+        for country in theuserInfo.approvedcountries.all():
+            countriesArray.append(country.id)
+        for category in theuserInfo.approvedcategories.all():
+            categoriesArray.append(category.id)
+        # Add custom claims
+        
+        token['username'] = user.username
+        token['superuser'] = user.is_superuser
+        token['approvedcountries'] = countriesArray
+        token['approvedcategories'] = categoriesArray
+        token['is_admin'] =theuserInfo.is_admin
+        token['approved'] =theuserInfo.approved
+        # ...
+
+        return token
+    
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
+
 def get_generated_problems_in_pdf(request,id):
 
     # queryset
     theEntry = entry.objects.get(id = id)
 
     # context passed in the template
-    context = {'entry' : theEntry, 'entrybody': markdown(theEntry.body) }
+    # context = {'entry' : theEntry, 'entrybody': markdown(theEntry.body) }
+    context = {'entry' : theEntry, 'entrybody': theEntry.body }
+    # return render(request, "frontend/thepdf.html", context)
 
     # render
     html_string = render_to_string(
@@ -118,6 +154,48 @@ def get_generated_problems_in_pdf(request,id):
 
     return response
 
+# class UserRegister(APIView):
+# 	permission_classes = (permissions.AllowAny,)
+# 	def post(self, request):
+# 		clean_data = custom_validation(request.data)
+# 		serializer = UserRegisterSerializer(data=clean_data)
+# 		if serializer.is_valid(raise_exception=True):
+# 			user = serializer.create(clean_data)
+# 			if user:
+# 				return Response(serializer.data, status=status.HTTP_201_CREATED)
+# 		return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# class UserLogin(APIView):
+# 	permission_classes = (permissions.AllowAny,)
+# 	authentication_classes = (SessionAuthentication,)
+# 	##
+# 	def post(self, request):
+# 		data = request.data
+# 		assert validate_email(data)
+# 		assert validate_password(data)
+# 		serializer = UserLoginSerializer(data=data)
+# 		if serializer.is_valid(raise_exception=True):
+# 			user = serializer.check_user(data)
+# 			login(request, user)
+# 			return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# class UserLogout(APIView):
+# 	permission_classes = (permissions.AllowAny,)
+# 	authentication_classes = ()
+# 	def post(self, request):
+# 		logout(request)
+# 		return Response(status=status.HTTP_200_OK)
+
+
+# class UserView(APIView):
+# 	permission_classes = (permissions.IsAuthenticated,)
+# 	authentication_classes = (SessionAuthentication,)
+# 	##
+# 	def get(self, request):
+# 		serializer = UserSerializer(request.user)
+# 		return Response({'user': serializer.data}, status=status.HTTP_200_OK)
 
 
 def login_view(request):
@@ -323,6 +401,7 @@ class UsersList(generics.ListCreateAPIView):
     serializer_class = UserInfoSerializer
 
 class FavouriteEntries(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, format=None):
         requestedUser = request.user
         desiredEntries =  entry.objects.filter(favouriteusers__in = [requestedUser.id])
@@ -359,80 +438,97 @@ class EntryEditDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = entry.objects.all()
     serializer_class = EntryEditFormSerializer
 
+
+# @api_view(['POST'])
+# def EntryFormViewSet(request):
+#     data = request.data
+#     print('working')
+#     # print(self)
+#     print(request.user)
+#     # data['entryClassification'] = request.data.get('entryClassification').split(",")
+#     # print(data)
+#     serializer = EntryFormSerializer(data=data)
+#     if serializer.is_valid():
+#         # print(self.request.user.id)
+#         serializer.save()
+#         return Response(serializer.data,status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class EntryFormViewSet(APIView):
-    # authentication_classes = [ BasicAuthentication, TokenAuthentication]
-    # permission_classes = [AllowAny]
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, format=None):
         data = request.data
-        print('working')
-        # print(self)
-        print(request.user)
-        # data['entryClassification'] = request.data.get('entryClassification').split(",")
-        # print(data)
         serializer = EntryFormSerializer(data=data)
-        if serializer.is_valid():
-            # print(self.request.user.id)
-            serializer.save()
+        theuserInfo = userInfo.objects.get(user = request.user)
+        if serializer.is_valid() and theuserInfo.is_admin is True:
+            serializer.save(submittedUser = request.user)
+            serializerData = serializer.data['id']
+            theuserInfo.submittedentries.add(int(serializerData))
+            theuserInfo.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class AuthorFormViewSet(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, format=None):
         serializer = AuthorFormSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(submittedUser = request.user.id)
+        theuserInfo = userInfo.objects.get(user = request.user)
+        if serializer.is_valid() and theuserInfo.is_admin is True:
+            serializer.save(submittedUser = request.user)
+            serializerData = serializer.data['id']
+            theuserInfo.submittedAuthors.add(int(serializerData))
+            theuserInfo.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EntryBookFormViewSet(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, format=None):
         print('working')
         data = json.loads(request.body)
-        title = data.get('title')
-        body = data.get('body')
-        bibliography = data.get('bibiliography')
-        bookId = data.get('book')
-        partId = data.get('part')
-        
-        theBook = book.objects.get(id = int(bookId))
-        print(theBook.bookOrigin.id)
-        theBookOrigin = theBook.bookOrigin
-        theBookCategory = theBook.bookCategory
-        theBookClassification = theBook.bookClassification.all()
-        theBookCover = theBook.cover.url[6:]
-        print (theBookCover[6:])
-        theBookAuthors = theBook.author.all()
-        # print(theBookAuthors)
-        
-        # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
-        newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user.id)
-        
-        # if newEntry.is_valid():
-        # newEntry.save() 
-        newEntry.entryauthor.set(theBookAuthors)
-        # newEntry.entryCover = theBookCover
-        newEntry.entryClassification.set(theBookClassification)
-        newEntry.save()
-        if int(partId) != 0:
-            thePart = part.objects.get(id = int(partId))
-            thePart.relatedEntries.add(newEntry)
-            thePart.save()
-        theBook.relatedChapters.add(newEntry)
-        theBook.save()
-        return Response(data,status=status.HTTP_201_CREATED)
-                                                                                                    
+        theuserInfo = userInfo.objects.get(user = request.user)
+        if theuserInfo.is_admin is True:
+            title = data.get('title')
+            body = data.get('body')
+            bibliography = data.get('bibiliography')
+            bookId = data.get('book')
+            partId = data.get('part')
+            theBook = book.objects.get(id = int(bookId))
+            print(theBook.bookOrigin.id)
+            theBookOrigin = theBook.bookOrigin
+            theBookCategory = theBook.bookCategory
+            theBookClassification = theBook.bookClassification.all()
+            theBookCover = theBook.cover.url[6:]
+            print (theBookCover[6:])
+            theBookAuthors = theBook.author.all()
+            # print(theBookAuthors)
+            
+            # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
+            newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user)
+            
+            # if newEntry.is_valid():
+            # newEntry.save() 
+            newEntry.entryauthor.set(theBookAuthors)
+            # newEntry.entryCover = theBookCover
+            newEntry.entryClassification.set(theBookClassification)
+            newEntry.save()
+            if int(partId) != 0:
+                thePart = part.objects.get(id = int(partId))
+                thePart.relatedEntries.add(newEntry)
+                thePart.save()
+            theBook.relatedChapters.add(newEntry)
+            theBook.save()
+            print(newEntry.id)
+            theuserInfo.submittedentries.add(int(newEntry.id))
+            theuserInfo.save()
+            return Response(data,status=status.HTTP_201_CREATED)
+        return Response(data,status=status.HTTP_400_BAD_REQUEST)
         # return Response(newEntry.errors, status=status.HTTP_400_BAD_REQUEST)                                                                                                
                                                                                                               
                                                                                                             
@@ -444,80 +540,87 @@ class EntryBookFormViewSet(APIView):
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class BookFormViewSet(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def post(self, request, format=None):
         
         serializer = BookFormSerializer(data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save(submittedUser = request.user.id)
-            
+        theuserInfo = userInfo.objects.get(user = request.user)
+        if serializer.is_valid() and theuserInfo.is_admin is True:
+            serializer.save(submittedUser = request.user)
+            serializerData = serializer.data['id']
+            theuserInfo.submittedBooks.add(int(serializerData))
+            theuserInfo.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
    
 
 class book_change(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put (self, request, pk):
+        theuserInfo = userInfo.objects.get(user = request.user)
         thebook = book.objects.get(pk =pk)
         thedata = request.data
         serializer = BookFormSerializer(thebook, data=thedata, partial=True)
-        if serializer.is_valid():
+        if serializer.is_valid() and theuserInfo.is_admin is True:
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    @csrf_exempt
+    def delete(self, request, pk, format=None):
+        theuserInfo = userInfo.objects.get(user = request.user)
+        if theuserInfo.is_admin is True:
+            thebook = book.objects.get(pk =pk)
+            thebook.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'messege' : 'cannot delete it'})
 class Author_change(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put(self, request, pk):
+        theuserInfo = userInfo.objects.get(user = request.user)
         theauthor = author.objects.get(pk = pk)
         thedata = request.data
         serializer = AuthorFormSerializer(theauthor, data=thedata, partial=True)
-        if serializer.is_valid():
+        if serializer.is_valid() and theuserInfo.is_admin is True:
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    @csrf_exempt
+    def delete(self, request, pk, format=None):
+        theuserInfo = userInfo.objects.get(user = request.user)
+        if theuserInfo.is_admin is True:
+            theauthor = author.objects.get(pk = pk)
+            theauthor.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'messege' : 'cannot delete it'})
+        
 class Entry_change(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put(self, request, pk):
         theentry = entry.objects.get(pk = pk)
         thedata = request.data
+        theuserInfo = userInfo.objects.get(user = request.user)
         serializer = EntryFormSerializer(theentry, data= thedata, partial = True)
-        if serializer.is_valid():
+        if serializer.is_valid() and theuserInfo.is_admin is True:
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
-# @csrf_exempt
-# @api_view(['PUT', 'DELETE'])
-# def book_change(request, pk):
-#     try:
-#         thebook = book.objects.get(pk =pk)
-#     except thebook.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
- 
-#     if request.method == 'PUT':
-#         serializer = BookSerializer(thebook, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     elif request.method == 'DELETE':
-#         thebook.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+    @csrf_exempt
+    def delete(self, request, pk, format=None):
+        theentry = entry.objects.get(pk = pk)
+        theuserInfo = userInfo.objects.get(user = request.user)
+        if theuserInfo.is_admin is True:
+            theentry.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'messege' : 'cannot delete it'})
+          
 
 @api_view(['GET'])
 def required_book(request, id):
@@ -566,27 +669,25 @@ def required_chapter(request, idddd):
         serializer = EntrySerializer(thechapter)
         return Response(serializer.data)
 
-class addpartViewSet(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
-    @csrf_exempt
-    def post(self, request, pk, format=None):
-        serializer = PartSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            first_value = list(serializer.data.values())[0]
-            print(first_value)
-            relatedbook = book.objects.get(id=pk)
-            relatedbook.relatedParts.add(first_value)
-            relatedbook.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class addpartViewSet(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser] @csrf_exempt
+#     @csrf_exempt
+#     def post(self, request, pk, format=None):
+#         serializer = PartSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             first_value = list(serializer.data.values())[0]
+#             print(first_value)
+#             relatedbook = book.objects.get(id=pk)
+#             relatedbook.relatedParts.add(first_value)
+#             relatedbook.save()
+#             return Response(serializer.data,status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
  
 class addpartViewSet(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def post(self, request, pk, format=None):
         serializer = PartSerializer(data=request.data)
@@ -604,9 +705,8 @@ class addpartViewSet(APIView):
     
 
 class addDoorViewSet(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = [TokenAuthentication]
-    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def post(self, request, pk, format=None):
         print(request.data)
@@ -737,24 +837,42 @@ def authentication_state(request):
     else:
         return Response ({"authentication" : False})
 
-
-@csrf_exempt
-def putFavourites (request, id):
-    print('recieved')
-    if request.method == 'PUT':
-        data = json.loads(request.body)
+class putFavourites(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
+    @csrf_exempt
+    def put(self, request, id):
+        data = request.data
         favouriteEntry = entry.objects.get(id= id)
         user = request.user
         info = userInfo.objects.get(user= user)
-        if data.get('fav') == True:
-            print('true')
+        if data['fav'] == True:
             favouriteEntry.favouriteusers.remove(user)
             info.favouriteEntries.remove(favouriteEntry)
         else: 
             favouriteEntry.favouriteusers.add(user)
             info.favouriteEntries.add(favouriteEntry)
-            print('false')
-    return JsonResponse({"message": "bid added successfully."}, status=201)
+            
+        return Response({"message": "bid added successfully."}, status=201)
+
+
+# @csrf_exempt
+# def putFavourites (request, id):
+#     print('recieved')
+#     if request.method == 'PUT':
+#         data = json.loads(request.body)
+#         favouriteEntry = entry.objects.get(id= id)
+#         user = request.user
+#         info = userInfo.objects.get(user= user)
+#         if data.get('fav') == True:
+#             print('true')
+#             favouriteEntry.favouriteusers.remove(user)
+#             info.favouriteEntries.remove(favouriteEntry)
+#         else: 
+#             favouriteEntry.favouriteusers.add(user)
+#             info.favouriteEntries.add(favouriteEntry)
+#             print('false')
+#     return JsonResponse({"message": "bid added successfully."}, status=201)
 
 @csrf_exempt
 def userform(request):

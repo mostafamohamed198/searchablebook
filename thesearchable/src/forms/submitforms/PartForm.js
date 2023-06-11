@@ -4,9 +4,11 @@ import axios from "axios";
 import DoorForm from "./DoorForm";
 import { faCirclePlus, faCircleMinus } from '@fortawesome/free-solid-svg-icons' 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
+import { useContext } from "react";
+import AuthContext from "../../authentication/AuthContext";
 
 export default function PartForm (props){
+  let {authTokens, logoutUser} = useContext(AuthContext)
     const [formValues, setFormValues] = React.useState([{ name: ""}])
     const [newParts, setNewParts] = React.useState([])
     const [doorDisplay, setDoorDisplay] = React.useState(false)
@@ -48,12 +50,16 @@ export default function PartForm (props){
     let form_data = new FormData();
     form_data.append('name', value.name);
     axios.post(`/addpart/${props.id}/`, form_data, {
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer ' + String(authTokens.access)
+    }
     }).then(res => {
       
         const thePart = {value: res.data.id, label: res.data.name, selected: false}
         setNewParts(oldArray => [...oldArray, thePart])
     }).catch(err => {
-        console.log(err.response.data);
+        alert('error')
     })
           })
           alert('posted');

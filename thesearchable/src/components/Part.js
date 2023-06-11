@@ -1,27 +1,4 @@
-// import React from "react";
-// import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
-// export default function Part(props){
-//     const [displayEntry, setDisplayEntry] = React.useState(false)
-//     const entry = props.relatedEntries.map(theentry => {
-//         return(
-//             <div>{theentry}</div>
-//         )
-//     })
-//     function clickPart(){
-//         setDisplayEntry(!displayEntry)
-//     }
 
-//     const styles = {
-//         display: displayEntry ? 'block': 'none'
-//     }
- 
-//        return(
-//         <div >
-//             <div className="Part--name" onClick={clickPart} >{props.name}</div>
-//             <div className="Part--entry" style={styles}>{entry}</div>
-//         </div>
-//        )
-// }
 
 import React from "react";
 import {Route, Link, Router, Routes, useParams} from 'react-router-dom';
@@ -56,9 +33,9 @@ export default function Part(props){
         display: displayEntry ? 'block': 'none'
     }
     const partName = `${props.name}`
-    console.log(partName)
+
     if (props.name[0]== 'v' && props.name[1] == 'o' && props.name[2] == 'i' && props.name[3] == 'd'){
-        console.log('equalv')
+
         return(
             <div>
                 {entry}

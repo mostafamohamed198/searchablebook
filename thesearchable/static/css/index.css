@@ -2992,3 +2992,116 @@ html {
   width:400px;
   height: 500px;
 }
+
+
+/* style of LoginPage.js */
+
+
+.loginPage ::selection{
+  background: #087cc4;
+}
+.loginPage .container{
+  max-width: 440px;
+  padding: 0 20px;
+  margin: 170px auto;
+}
+.loginPage  .wrapper{
+  max-width: 440px;
+  /* padding: 0 20px; */
+  background: #fff;
+  margin: 170px auto;
+  border-radius: 5px;
+  box-shadow: 0px 4px 10px 1px rgba(0,0,0,0.1);
+}
+.loginPage  .wrapper .title{
+  height: 90px;
+  background: #087cc4;
+  border-radius: 5px 5px 0 0;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+}
+.loginPage  .wrapper form{
+  padding: 30px 25px 25px 25px;
+}
+.loginPage  .wrapper form .row{
+  height: 45px;
+  margin-bottom: 15px;
+  position: relative;
+}
+.loginPage .wrapper form .row input{
+  height: 100%;
+  width: 100%;
+  outline: none;
+  padding-right: 60px;
+  border-radius: 5px;
+  border: 1px solid lightgrey;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+.loginPage  form .row input:focus{
+  border-color: #087cc4;
+  box-shadow: inset 0px 0px 2px 2px rgba(26,188,156,0.25);
+}
+.loginPage  form .row input::placeholder{
+  color: #999;
+}
+.loginPage  .wrapper form .row i{
+  position: absolute;
+  width: 47px;
+  height: 100%;
+  color: #fff;
+  font-size: 18px;
+  background: #087cc4;
+  border: 1px solid #087cc4;
+  border-radius: 0 5px 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loginPage  .wrapper form .pass{
+  margin: -8px 0 20px 0;
+}
+.loginPage .wrapper form .pass a{
+  color: #087cc4;
+  font-size: 17px;
+  text-decoration: none;
+}
+.loginPage .wrapper form .pass a:hover{
+  text-decoration: underline;
+}
+.loginPage .wrapper form .button input{
+  color: #fff;
+  font-size: 20px;
+  font-weight: 500;
+  padding-right: 0px;
+  background: #087cc4;
+  border: 1px solid #087cc4;
+  cursor: pointer;
+}
+.loginPage form .button input:hover{
+  background: #0e9ff9;
+}
+.wrapper form .signup-link{
+  text-align: center;
+  margin-top: 20px;
+  font-size: 17px;
+}
+.loginPage .wrapper form .signup-link a{
+  color: #087cc4;
+  text-decoration: none;
+}
+.loginPage form .signup-link a:hover{
+  text-decoration: underline;
+}
+
+.edit-delete{
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  
+}

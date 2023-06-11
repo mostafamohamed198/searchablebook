@@ -9,19 +9,19 @@ import {ProSidebarProvider, Sidebar, Menu, MenuItem, SubMenu, useProSidebar } fr
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import {HierarchicalMenu, ToggleRefinement, MenuSelect, Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet } from "react-instantsearch-dom";
 
-export default function Category(){
-  const params = useParams();
+export default function Category(props){
+  // const params = useParams();
   const [largeWindow, setLargeWindow] = React.useState(true)
   const [categoryName, setCategoryName] = React.useState('')
-  const searchvalue = params.resultvalue
+
   React.useEffect(function(){
-        fetch('/categorydetail/' + params.catid)
+        fetch('/categorydetail/' + props.id)
         .then(res => res.json())
         .then(data => {
             setCategoryName(data.thecategory)
         })
-  },[])
-  console.log(categoryName)
+  },[props.id])
+
   const sk = new Searchkit({
     connection: {
       host: "http://localhost:9200",
@@ -53,7 +53,7 @@ export default function Category(){
  
     return (
     <div >
-            <a href={theID}>
+            <Link to={theID}>
         <div className="LP--product--card">
         <div className="LP--PD--media">
           <span className="LP--PD--media--tigger">
@@ -64,7 +64,7 @@ export default function Category(){
          {hit.title}
         </div>
       </div>
-      </a>
+      </Link>
       </div>
     )
   }

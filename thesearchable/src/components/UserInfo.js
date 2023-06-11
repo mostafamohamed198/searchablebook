@@ -1,24 +1,29 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams , Link } from "react-router-dom";
+import Author from "./Author";
+import axios from "axios";
+import { useContext } from "react";
+import AuthContext from "../authentication/AuthContext";
 
 
-
-export default function UserInfo(){
+export default function UserInfo(props){
+    let {authTokens} = useContext(AuthContext)
     const [userDetails, setUserDetails] = React.useState({})
     const [collapseFavourites, setCollapseFavourites] = React.useState(false)
-    const [collapseSubmitted, setCollapseSubmitted] = React.useState(false)
+    const [collapseSubmittedEntries, setCollapseSubmittedEntries] = React.useState(false)
+    const [collapseSubmittedAuthors, setCollapseSubmittedAuthors] = React.useState(false)
+    const [collapseSubmittedBooks, setCollapseSubmittedBooks] = React.useState(false)
     const [collapseViewed, setCollapseViewed] = React.useState(false)
     const [collapseDownloaded, setCollapseDownloaded] = React.useState(false)
     const params = useParams();
     React.useEffect(function(){
-        fetch('/userinfodetails/' + params.id)
+        fetch('/userinfodetails/' + props.id)
         .then(res => res.json())
         .then(data => {
             setUserDetails(data)
       
         })
     },[])
-    console.log(collapseSubmitted)
     const approvedCountries = userDetails.approvedcountries?.map(country =>{
         return(
             <span style={{paddingRight: '5px'}}>{country.country}.</span>
@@ -46,13 +51,14 @@ export default function UserInfo(){
 
     const downloadedEntries = userDetails.downloadedEntries?.map(entry =>{
         const direct =`/entry/${entry.id}`
+        
         return(
             <div className="Au--entry--div">
                 <div >
                     <img className="Au--entryCover" src={entry.entryCover} />
                 </div>
                 <div className="Au--entry--info">
-                    <a href={direct} style={{textDecoration:'none', color:'#087cc4'}}><div>{entry.title}</div></a>
+                    <Link href={direct} style={{textDecoration:'none', color:'#087cc4'}}><div>{entry.title}</div></Link>
                 </div> 
             </div>
         )
@@ -72,15 +78,74 @@ export default function UserInfo(){
         )
     })
 
-    const submittedEntries = userDetails.submittedEntries?.map(entry =>{
+    const submittedEntries = userDetails.submittedentries?.map(entry =>{
         const direct =`/entry/${entry.id}`
+        const edit = `/editform/${entry.id}`
+        function deleteEntry(){
+            alert('هل أنت متأكد من مسح المحتوي؟ ')
+            axios.delete(`/entrychange/${entry.id}/`,
+            {headers: {
+               'Authorization':'Bearer ' + String(authTokens.access)
+          }}
+            )
+        }
         return(
             <div className="Au--entry--div">
                 <div >
                     <img className="Au--entryCover" src={entry.entryCover} />
                 </div>
                 <div className="Au--entry--info">
-                    <a href={direct} style={{textDecoration:'none', color:'#087cc4'}}><div>{entry.title}</div></a>
+
+                    <Link to={direct} style={{textDecoration:'none', color:'#087cc4'}}><div>{entry.title}</div></Link>
+                    <div className="edit-delete"><Link to={edit}>تعديل</Link> | <span onClick={() => deleteEntry()}>مسح</span></div>
+                </div> 
+            </div>
+        )
+    })
+
+    const submittedAuthors = userDetails.submittedAuthors?.map(author =>{
+        const direct =`/authordetails/${author.id}`
+        const edit = `/editauthor/${author.id}`
+
+        function deleteAuthor(){
+            alert('هل أنت متأكد من مسح المحتوي؟ ')
+            axios.delete(`/authorchange/${author.id}/`,
+            {headers: {
+               'Authorization':'Bearer ' + String(authTokens.access)
+          }}
+            )
+        }
+        return(
+            <div className="Au--entry--div">
+                <div >
+                    <img className="Au--entryCover" src={author.authorPicture} />
+                </div>
+                <div className="Au--entry--info">
+                    <Link to={direct} style={{textDecoration:'none', color:'#087cc4'}}><div>{author.name}</div></Link>
+                    <div className="edit-delete"><Link to={edit}>تعديل</Link>| <span onClick={() => deleteAuthor()}>مسح</span></div>
+                </div> 
+            </div>
+        )
+    })
+
+    const submittedBooks = userDetails.submittedBooks?.map(book =>{
+        const edit = `/editbook/${book.id}`
+        function deleteBook(){
+            alert('هل أنت متأكد من مسح المحتوي؟ ')
+            axios.delete(`/bookchange/${book.id}/`,
+            {headers: {
+               'Authorization':'Bearer ' + String(authTokens.access)
+          }}
+            )
+        }
+        return(
+            <div className="Au--entry--div">
+                <div >
+                    <img className="Au--entryCover" src={book.bookCover} />
+                </div>
+                <div className="Au--entry--info">
+                    <a style={{textDecoration:'none', color:'#087cc4'}}><div>{book.name}</div></a>
+                    <div className="edit-delete"><Link to={edit}>تعديل</Link>| <span onClick={() => deleteBook()}>مسح</span></div>
                 </div> 
             </div>
         )
@@ -106,16 +171,20 @@ export default function UserInfo(){
             </div>
             <div>
                 <h2>تاريخ البحث:</h2>
-                <div className='UI--searchhistory' onClick={() => {setCollapseSubmitted(!collapseSubmitted)}} ><h3>المقالات التي تم نشرها (للمحرين فقط): </h3></div>
-                <div style={{display : collapseSubmitted? 'block': 'none' }}>{submittedEntries}</div>
-                <div className='UI--searchhistory' onClick={() => {setCollapseFavourites(!collapseFavourites)}} ><h3>المفضلة: </h3></div>
+                <div className='UI--searchhistory' onClick={() => {setCollapseSubmittedEntries(!collapseSubmittedEntries)}} ><h3>المقالات التي تم نشرها (للمحرين فقط): </h3></div>
+                <div style={{display : collapseSubmittedEntries? 'block': 'none' }}>{submittedEntries}</div>
+                <div className='UI--searchhistory' onClick={() => {setCollapseSubmittedBooks(!collapseSubmittedBooks)}} ><h3>الكتب التي تم نشرها (للمحرين فقط): </h3></div>
+                <div style={{display : collapseSubmittedBooks? 'block': 'none' }}>{submittedBooks}</div>
+                <div className='UI--searchhistory' onClick={() => {setCollapseSubmittedAuthors(!collapseSubmittedAuthors)}} ><h3>المؤلفون الذين تم نشرهم (للمحرين فقط): </h3></div>
+                <div style={{display : collapseSubmittedAuthors? 'block': 'none' }}>{submittedAuthors}</div>
+                {/* <div className='UI--searchhistory' onClick={() => {setCollapseFavourites(!collapseFavourites)}} ><h3>المفضلة: </h3></div>
                 <div style={{display : collapseFavourites? 'block': 'none' }}>{favouriteEntries}</div>
                 <div className='UI--searchhistory' onClick={() => {setCollapseDownloaded(!collapseDownloaded)}}><h3>المقالات التي تم تنزيلها: </h3></div>
                 <div style={{display : collapseDownloaded? 'block': 'none' }}>{downloadedEntries}</div>
                 <div className='UI--searchhistory' onClick={() => {setCollapseViewed(!collapseViewed)}}><h3>المقالات التي تم عرضها: </h3></div>
-                <div style={{display : collapseViewed? 'block': 'none' }}>{viewedEntries}</div>
+                <div style={{display : collapseViewed? 'block': 'none' }}>{viewedEntries}</div> */}
             </div>
-            <a href={editUrl}>تعديل بيانات المستخدم</a>
+            <Link to={editUrl}>تعديل بيانات المستخدم</Link>
         </div>
     )
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import Slider from "react-slick";
+import { Link } from "react-router-dom";
 // import MyImage from '../../../media/entrycover/226.jpg'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -19,15 +20,14 @@ export default function SimpleSlider(props) {
             })
         })
     },[])
-    console.log(catEnt)
+
     const allCatEnt = catEnt.map(ent => {
         const cover =  `${ent.entryCover}`
        
-        console.log(`${window.location.origin}/media/entrycover/226.jpg`)
-        const link  = `/entry/${ent.id}`
+         const link  = `/entry/${ent.id}`
         return(
             <div >
-                <a  href={link}>
+                <Link  to={link}>
             <div  className="LP--product--card">
             <div className="LP--PD--media">
               <span className="LP--PD--media--tigger">
@@ -39,7 +39,7 @@ export default function SimpleSlider(props) {
              {ent.title}
             </div>
           </div>
-          </a>
+          </Link>
           </div>
         )
     })

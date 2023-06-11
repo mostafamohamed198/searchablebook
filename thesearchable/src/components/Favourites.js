@@ -1,19 +1,27 @@
 import React from "react";
 import Pagination from 'rc-pagination';
-
+import { useContext } from "react";
+import AuthContext from "../authentication/AuthContext";
 export default function Favourites(){
+    let {authTokens} = useContext(AuthContext)
     const [userFavouriteEntries, setUserFavouriteEntries] = React.useState([])
     const [perPage, setPerPage] = React.useState(10);
     const [size, setSize] = React.useState(perPage);
     const [current, setCurrent] = React.useState(1);
     
     React.useEffect(function(){
-        fetch('/favouriteEntries/')
+
+        fetch('/favouriteEntries/', {
+            method:'GET',
+            headers:{
+                'Content-Type':'application/json',
+                'Authorization':'Bearer ' + String(authTokens.access)
+            }
+        })
         .then(res => res.json())
-  .then(data => {
-        setUserFavouriteEntries(data)
-        console.log(data)
-  })
+        .then(data => {
+                    setUserFavouriteEntries(data)
+              })
     },[])
 
 
@@ -48,7 +56,7 @@ export default function Favourites(){
         const resultingAuthors = entry.entryauthor.map(author => {
             const authid= `/authordetails/${author.id}`
             return (
-                <a href={authid}><div>{author.name}،</div></a>
+                <Link to={authid}><div>{author.name}،</div></Link>
             )
         })
         const entryLink = `/entry/${entry.id}/`
@@ -61,7 +69,7 @@ export default function Favourites(){
         </div>
         <div className="SR--content">
         <p className="SR--category">{entry.entryCategory.thecategory}</p>
-        <a style={{textDecoration: 'none'}} href={entryLink}><h2 style={{color:'#087cc4'}}>{entry.title}</h2></a>
+        <Link style={{textDecoration: 'none'}} to={entryLink}><h2 style={{color:'#087cc4'}}>{entry.title}</h2></Link>
         <div className="SR--authors--div">
             <p className="SR--authors--title">المؤلفون:</p> 
          <div className="SR--authors--names">
@@ -78,7 +86,7 @@ export default function Favourites(){
       </div>
         )
     })
-    // console.log(userFavouriteEntries)
+
     return (
         <div className="favourites--div">
               <div className="Cat--div">

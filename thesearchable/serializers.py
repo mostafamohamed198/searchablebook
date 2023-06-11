@@ -5,6 +5,7 @@ from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
 # from rest_framework_simplejwt.views import TokenObtainPairView
 # from.documents import EntryDocument
 
+from django.contrib.auth import get_user_model, authenticate
 class EntrySerializer(serializers.ModelSerializer):
     # entryauthor = serializers.SlugRelatedField(
     #     many=True,
@@ -65,6 +66,33 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+
+# UserModel = get_user_model()
+
+# class UserRegisterSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = UserModel
+# 		fields = '__all__'
+# 	def create(self, clean_data):
+# 		user_obj = UserModel.objects.create_user(email=clean_data['email'], password=clean_data['password'])
+# 		user_obj.username = clean_data['username']
+# 		user_obj.save()
+# 		return user_obj
+
+# class UserLoginSerializer(serializers.Serializer):
+# 	email = serializers.EmailField()
+# 	password = serializers.CharField()
+# 	##
+# 	def check_user(self, clean_data):
+# 		user = authenticate(username=clean_data['email'], password=clean_data['password'])
+# 		if not user:
+# 			raise ValidationError('user not found')
+# 		return user
+
+# class UserSerializer(serializers.ModelSerializer):
+# 	class Meta:
+# 		model = UserModel
+# 		fields = ('email', 'username')
 
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -215,10 +243,22 @@ class UserInfoSerializer(serializers.ModelSerializer):
         slug_field='entry_dictionary'
     )
 
+    submittedAuthors = serializers.SlugRelatedField(
+        many = True,
+        read_only=True,
+        slug_field='author_dictionary'
+    )
+    submittedBooks = serializers.SlugRelatedField(
+        many = True,
+        read_only=True,
+        slug_field='book_dictionary'
+    )
+
+
 
     class Meta:
         model = userInfo
-        fields = ['user', 'lastPaid', 'lastDatePayment', 'is_admin', 'approved', 'approvedcountries','approvedcategories','favouriteEntries','downloadedEntries', 'viewedEntries','submittedentries']
+        fields = ['user', 'lastPaid', 'lastDatePayment', 'is_admin', 'approved', 'approvedcountries','approvedcategories','favouriteEntries','downloadedEntries', 'viewedEntries','submittedentries', 'submittedAuthors','submittedBooks']
 
 
 class EntryFormSerializer(serializers.ModelSerializer):
@@ -237,7 +277,7 @@ class AuthorFormSerializer(serializers.ModelSerializer):
     picture = serializers.ImageField(required=False)
     class Meta:
         model = author
-        fields = ['name', 'degree', 'picture', 'about']
+        fields = ['id','name', 'degree', 'picture', 'about']
 
 class BookFormSerializer(serializers.ModelSerializer):
     cover = serializers.ImageField(required=False)
