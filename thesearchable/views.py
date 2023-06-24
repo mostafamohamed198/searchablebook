@@ -272,6 +272,53 @@ class AuthorFormViewSet(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# class EntryBookFormViewSet(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser]
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         print('working')
+#         data = json.loads(request.body)
+#         theuserInfo = userInfo.objects.get(user = request.user)
+#         if theuserInfo.is_admin is True:
+#             title = data.get('title')
+#             body = data.get('body')
+#             bibliography = data.get('bibiliography')
+#             bookId = data.get('book')
+#             partId = data.get('part')
+#             theBook = book.objects.get(id = int(bookId))
+#             print(theBook.bookOrigin.id)
+#             theBookOrigin = theBook.bookOrigin
+#             theBookCategory = theBook.bookCategory
+#             theBookClassification = theBook.bookClassification.all()
+#             theBookCover = theBook.cover.url[6:]
+#             print (theBookCover[6:])
+#             theBookAuthors = theBook.author.all()
+#             # print(theBookAuthors)
+            
+#             # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
+#             newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user)
+            
+#             # if newEntry.is_valid():
+#             # newEntry.save() 
+#             newEntry.entryauthor.set(theBookAuthors)
+#             # newEntry.entryCover = theBookCover
+#             newEntry.entryClassification.set(theBookClassification)
+#             newEntry.save()
+#             if int(partId) != 0:
+#                 thePart = part.objects.get(id = int(partId))
+#                 thePart.relatedEntries.add(newEntry)
+#                 thePart.save()
+#             theBook.relatedChapters.add(newEntry)
+#             theBook.save()
+#             print(newEntry.id)
+#             theuserInfo.submittedentries.add(int(newEntry.id))
+#             theuserInfo.save()
+#             data['id'] = int(newEntry.id)
+     
+#             return Response(data ,status=status.HTTP_201_CREATED)
+#         return Response(data,status=status.HTTP_400_BAD_REQUEST)
+                                                                                                             
 class EntryBookFormViewSet(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
@@ -279,6 +326,7 @@ class EntryBookFormViewSet(APIView):
     def post(self, request, format=None):
         print('working')
         data = json.loads(request.body)
+        serializer = EntryFormSerializer(data=data)
         theuserInfo = userInfo.objects.get(user = request.user)
         if theuserInfo.is_admin is True:
             title = data.get('title')
@@ -297,7 +345,7 @@ class EntryBookFormViewSet(APIView):
             # print(theBookAuthors)
             
             # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
-            newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user)
+            newEntry = serializer.save(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user)
             
             # if newEntry.is_valid():
             # newEntry.save() 
@@ -314,18 +362,12 @@ class EntryBookFormViewSet(APIView):
             print(newEntry.id)
             theuserInfo.submittedentries.add(int(newEntry.id))
             theuserInfo.save()
-            return Response(data,status=status.HTTP_201_CREATED)
-        return Response(data,status=status.HTTP_400_BAD_REQUEST)
-        # return Response(newEntry.errors, status=status.HTTP_400_BAD_REQUEST)                                                                                                
-                                                                                                              
-                                                                                                            
+            # data['id'] = int(newEntry.id)
+     
+            return Response(data ,status=status.HTTP_201_CREATED)
+        return Response(data,status=status.HTTP_400_BAD_REQUEST)                                                                                                        
                                                                                                                
-        # serializer = EntryFormSerializer(data=request.data)
-        # if serializer.is_valid():
-        #     serializer.save()
-        #     return Response(serializer.data,status=status.HTTP_201_CREATED)
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+       
 class BookFormViewSet(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
@@ -386,6 +428,7 @@ class Author_change(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({'messege' : 'cannot delete it'})
         
+
 class Entry_change(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
@@ -393,6 +436,7 @@ class Entry_change(APIView):
     def put(self, request, pk):
         theentry = entry.objects.get(pk = pk)
         thedata = request.data
+        print(thedata)
         theuserInfo = userInfo.objects.get(user = request.user)
         serializer = EntryFormSerializer(theentry, data= thedata, partial = True)
         if serializer.is_valid() and theuserInfo.is_admin is True:
@@ -420,8 +464,13 @@ def required_book(request, id):
                 print(object.id)
 
     if request.method == 'GET':
-        serializer = BookSerializer(snippet)
-        return Response(serializer.data)
+        # if snippet.DoesNotExist:
+        #      print ('doesnt')
+        #      return Response(status=status.HTTP_204_NO_CONTENT)
+        # else:
+            print('does')
+            serializer = BookSerializer(snippet)
+            return Response(serializer.data)
     
 @api_view(['GET'])
 def required_door(request, idd):
@@ -603,17 +652,54 @@ class putFavourites(APIView):
 
 
 
-@csrf_exempt
-def userform(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        theUserInfo = userInfo.objects.get(id = data.get('id'))
-        theUserInfo.lastPaid = data.get('lastPaid')
-        theUserInfo.lastDatePayment = data.get('lastDatePayment')
-        theUserInfo.approved = data.get('approved')
-        theUserInfo.is_admin = data.get('is_admin')
-        theUserInfo.approvedcountries.set(data.get('approvedcountries'))
-        theUserInfo.approvedcategories.set(data.get('approvedcategories'))
-        theUserInfo.save()
-        return JsonResponse({"message": "User edited successfully."}, status=201)
+# @csrf_exempt
+# def userform(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+#         theUserInfo = userInfo.objects.get(id = data.get('id'))
+#         theUserInfo.lastPaid = data.get('lastPaid')
+#         theUserInfo.lastDatePayment = data.get('lastDatePayment')
+#         theUserInfo.approved = data.get('approved')
+#         theUserInfo.is_admin = data.get('is_admin')
+#         theUserInfo.approvedcountries.set(data.get('approvedcountries'))
+#         theUserInfo.approvedcategories.set(data.get('approvedcategories'))
+#         theUserInfo.save()
+#         return JsonResponse({"message": "User edited successfully."}, status=201)
+    
+class userform(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
+    @csrf_exempt
+    def put(self, request):
+        if request.user.is_superuser:
+            data = request.data
+            userid = data['id']
+            print(data)
+            theUserInfo = userInfo.objects.get(user = userid)
+            serializer = UserInfoPutSerializer(theUserInfo, data=data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(data,status=status.HTTP_201_CREATED)
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+# class userform(APIView):
+#     permission_classes = [IsAuthenticated]
+#     parser_classes = [MultiPartParser, FormParser, JSONParser] 
+#     @csrf_exempt
+#     def post(self, request, pk, format=None):
+#         serializer = PartSerializer(data=request.data)
+#         if serializer.is_valid():
+#             if request.user.is_superuser:
+#                 serializer.save()
+#                 first_value = list(serializer.data.values())[0]
+#                 print(first_value)
+#                 relatedbook = book.objects.get(id=pk)
+#                 print(f'the book is {relatedbook.id}')
+                
+#                 relatedbook.relatedParts.add(int(first_value))
+#                 relatedbook.save()
+#                 return Response(serializer.data,status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

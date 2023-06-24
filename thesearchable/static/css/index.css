@@ -320,6 +320,18 @@ font-size: 20px;
 
 }
 
+.SE--markdown--content hr{
+  height: 0.5px;
+  border-width: 0.05px;
+  border-color: rgb(166, 166, 166);
+  color:rgb(166, 166, 166);
+
+}
+.SE--markdown--content .footnotes{
+  font-size: 16px;
+  margin-top: 3px;
+}
+
 .SE--markdown--title{
   text-align: right;
   margin-top: 40px;
@@ -3105,4 +3117,18 @@ html {
   cursor: pointer;
   font-size: 14px;
 
+}
+
+
+
+.content--input--div{
+  display:flex
+}
+
+.content--textarea{
+  width: 50%;
+}
+
+.markdown--input{
+  width: 50%
 }

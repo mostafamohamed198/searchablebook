@@ -7,9 +7,12 @@ import { TextField, Checkbox } from "@material-ui/core";
 import {Route, Link, Routes, useParams} from 'react-router-dom';
 import { useContext } from 'react';
 import AuthContext from '../../authentication/AuthContext';
-
-
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import { useNavigate } from "react-router-dom";
 export default function FormEdit(){
+  const navigate = useNavigate()
     let {authTokens} = useContext(AuthContext)
     const params = useParams();
     const [values,setValues] = React.useState({})
@@ -18,10 +21,6 @@ export default function FormEdit(){
     const [countryOptions, setCountryOptions] = React.useState([])
     const [categoriesOptions, setCategoriesOptions] = React.useState([])
     const [classificationOptions, setClassificationOptions] = React.useState([])
-    const [selected, setSelected] = React.useState(null);
-    const [selectedFile, setSelectedFile] = React.useState(null);
-    const [entryClass, setEntryClass] =React.useState([])
-    const [entryAuth , setEntryAuth] = React.useState([])
     const [formDisplay, setFormDisplay] = React.useState(true)
     const [submittedDisplay, setSubmittedDisplay] = React.useState(false)
     const [loaded, setLoaded] = React.useState(false)
@@ -69,6 +68,13 @@ export default function FormEdit(){
         })
         })
     },[])
+    
+    const handleChange = (event) => {
+      const name = event.target.name;
+      const value = event.target.value;
+      setInputs(values => ({...values, [name]: value}))
+    }
+    
     
     const styles ={
     
@@ -148,14 +154,15 @@ export default function FormEdit(){
       }).then(res => {
      
           alert('edited')
+          navigate(`/entry/${params.id}`)
       }).catch(err => {
          
           alert('error')
       })
         
-
-      setFormDisplay(false)
-      setSubmittedDisplay(true)
+      
+      // setFormDisplay(false)
+      // setSubmittedDisplay(true)
       }
 
 
@@ -168,7 +175,7 @@ export default function FormEdit(){
         <input className="inputForm" type="text" {...register("title", { required: false })} defaultValue={values.title} />
         </label>
         {errors.title && <span>This field is required</span>}
-        <div>
+        {/* <div>
         <div className="inputLabel" >محتوي المقال:
           <textarea 
           style={{width:'600px', height:"600px"}}
@@ -179,7 +186,23 @@ export default function FormEdit(){
           />
           </div>
           {errors.body && <span>This field is required</span>}
+          </div> */}
+           <div className="content--input--div">
+        <div className="inputLabel content--textarea">محتوي المقال:
+          <textarea 
+          style={{width:'100%', height:"600px"}}
+            type="text" 
+            name="body" 
+            defaultValue={values.body}
+            // onChange={(e) => setValue("body", e.target.value)}
+            {...register("body", { required: false})}
+            onChange={(e) => {handleChange(e)}}
+          />
+          {errors.body && <span>This field is required</span>}
+ 
           </div>
+          <ReactMarkdown className="SE--markdown--content markdown--input" rehypePlugins={[rehypeRaw, remarkGfm]} children={inputs.body} remarkPlugins={[remarkGfm]} />
+           </div>
      {loaded && 
      <div>
              

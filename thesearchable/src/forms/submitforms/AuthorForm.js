@@ -3,12 +3,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import axios from 'axios';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useContext } from "react";
 import AuthContext from "../../authentication/AuthContext";
 import { useForm, Controller } from "react-hook-form";
 import { TextField, Checkbox } from "@material-ui/core";
 
 export default function AuthorForm() {
+    const navigate = useNavigate()
     const [inputs, setInputs] = React.useState({});
     let {authTokens, logoutUser} = useContext(AuthContext)
     const { register, handleSubmit,control, watch, formState: { errors } } = useForm({});
@@ -42,6 +44,7 @@ export default function AuthorForm() {
           }).then(res => {
           
               alert('posted')
+              navigate(`/authordetails/${res.data.id}`)
           }).catch(err => {
             alert('error')
           })

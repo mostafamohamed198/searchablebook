@@ -8,10 +8,14 @@ import { useForm, Controller } from "react-hook-form";
 import { TextField, Checkbox } from "@material-ui/core";
 import { useContext } from "react";
 import AuthContext from "../../authentication/AuthContext";
-
-
+import { useNavigate } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 export default function EntryBookForm(){
+  const navigate = useNavigate()
   let {authTokens, logoutUser} = useContext(AuthContext)
+  const [bodyInput , setBodyInput] = React.useState({})
     const [inputs, setInputs] = React.useState({part: 0});
     const [bookId, setBookId] = React.useState(0)
     const [bookOptions, setBookOptions] =React.useState([])
@@ -33,7 +37,7 @@ export default function EntryBookForm(){
     },[])
 
     React.useEffect(function(){
-       
+       if (bookId != 0){
         fetch(`/bookdetail/${bookId}`)
         .then(res => res.json())
         .then(data => {
@@ -43,6 +47,7 @@ export default function EntryBookForm(){
             setPartsOptions(oldArray => [...oldArray, newPart])
            })
         })
+      }
     },[bookId])
     
   const handleBookChange =(selectedOption) =>{
@@ -68,8 +73,8 @@ export default function EntryBookForm(){
     const handleChange = (event) => {
         const name = event.target.name;
         const value = event.target.value;
-        setInputs(values => ({...values, [name]: value}))
-      
+        setBodyInput(values => ({...values, [name]: value}))
+     
       }
 
     
@@ -77,27 +82,45 @@ export default function EntryBookForm(){
 
       const onSubmit = (data) => {
 
-   fetch('/entrybookform/',{
-        method: 'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':'Bearer ' + String(authTokens.access)
-      },
-        body: JSON.stringify ({
-            title: data.title,
-            body: data.body,
-            bibiliography: data.bibiliography,
-            book: bookId,
-            part: partId
+  // fetch('/entrybookform/',{
+  //       method: 'POST',
+  //       headers:{
+  //         'Content-Type':'application/json',
+  //         'Authorization':'Bearer ' + String(authTokens.access)
+  //     },
+  //       body: JSON.stringify ({
+  //           title: data.title,
+  //           body: data.body,
+  //           bibiliography: data.bibiliography,
+  //           book: bookId,
+  //           part: partId
 
-        })
-    }).then(res => {
+  //       })
+  //   })
+  axios.post('/entrybookformpost/',
+    JSON.stringify ({
+        title: data.title,
+        body: data.body,
+        bibiliography: data.bibiliography,
+        book: bookId,
+        part: partId
+
+    })
+, {
+  headers:{
+    'Content-Type':'application/json',
+    'Authorization':'Bearer ' + String(authTokens.access)
+},
+})
+    .then(res => {
        alert('posted')
+       navigate(`/entry/${res.data.id}/`);
+  
           }).catch(err => {
-            alert('error')
+          alert('error')
           })
-          setFormDisplay(false)
-          setSubmittedDisplay(true)
+          // setFormDisplay(false)
+          // setSubmittedDisplay(true)
       }
 
 
@@ -109,16 +132,20 @@ export default function EntryBookForm(){
         <input className="inputForm" type="text" {...register("title", { required: true })}/>
         </label>
         {errors.title && <span>This field is required</span>}
-        <div>
-        <div className="inputLabel">محتوي المقال:
+        <div  className="content--input--div">
+        <div className="inputLabel content--textarea">محتوي المقال:
           <textarea 
-          style={{width:'600px', height:"600px"}}
+          style={{width:'100%', height:"600px"}}
             type="text" 
             name="body" 
            
             {...register("body", { required: true })}
+            onChange={(e) => {handleChange(e)}}
           />
+
           </div>
+
+          <ReactMarkdown className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={bodyInput.body} remarkPlugins={[remarkGfm]} />
           {errors.body && <span>This field is required</span>}
           </div>
 

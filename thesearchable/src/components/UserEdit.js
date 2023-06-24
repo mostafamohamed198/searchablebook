@@ -1,9 +1,11 @@
 import { integerPropType } from "@mui/utils";
 import React from "react";
 import { useParams } from "react-router-dom";
-
-
+import { useContext } from "react";
+import AuthContext from "../authentication/AuthContext";
+import axios from "axios";
 export default function UserEdit(){
+    let {user, authTokens} = useContext(AuthContext)
     const [userEdits, setUserEdits] = React.useState({})
     const [categories, setCategories] = React.useState([])
     const [approvedCategoriesId, setapprovedCategoriesId] = React.useState([])
@@ -125,19 +127,51 @@ export default function UserEdit(){
 
         const handleSubmit = (event) => {
             event.preventDefault()
-            fetch('/userform/', {
-                method: 'POST',
+
+            // axios.put(`/userform/`,{
+            //     id: params.id,
+            //     lastPaid: inputs.lastPaid,
+            //     lastDatePayment: inputs.lastDatePayment,
+            //     approved: isApproved,
+            //     is_admin: isAdmin,
+            //     approvedcategories: approvedCategoriesId,
+            //     approvedcountries: approvedCountriesId
+
+            // }, {headers: {
+            //     'Content-Type': 'multipart/form-data',
+            //     'Authorization':'Bearer ' + String(authTokens.access)
+            // }})
+
+            fetch(`/userform/`,{
+                method: 'PUT',
+                headers: {
+                'Content-Type': 'application/json',
+                'Authorization':'Bearer ' + String(authTokens.access)
+                },
                 body: JSON.stringify({
-                    id: params.id,
+                    id : params.id,
                     lastPaid: inputs.lastPaid,
                     lastDatePayment: inputs.lastDatePayment,
                     approved: isApproved,
                     is_admin: isAdmin,
                     approvedcategories: approvedCategoriesId,
                     approvedcountries: approvedCountriesId
-
-                })
             })
+            })
+        
+            // fetch('/userform/', {
+            //     method: 'POST',
+            //     body: JSON.stringify({
+            //         id: params.id,
+            //         lastPaid: inputs.lastPaid,
+            //         lastDatePayment: inputs.lastDatePayment,
+            //         approved: isApproved,
+            //         is_admin: isAdmin,
+            //         approvedcategories: approvedCategoriesId,
+            //         approvedcountries: approvedCountriesId
+
+            //     })
+            // })
          }
 
 

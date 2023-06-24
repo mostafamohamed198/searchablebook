@@ -12,6 +12,12 @@ class EntrySerializer(serializers.ModelSerializer):
     #     read_only=True,
     #     slug_field='name'
     # )
+    entryauthor = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='author_dictionary'
+    )
+   
     class Meta:
         model = entry
         fields = (
@@ -32,7 +38,18 @@ class BookSerializer(serializers.ModelSerializer):
     relatedParts = serializers.SlugRelatedField(
         many=True,
         read_only = True,
-        slug_field='part_dictionary'
+        slug_field='part_related_dictionary'
+    )
+    relatedDoors = serializers.SlugRelatedField(
+        many=True,
+        read_only = True,
+        slug_field='door_related_dictionary'
+    )
+
+    relatedChapters = serializers.SlugRelatedField(
+        many=True,
+        read_only = True,
+        slug_field='entry_dictionary'
     )
     bookCategory = serializers.SlugRelatedField(
      
@@ -101,11 +118,21 @@ class AuthorSerializer(serializers.ModelSerializer):
 
 class PartSerializer(serializers.ModelSerializer):
 
+    relatedEntries = serializers.SlugRelatedField(
+        many=True,
+        read_only = True,
+        slug_field='entry_dictionary'
+    )
     class Meta:
         model = part
         fields = '__all__'
     
 class DoorSerializer(serializers.ModelSerializer):
+    relatedParts = serializers.SlugRelatedField(
+        many=True,
+        read_only = True,
+        slug_field='part_related_dictionary'
+    )
 
     class Meta:
         model = door
@@ -259,6 +286,12 @@ class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = userInfo
         fields = ['user', 'lastPaid', 'lastDatePayment', 'is_admin', 'approved', 'approvedcountries','approvedcategories','favouriteEntries','downloadedEntries', 'viewedEntries','submittedentries', 'submittedAuthors','submittedBooks']
+
+class UserInfoPutSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model = userInfo
+        fields = ['id','user', 'lastPaid', 'lastDatePayment', 'is_admin', 'approved', 'approvedcountries','approvedcategories','favouriteEntries','downloadedEntries', 'viewedEntries','submittedentries', 'submittedAuthors','submittedBooks']
 
 
 class EntryFormSerializer(serializers.ModelSerializer):

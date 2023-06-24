@@ -60,6 +60,8 @@ export default function SingleEntry (props){
     const [loaded, setLoaded] = React.useState(false)
     const [entryOrigin , setEntryOrigin] = React.useState(0)
     const [entryCategory, setEntryCategory] = React.useState(0)
+    let {user, authTokens} = useContext(AuthContext)
+  
      React.useEffect(function(){
         //    fetch('/authentication_state' )
         //         .then(res => res.json())
@@ -79,21 +81,9 @@ export default function SingleEntry (props){
                 setEntryOrigin(data.entryOrigin)
                 setBibilography(`${data.bibiliography}`)
                 setFavouriteUsers(data.favouriteusers)
+                setAuthors(data.entryauthor)
                 setLoaded(true)
-            
-              
-                data.entryauthor.map(author => {
-                    fetch('/author/' + author)
-                    .then(res => res.json())
-                    .then(data => {
-                        const newData = {
-                            'id': data.id,
-                            'name': data.name
-                        }
-                    
-                        setAuthors(oldArray => [...oldArray, newData]);
-                    })
-                })
+
                 }) 
         
                 fetch('/thebook/' + props.id)
@@ -103,45 +93,49 @@ export default function SingleEntry (props){
                 setTheBookName(data.name)
                 setContainsDoors(data.containsDoors)
                 setContainsParts(data.containsParts)
-                if (data.containsParts && !data.containsDoors){
+                setParts(data.relatedParts)
+                setDoors(data.relatedDoors)
+                setChapters(data.relatedChapters)
+                // if (data.containsParts && !data.containsDoors){
                   
-                    data.relatedParts.map(part =>{
-                        fetch('/thepart/' + part.id)
-                        .then(res => res.json())
-                        .then(data => {
+                //     data.relatedParts.map(part =>{
+                //         fetch('/thepart/' + part.id)
+                //         .then(res => res.json())
+                //         .then(data => {
                            
-                            let newpart = {
-                                name: data.name,
-                                relatedEntries: data.relatedEntries
-                            }
-                            setParts(oldArray => [...oldArray, newpart]);
+                //             let newpart = {
+                //                 name: data.name,
+                //                 relatedEntries: data.relatedEntries
+                //             }
+                //             setParts(oldArray => [...oldArray, newpart]);
                             
-                        })
-                    })
-                }
-                else if(data.containsDoors && data.containsParts){
-                    data.relatedDoors.map(door =>{
-                        fetch('/thedoor/' + door)
-                        .then(res => res.json())
-                        .then(data =>{
-                            let newDoor = {
-                                id: data.id,
-                                name: data.name,
-                                relatedParts: data.relatedParts
-                            }
-                            setDoors(oldArr => [...oldArr, newDoor]);
-                        })
-                    })
-                }
-                else{
-                    data.relatedChapters.map(chapter => {
-                        setChapters(oldAr => [...oldAr, chapter])
-                    })
-                }
+                //         })
+                //     })
+                // }
+                // else if(data.containsDoors && data.containsParts){
+                //     data.relatedDoors.map(door =>{
+                //         fetch('/thedoor/' + door)
+                //         .then(res => res.json())
+                //         .then(data =>{
+                //             let newDoor = {
+                //                 id: data.id,
+                //                 name: data.name,
+                //                 relatedParts: data.relatedParts
+                //             }
+                //             setDoors(oldArr => [...oldArr, newDoor]);
+                //         })
+                //     })
+                // }
+                // else{
+                //     data.relatedChapters.map(chapter => {
+                //         setChapters(oldAr => [...oldAr, chapter])
+                //     })
+                // }
                }) 
                
                
-             },[])
+             }
+             ,[])
             React.useEffect(function(){
                 fetch('/entries/' + props.id)
                 .then(res => res.json())
@@ -165,8 +159,7 @@ export default function SingleEntry (props){
                 fetchData()
                 
              },[requestUser, favouriteUsers, props.id])
-           
-
+       
 // if (loaded){
 // let {user, authTokens} = useContext(AuthContext)
 // const userApprovedCountires = user.approvedcountries
@@ -188,7 +181,7 @@ const returnedDoors =   doors.map(thedoor => {
 
 const returnedChapters = chapters.map(thechapter => {
     return (
-        <Chapter chapterid = {thechapter} />
+        <Chapter chapterid = {thechapter.id} title= {thechapter.title} />
     )
 })
 
@@ -227,28 +220,6 @@ const handleChange = (event) => {
     setValue('')
   
   };
-// const handleChange = (event) => {
-//     setValue(event.target.value);
-//   };
-
-//   const handleSubmit = (event) => {
-//     event.preventDefault()
-//     if (value != '') {
-        
-//       setList(list.concat(value));
-//       setSearched(true)
-//     }
-//     else{
-//         setSearched(false)
-//     }
-
-//         const ccc= reactStringReplace(theEntry, value, (match, i) => (
-//             `<mark>${match}</mark>`
-//            ));
-//      setTheSearchedEntry(ccc.join(""));
-//     setValue('')
-//     // event.preventDefault();
-//   };
 
   const { collapseSidebar, rtl } = useProSidebar();
 

@@ -137,12 +137,23 @@ class part(models.Model):
     @property
     def part_dictionary(self):
         return {'id': self.id, 'name': self.name}
+    @property
+    def part_related_dictionary(self):
+        return {'id': self.id, 'name': self.name, 'relatedEntries': self.relatedEntries.all().values('id', 'title')}
     
 class door(models.Model):
     name = models.CharField(max_length=500)
     relatedParts = models.ManyToManyField('part', blank=True)
     def __str__(self):
         return self.name
+    @property
+    def door_dictionary(self):
+        return {'id': self.id, 'name': self.name}
+    @property
+    def door_related_dictionary(self):
+        return {'id': self.id, 'name': self.name, 'relatedParts': self.relatedParts.all().values('id', 'name')} 
+    
+    
     
 
 class book(models.Model):

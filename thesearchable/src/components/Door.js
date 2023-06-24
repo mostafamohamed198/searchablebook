@@ -7,7 +7,8 @@ const [theDisplay, setTheDisplay] = React.useState(false)
 
 React.useEffect(function(){
     props.relatedParts.map(part =>{
-        fetch('/thepart/' + part)
+        console.log(part)
+        fetch('/thepart/' + part.id)
         .then(res => res.json())
         .then(data => {
             let newDoorPart = {
@@ -26,9 +27,7 @@ React.useEffect(function(){
             <Part relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )
     })
-    function changedisplay(){
-        setTheDisplay(!theDisplay)
-    }
+ 
 
     const styles = {
         display : theDisplay ? 'block' : 'none'

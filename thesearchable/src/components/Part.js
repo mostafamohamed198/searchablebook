@@ -10,19 +10,17 @@ export default function Part(props){
     
     const entry = props.relatedEntries.map(theentry => {
         const [entryName,setEntryName] = React.useState('')
-        const url = `/entry/${theentry}`
+        const url = `/entry/${theentry.id}`
 
-        fetch('/entries/' + theentry)
-        .then(res => res.json())
-        .then(data => {
-            setEntryName(data.title)
-        })
+       
         return(
+            <Link key={theentry.id} style={{color:'black'}} to={url}>
             <MenuItem style={{color:'black', textDecorationLine: 'underline',overflow: 'hidden'}}>
-           <Link key={theentry} style={{color:'black'}} to={url}>
-             {entryName}
-             </Link>
+          
+             {theentry.title}
+            
        </MenuItem>
+       </Link>
         )
     })
     function clickPart(){
