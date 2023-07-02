@@ -19,9 +19,11 @@ export default function EntryBookForm(){
     const [inputs, setInputs] = React.useState({part: 0});
     const [bookId, setBookId] = React.useState(0)
     const [bookOptions, setBookOptions] =React.useState([])
+    const [bookName, setBookName] = React.useState('')
     const [book, setBook] = React.useState()
     const [partsOptions, setPartsOptions] = React.useState([])
     const [partId, setPartId] = React.useState(0)
+    const [partName, setPartName] = React.useState('')
      const [formDisplay, setFormDisplay] = React.useState(true)
     const [submittedDisplay, setSubmittedDisplay] = React.useState(false)
     React.useEffect (function(){
@@ -51,8 +53,9 @@ export default function EntryBookForm(){
     },[bookId])
     
   const handleBookChange =(selectedOption) =>{
-
+console.log(selectedOption)
     setBookId(selectedOption.value)
+    setBookName(selectedOption.label)
     
   }
   const styles ={
@@ -68,6 +71,7 @@ export default function EntryBookForm(){
     }
   const handlePartChange =(selectedOption) => {
     setPartId(selectedOption.value)
+    setPartName(selectedOption.label)
   }
 
     const handleChange = (event) => {
@@ -81,29 +85,29 @@ export default function EntryBookForm(){
       const { register, handleSubmit,control, watch, formState: { errors } } = useForm({});
 
       const onSubmit = (data) => {
+function entrySource(){
+  if (partId != 0){
+    return(
+      `${bookName} ، ${partName}`
+    )
 
-  // fetch('/entrybookform/',{
-  //       method: 'POST',
-  //       headers:{
-  //         'Content-Type':'application/json',
-  //         'Authorization':'Bearer ' + String(authTokens.access)
-  //     },
-  //       body: JSON.stringify ({
-  //           title: data.title,
-  //           body: data.body,
-  //           bibiliography: data.bibiliography,
-  //           book: bookId,
-  //           part: partId
+  }
+  else{
+    return(
+      `${bookName}`
+    )
+  }
+}
 
-  //       })
-  //   })
+
   axios.post('/entrybookformpost/',
     JSON.stringify ({
         title: data.title,
         body: data.body,
         bibiliography: data.bibiliography,
         book: bookId,
-        part: partId
+        part: partId,
+        source: entrySource()
 
     })
 , {
@@ -118,6 +122,7 @@ export default function EntryBookForm(){
   
           }).catch(err => {
           alert('error')
+          console.log(err)
           })
           // setFormDisplay(false)
           // setSubmittedDisplay(true)

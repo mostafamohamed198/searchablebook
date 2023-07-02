@@ -109,7 +109,8 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
         form_data.append('bookCategory', data.bookCategory.value);
         // form_data.append('bookClassification', classArray);
         form_data.append('bookOrigin', data.bookOrigin.value);
- 
+        form_data.append('publisher', data.publisher);
+        form_data.append('isbn', data.isbn);
             axios.post('/postbook/', form_data, {
               headers: {
                   'Content-Type': 'multipart/form-data',
@@ -263,6 +264,21 @@ const { register, handleSubmit,control, watch, formState: { errors } } = useForm
                         {...register("cover", { required: true })} />
                     </label>
                     {errors.cover && <span>This field is required</span>}
+                </div>
+                <div>
+                    <label className="inputLabel">
+                        الناشر:
+                        <input  {...register("publisher", { required: false })}type="text" name="publisher"/>
+                    </label>
+                    {errors.publisher && <span>This field is required</span>}
+                </div>
+
+                <div>
+                    <label className="inputLabel">
+                        رقم الكتاب المعياري الدولي:
+                        <input  {...register("isbn", { required: false })}type="text" name="isbn"/>
+                    </label>
+                    {errors.isbn && <span>This field is required</span>}
                 </div>
                 <div>
                     <input type="submit" />

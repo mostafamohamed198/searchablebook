@@ -111,7 +111,7 @@ class entry(models.Model):
     entryauthor = models.ManyToManyField('author', blank=True)
     chapterNumber = models.IntegerField( null=True, blank=True)
     entryOrigin = models.ForeignKey('countries', null=True, blank=True, on_delete=models.CASCADE)
-    entryPubDate = models.DateField()
+    entryPubDate = models.DateField(null=True, blank=True)
     submissionDate= models.DateTimeField(auto_now=True)
     entryCover = models.ImageField(upload_to='entrycover', blank=True, null=True)
     relatedRatings = models.ManyToManyField('rating', blank=True)
@@ -122,6 +122,7 @@ class entry(models.Model):
     views = models.ManyToManyField('User', blank=True, related_name='views')
     favouriteusers = models.ManyToManyField('User', blank=True, related_name='favouriteusers')
     viewsCounts = models.IntegerField(default=0)
+    source = models.CharField(max_length=700,  blank=True, null=True)
    
     def __str__ (self):
         return self.title
@@ -170,6 +171,9 @@ class book(models.Model):
     relatedParts = models.ManyToManyField('part',  blank=True)
     relatedDoors = models.ManyToManyField('door', blank=True)
     submittedUser = models.ForeignKey('User', null=True, blank=True, related_name='submittedBookUser', on_delete=models.CASCADE)
+    publisher = models.CharField(max_length=700, blank=True, null=True)
+    favouriteusers = models.ManyToManyField('User', blank=True, related_name='bookfavouriteusers')
+    isbn = models.CharField(max_length=700, blank=True, null=True )
     def __str__ (self):
         return self.name
     @property
@@ -188,6 +192,7 @@ class userInfo(models.Model):
     approvedcountries = models.ManyToManyField('countries',  blank=True)
     approvedcategories = models.ManyToManyField('categories', blank=True)
     favouriteEntries = models.ManyToManyField('entry',  blank=True, related_name='favourites')
+    favouriteBooks = models.ManyToManyField('book', blank=True, related_name='favouriteBooks')
     downloadedEntries = models.ManyToManyField('entry',blank=True, related_name='downloadedbooks')
     viewedEntries = models.ManyToManyField('entry',  blank=True, related_name='viewedEntries')
     submittedentries = models.ManyToManyField('entry',blank=True, related_name='submittedentries')

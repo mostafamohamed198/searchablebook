@@ -226,6 +226,27 @@ class EntryFavourtiesSerializer(serializers.ModelSerializer):
             'entryCover',
             'favouriteusers', 
         )
+
+class BookFavourtiesSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='author_dictionary'
+    )
+    bookCategory = serializers.SlugRelatedField(
+        many=False,
+        read_only = True,
+        slug_field="categories_dictionary"
+    )
+    # entryClassification = serializers.SlugRelatedField(
+    #     many = True,
+    #     read_only = True,
+    #     slug_field= "classification_dictionary"
+    # )
+
+    class Meta:
+        model = book
+        fields = '__all__'
         
 
 

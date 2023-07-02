@@ -22,6 +22,7 @@ urlpatterns = [
     path('author/',views.AuthorList.as_view()),
     path('countries/', views.CountriesList.as_view()),
     path('favouriteEntries/',views.FavouriteEntries.as_view()),
+    path('favouriteBooks/',views.FavouriteBooks.as_view()),
     path('userslist/', views.UsersList.as_view()),
     path('booklist/', views.BookList.as_view()),
     path('categories/', views.CategoriesList.as_view()),
@@ -61,6 +62,7 @@ urlpatterns = [
     path("form", views.landing, name="form"),
     path("favourites/", views.landing, name="favourites"),
     path("putFavourites/<int:id>", views.putFavourites.as_view(), name="putFavourites"),
+    path("putBookFavourites/<int:id>", views.putBookFavourites.as_view(), name="putBookFavourites"),
     path("users", views.landing, name="users"),
     path('userinfo/<int:id>', views.index, name="userinfo"),
     path('useredit/<int:id>', views.index, name="useredits"),
@@ -75,7 +77,8 @@ urlpatterns = [
      path('editform/<int:id>', views.index, name="editform"),
      path('entrychange/<int:pk>/', views.Entry_change.as_view(), name='entrychange'),
      path('adminPageLinks/', views.landing, name="adminPage"),
-     path('editPageLinks/', views.landing, name="adminPage")
+     path('editPageLinks/', views.landing, name="adminPage"),
+     path('book/<int:id>', views.index, name='book')
     
 ]
 

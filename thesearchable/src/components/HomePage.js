@@ -10,6 +10,7 @@ import AdminPrivateRoute from "../utils/AdminPrivateRoute";
 import CategoryPrivateRoute from "../utils/CategoryPrivateRoute";
 import LoginPage from "../authentication/LoginPage";
 import AuthorForm from "../forms/submitforms/AuthorForm";
+
 import {
   BrowserRouter as Router,
   Route,
@@ -18,11 +19,13 @@ import {
   Outlet,
   useLocation
 } from "react-router-dom";
+// import Navbar from "./Navbar";
+import BasicNav from "./Navbar";
 import EntryPrivateRoute from "../utils/EntryPrivateRoute";
 import  AuthContext  from "../authentication/AuthContext";
 import PrivateRoute from "../utils/PrivateRoute";
 import Form from "../forms/submitforms/Form"
-
+import BookPrivateRoute from "../utils/BookPrivateRoute"; 
 import Favourites from "./Favourites";
 import EditLinks from "../administration/EditLinks";
 import Users from "./Users";
@@ -32,6 +35,9 @@ import BookForm from "../forms/submitforms/BookForm";
 import EntryBookForm from "../forms/submitforms/EntryBookForm";
 import BookEditForm from "../forms/editForms/BookEditForm";
 import AuthorEditForm from "../forms/editForms/AuthorEditForm";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {faChevronUp, faDownload, faPrint, faShare, faStar} from '@fortawesome/free-solid-svg-icons' 
+
 export default function HomePage() {
 
    const [isNavExpanded, setIsNavExpanded] = useState(false)
@@ -49,10 +55,10 @@ const location = useLocation();
 function favouriteButton(){
   if (user){
     return(
-      <li>
-            <Link to="/favourites">المفضلة</Link>
-            {/* <Link to="/favourites">المفضلة</Link> */}
-          </li>
+     
+            <Link to="/favourites"><FontAwesomeIcon style={{fontSize: '18px'}} icon={faStar} /> المفضلة </Link>
+           
+         
     )
   }
 }
@@ -62,20 +68,29 @@ function authenticationButtons (){
   
   if (user){
     return(
-      // <p className="brand-name" >Logout</p>
 
-      <p className="brand-name" onClick={logoutUser}>تسجيل الخروج</p>
-
+      <div className="logout--dropdown">
+         <div className="authentication--links " >
+        {/* <p  onClick={logoutUser}>تسجيل الخروج</p> */}
+        <a className="user--letter"><span className="user--letter--span">{user.username.charAt(0)}</span></a>
+        <a>{user.username} <FontAwesomeIcon icon={faChevronUp} className="logout--dropdown--icon" style={{'fontSize': '18px', marginRight: '2px'}}/></a>
+      </div>
+      <div className="logout--dropdown--content">
+      <p  onClick={logoutUser}>تسجيل الخروج</p>
+      </div>
+      </div>
+     
+      
     )
   }
   else{
 return(
-    <div>
+    <div className="authentication--links">
       
 
-      <Link to="/login"className='brand-name' > تسجيل الدخول.</Link>
+      <Link to="/login" > تسجيل الدخول</Link>
 
-      <a href="/register" className="brand-name">
+      <a href="/register" style={{marginRight: '25px'}} >
         <span>
        إنشاء حساب
       </span>
@@ -88,12 +103,20 @@ const requiresAuthentication = location.pathname !== "/login";
 
     return (
 
-        <div className="container">    
+        <div className="container" > 
+        <div className="first--nav">  
             <div className="logoandtitle">
-             <Link to="/" className="brand-name">
-        العنوان واللوجو 
+             <Link to="/"  style={{'color': 'black'}}>
+        المكتبة القانونية الإلكترونية
       </Link>
+      
       </div>
+      <div className="first--nav--left">
+      {favouriteButton()}
+      <div>الدعم</div>
+      {authenticationButtons()}
+      </div>
+      </div> 
             <nav className="navigation">
             <button
         className="hamburger"
@@ -119,17 +142,22 @@ const requiresAuthentication = location.pathname !== "/login";
           isNavExpanded ? "navigation-menu expanded" : "navigation-menu"
         }
       >
-        <div>{authenticationButtons()}</div>
+       
         
       
         <ul>
         <li>
+            <Link to="/">الصفحة الرئيسية</Link>
+          </li>
+        <li>
         <div className="dropdown">
-            <span className="dropdown-title"> كتب قانونية و موسوعات</span> <i class="fa-solid fa-angle-down"></i>
+          <li>
+            <div style={{'display': 'flex'}}><a className="dropdown-title"> كتب قانونية و موسوعات <FontAwesomeIcon icon={faChevronUp} className='navbar--icon' /></a> </div>
+            </li>
             <div className="dropdown-content">
-              <Link to="/category/1"><p className="dropdown-element">كتب قانونية</p></Link>
+              <Link to="/category/1" className="dropdown-link"><p className="dropdown-element">كتب قانونية</p></Link>
 
-              <Link to="/category/2"><p className="dropdown-element"> موسوعات</p></Link>
+              <Link to="/category/2" className="dropdown-link"><p className="dropdown-element"> موسوعات</p></Link>
             </div>
           </div>
           </li>
@@ -140,26 +168,32 @@ const requiresAuthentication = location.pathname !== "/login";
 
           <li>
           <div className="dropdown">
-            <span className="dropdown-title">رسائل</span> <i class="fa-solid fa-angle-down"></i>
+          <li>
+            <div style={{'display': 'flex'}}><a className="dropdown-title">  رسائل<FontAwesomeIcon icon={faChevronUp} className='navbar--icon'/></a> </div>
+            </li>
             <div className="dropdown-content">
-            <Link to="/category/5"><p className="dropdown-element">رسائل ماجستير</p></Link>
-              <Link to="/category/3"><p className="dropdown-element"> رسائل دكتوراه</p></Link>
+            <Link to="/category/5" className="dropdown-link"><p className="dropdown-element">رسائل ماجستير</p></Link>
+              <Link to="/category/3" className="dropdown-link"><p className="dropdown-element"> رسائل دكتوراه</p></Link>
             </div>
           </div>
           </li>
-          {favouriteButton()}
+          
         </ul>
       </div>
 
      
         </nav>
 
+<div >
+
         <Routes> 
+            
             <Route exact  element={<PrivateRoute/>}>
                 <Route path='results/:resultvalue' element={<SearchResults />} />
                 <Route path='authordetails/:theauthid' element={<Author />} />
                 <Route path="favourites" element={<Favourites />} />
             </Route> 
+            <Route path='/book/:bookId' element={<BookPrivateRoute  />}/>
             <Route path='/entry/:entryId' element={<EntryPrivateRoute  />}/>
             <Route  path="/" element={<LandingPage />} />
             <Route  path="/login" element={<LoginPage />} />
@@ -185,7 +219,16 @@ const requiresAuthentication = location.pathname !== "/login";
 
             
         </Routes>
-    
+        </div>
+        <footer>
+          <div className="footer--title">المكتبة القانونية الإلكترونية</div>
+          <div>
+            <p>السياسة والخصوصية</p>
+            <p>الدعم</p>
+            <p>اتصل بنا</p>
+            <p>Copryright © 2023, By المكتبة القانونية الإلكترونية | جميع الحقوق محفوظة.</p>
+          </div>
+        </footer> 
       </div >
     );
   }

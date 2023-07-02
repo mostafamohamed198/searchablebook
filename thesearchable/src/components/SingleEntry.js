@@ -63,13 +63,7 @@ export default function SingleEntry (props){
     let {user, authTokens} = useContext(AuthContext)
   
      React.useEffect(function(){
-        //    fetch('/authentication_state' )
-        //         .then(res => res.json())
-        //         .then(data => {
-        //           setAuthentication(data.authentication)
-        //           setRequestUser(data.userid) 
-        //         }) 
-           
+       
               
                 fetch('/entries/' + props.id)
                 // fetch('/entries/' + 4)
@@ -96,41 +90,7 @@ export default function SingleEntry (props){
                 setParts(data.relatedParts)
                 setDoors(data.relatedDoors)
                 setChapters(data.relatedChapters)
-                // if (data.containsParts && !data.containsDoors){
-                  
-                //     data.relatedParts.map(part =>{
-                //         fetch('/thepart/' + part.id)
-                //         .then(res => res.json())
-                //         .then(data => {
-                           
-                //             let newpart = {
-                //                 name: data.name,
-                //                 relatedEntries: data.relatedEntries
-                //             }
-                //             setParts(oldArray => [...oldArray, newpart]);
-                            
-                //         })
-                //     })
-                // }
-                // else if(data.containsDoors && data.containsParts){
-                //     data.relatedDoors.map(door =>{
-                //         fetch('/thedoor/' + door)
-                //         .then(res => res.json())
-                //         .then(data =>{
-                //             let newDoor = {
-                //                 id: data.id,
-                //                 name: data.name,
-                //                 relatedParts: data.relatedParts
-                //             }
-                //             setDoors(oldArr => [...oldArr, newDoor]);
-                //         })
-                //     })
-                // }
-                // else{
-                //     data.relatedChapters.map(chapter => {
-                //         setChapters(oldAr => [...oldAr, chapter])
-                //     })
-                // }
+      
                }) 
                
                
@@ -160,12 +120,7 @@ export default function SingleEntry (props){
                 
              },[requestUser, favouriteUsers, props.id])
        
-// if (loaded){
-// let {user, authTokens} = useContext(AuthContext)
-// const userApprovedCountires = user.approvedcountries
-// const userApprovedCategories = user.approvedcategories
-// if (userApprovedCategories.includes(entryCategory) && userApprovedCountires.includes(entryOrigin)){
-  
+
     const returnedParts = parts.map(thepart => {
         
         return (
@@ -256,16 +211,7 @@ const customStyles = {
 
 function changeFavourites(){
     setInFavourites(!inFavourites);
-    // fetch('/putFavourites/' + props.id, {
-    //     method: 'PUT',
-    //     headers: {
-    //          'Authorization':'Bearer ' + String(authTokens.access)
-    //     },
-    //     body: {
-    //         'fav' : inFavourites
-    //     }
-    // }
-    // )   
+
     axios.put(`/putFavourites/${props.id}`,{
         'fav' : inFavourites
     }, {headers: {
@@ -336,14 +282,16 @@ function iconStar(){
          
           </MenuItem>
          
-      <div className="SE--bookName">{theBookName}</div>
+      <div className="SE--bookName"><Link style={{color: 'black'}} to={`/book/${theBook}`}>{theBookName}</Link></div>
                 <div  className="SE--input--div">
                     <form  className="SE--input">
-                            <input value={value} onChange={handleChange} type="search" placeholder="ابحث..." />
+                            <input value={value} onChange={handleChange} type="search" placeholder="ابحث عن كلمة في هذا المستند" />
                             <button onClick={handleSubmit}>Search</button>
                     </form>
                 </div>
+                <div className="SE--final--returned">
             {finalreturned()}
+            </div>
  
         </Menu>
         
@@ -374,7 +322,7 @@ function iconStar(){
                 <div className="SE--document--info">
                 <div style={{fontSize:'20px', fontWeight:'700'}}> معلومات عن المقال </div>
                     <div className="SE--document--authors">
-                        <div style={{fontSize: '16px',fontWeight:'700', marginLeft:'30px'}}> المؤلفون:</div>
+                        <div style={{fontSize: '16px',fontWeight:'700', marginLeft:'30px'}}>{authors.length > 1 ? "المؤلفون:" : "المؤلف:"}</div>
                         <div className="SE--authors--div">
                             {theauthors}
                         </div>
@@ -389,10 +337,4 @@ function iconStar(){
 
     )
 }
-// else {
-//     return (<LoginPage />)
-//         }
 
-
-//     }
-// }

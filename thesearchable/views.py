@@ -207,6 +207,14 @@ class FavouriteEntries(APIView):
         desiredEntries =  entry.objects.filter(favouriteusers__in = [requestedUser.id])
         serializer = EntryFavourtiesSerializer(desiredEntries, many=True)
         return Response(serializer.data)
+    
+class FavouriteBooks(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self, request, format=None):
+        requestedUser = request.user
+        desiredBooks =  book.objects.filter(favouriteusers__in = [requestedUser.id])
+        serializer = BookFavourtiesSerializer(desiredBooks, many=True)
+        return Response(serializer.data)
 
 class ClassificationList(generics.ListCreateAPIView):
     queryset = classification.objects.all()
@@ -327,45 +335,50 @@ class EntryBookFormViewSet(APIView):
         print('working')
         data = json.loads(request.body)
         serializer = EntryFormSerializer(data=data)
-        theuserInfo = userInfo.objects.get(user = request.user)
-        if theuserInfo.is_admin is True:
-            title = data.get('title')
-            body = data.get('body')
-            bibliography = data.get('bibiliography')
-            bookId = data.get('book')
-            partId = data.get('part')
-            theBook = book.objects.get(id = int(bookId))
-            print(theBook.bookOrigin.id)
-            theBookOrigin = theBook.bookOrigin
-            theBookCategory = theBook.bookCategory
-            theBookClassification = theBook.bookClassification.all()
-            theBookCover = theBook.cover.url[6:]
-            print (theBookCover[6:])
-            theBookAuthors = theBook.author.all()
-            # print(theBookAuthors)
-            
-            # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
-            newEntry = serializer.save(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user)
-            
-            # if newEntry.is_valid():
-            # newEntry.save() 
-            newEntry.entryauthor.set(theBookAuthors)
-            # newEntry.entryCover = theBookCover
-            newEntry.entryClassification.set(theBookClassification)
-            newEntry.save()
-            if int(partId) != 0:
-                thePart = part.objects.get(id = int(partId))
-                thePart.relatedEntries.add(newEntry)
-                thePart.save()
-            theBook.relatedChapters.add(newEntry)
-            theBook.save()
-            print(newEntry.id)
-            theuserInfo.submittedentries.add(int(newEntry.id))
-            theuserInfo.save()
+        if serializer.is_valid():
+            theuserInfo = userInfo.objects.get(user = request.user)
+            if theuserInfo.is_admin is True:
+                title = data.get('title')
+                body = data.get('body')
+                bibliography = data.get('bibiliography')
+                bookId = data.get('book')
+                partId = data.get('part')
+                source = data.get('source')
+                theBook = book.objects.get(id = int(bookId))
+                print(theBook.bookOrigin.id)
+                theBookOrigin = theBook.bookOrigin
+                theBookCategory = theBook.bookCategory
+                theBookClassification = theBook.bookClassification.all()
+                theBookCover = theBook.cover.url[6:]
+                print (theBookCover[6:])
+                theBookAuthors = theBook.author.all()
+                # print(theBookAuthors)
+                
+                # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
+                newEntry = serializer.save(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user, source= source)
+                
+                # if newEntry.is_valid():
+                # newEntry.save() 
+                newEntry.entryauthor.set(theBookAuthors)
+                # newEntry.entryCover = theBookCover
+                newEntry.entryClassification.set(theBookClassification)
+                newEntry.save()
+                if int(partId) != 0:
+                    thePart = part.objects.get(id = int(partId))
+                    thePart.relatedEntries.add(newEntry)
+                    thePart.save()
+                theBook.relatedChapters.add(newEntry)
+                theBook.save()
+                print(newEntry.id)
+                theuserInfo.submittedentries.add(int(newEntry.id))
+                theuserInfo.save()
+            return Response(serializer.data ,status=status.HTTP_201_CREATED)
             # data['id'] = int(newEntry.id)
-     
-            return Response(data ,status=status.HTTP_201_CREATED)
-        return Response(data,status=status.HTTP_400_BAD_REQUEST)                                                                                                        
+        else:
+         
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        # return Response(data,status=status.HTTP_400_BAD_REQUEST)                                                                                                        
                                                                                                                
        
 class BookFormViewSet(APIView):
@@ -373,11 +386,11 @@ class BookFormViewSet(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def post(self, request, format=None):
-        
+        print(request.data)
         serializer = BookFormSerializer(data=request.data, partial=True)
         theuserInfo = userInfo.objects.get(user = request.user)
         if serializer.is_valid() and theuserInfo.is_admin is True:
-            serializer.save(submittedUser = request.user)
+            serializer.save(submittedUser = request.user, publisher = request.data['publisher'], isbn = request.data['isbn'])
             serializerData = serializer.data['id']
             theuserInfo.submittedBooks.add(int(serializerData))
             theuserInfo.save()
@@ -641,14 +654,45 @@ class putFavourites(APIView):
         favouriteEntry = entry.objects.get(id= id)
         user = request.user
         info = userInfo.objects.get(user= user)
+        snippet = 0
+        for object in book.objects.all():
+            for chapter in object.relatedChapters.all():
+                if int(chapter.id) == int(id):
+                    snippet = book.objects.get(id = object.id)
+                    print(object.id)
         if data['fav'] == True:
             favouriteEntry.favouriteusers.remove(user)
+            
             info.favouriteEntries.remove(favouriteEntry)
         else: 
             favouriteEntry.favouriteusers.add(user)
+            snippet.favouriteusers.add(user)
             info.favouriteEntries.add(favouriteEntry)
+            info.favouriteBooks.add(snippet)
             
         return Response({"message": "bid added successfully."}, status=201)
+
+
+class putBookFavourites(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser, JSONParser] 
+    @csrf_exempt
+    def put(self, request, id):
+        data = request.data
+        favouriteBook = book.objects.get(id= id)
+        user = request.user
+        info = userInfo.objects.get(user= user)
+        if data['fav'] == True:
+            favouriteBook.favouriteusers.remove(user)
+            info.favouriteBooks.remove(favouriteBook)
+            info.save
+        else: 
+            favouriteBook.favouriteusers.add(user)
+            info.favouriteBooks.add(favouriteBook)
+            info.save()
+            
+        return Response({"message": "bid added successfully."}, status=201)
+
 
 
 
