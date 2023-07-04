@@ -4,7 +4,7 @@ import Client from "@searchkit/instantsearch-client";
 import Searchkit from "searchkit";
 import {ProSidebarProvider, Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import {SortBy, HierarchicalMenu, Menu as MenuSearch, connectMenu, ToggleRefinement, MenuSelect, Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet } from "react-instantsearch-dom";
+import {SortBy, HierarchicalMenu, Menu as MenuSearch, connectMenu, ToggleRefinement, MenuSelect, Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet , Configure} from "react-instantsearch-dom";
 import ReactTags from 'react-tag-autocomplete'
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -18,37 +18,11 @@ export default function SearchResults(){
   const params = useParams();
   const [searchBoxValue, setSearchBoxValue] = React.useState(params.resultvalue)
   const searchvalue = params.resultvalue
-  console.log(searchvalue)
-  React.useEffect(function(){
-    fetch('/authentication_state' )
-    .then(res => res.json())
-    .then(data => {
-      setAuthentication(data.authentication)
-      setRequestUser(data.userid)  
-     
-    })
 
-    fetch('/resultsapproval' )
-    .then(res => res.json())
-    .then(data => {
-     setApproved(data.approved)
-    })
-  },[])
+
   const tableStyle = {
     display: displayTable ? 'block': 'none'
   }
-
-
-  // function collapsedWidth(){
-  //   const windowWidth = React.useRef(window.innerWidth);
-  //   if (windowWidth.current >= 390){
-  //           setLargeWindow(false)
-  //   }
-  //   else{
-  //           setLargeWindow(true)
-  //   }
-   
-  // }
 
   function collapsedWidth(){
     const windowWidth = React.useRef(window.innerWidth);
@@ -151,10 +125,7 @@ export default function SearchResults(){
           fields:["title^3", "body", "bibiliography","source", "entryauthor.name"],
           query: query
        }
-      // simple_query_string : {
-      //   query:    query,
-      //   fields: ["title^3", "body", "bibiliography"] 
-      // }
+  
   
     }
   }}, { debug: true });
@@ -457,7 +428,10 @@ const CustomMenu = connectMenu(TheMenu);
         
       <CustomMenu attribute="entryCategory.thecategory.key" searchable />
     
-      
+      <Configure
+
+hitsPerPage={15}
+/>
                   <Stats />
       <Hits hitComponent={hitView} /> 
       <Pagination />

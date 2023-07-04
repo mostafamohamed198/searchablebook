@@ -112,7 +112,12 @@ class EntryDocument(Document):
     favouriteusers = fields.ObjectField(
         attr='favouriteusers',
         properties = {
-        'id':  fields.IntegerField(),
+        'id':  fields.IntegerField(
+            attr='id',
+            fields={
+                'key': fields.KeywordField()
+            }
+        ),
         
         }
     )

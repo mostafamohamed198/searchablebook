@@ -7,7 +7,7 @@ import Client from "@searchkit/instantsearch-client";
 import Searchkit from "searchkit";
 import {ProSidebarProvider, Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import {HierarchicalMenu, ToggleRefinement, MenuSelect, Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet } from "react-instantsearch-dom";
+import {Configure, HierarchicalMenu, ToggleRefinement, MenuSelect, Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet } from "react-instantsearch-dom";
 
 export default function Category(props){
   // const params = useParams();
@@ -170,6 +170,10 @@ export default function Category(props){
         <h2>{categoryName}</h2>
     
       </div>
+      <Configure
+
+  hitsPerPage={15}
+/>
       <Hits hitComponent={hitView} /> 
       <Pagination />
       </div>

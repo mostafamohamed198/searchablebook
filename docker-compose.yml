@@ -10,13 +10,13 @@ services:
       - postgres_data:/var/lib/postgresql/data/
       # - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      # - POSTGRES_HOST_AUTH_METHOD=trust
       # - POSTGRES_NAME=admin
       # - POSTGRES_USER=postgres
-      # - POSTGRES_PASSWORD=postgres
+      POSTGRES_PASSWORD: web1@alk@fyye1a12p3p
       # - POSTGRES_USER=root
       # - POSTGRES_PASSWORD=root
-      - POSTGRES_DATABASE=db
+      # - POSTGRES_DATABASE=db
       # - listen_addresses='0.0.0.0'
     networks:
       - heritage-network

@@ -74,6 +74,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         
         token['username'] = user.username
+        # token['userid'] = user.userid
         token['superuser'] = user.is_superuser
         token['approvedcountries'] = countriesArray
         token['approvedcategories'] = categoriesArray

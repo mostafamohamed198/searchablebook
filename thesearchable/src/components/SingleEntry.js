@@ -15,7 +15,8 @@ import { ComponentToPrint } from "./ComponentToPrint";
 import ReactToPrint from 'react-to-print';
 import { useReactToPrint } from "react-to-print";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDownload, faPrint, faShare, faStar as fasolidstar } from '@fortawesome/free-solid-svg-icons' 
+import {faArrowLeft ,faDownload, faPrint, faShare, faStar as fasolidstar } from '@fortawesome/free-solid-svg-icons'
+// import {faArrowRight } from '@fortawesome/free-regular-svg-icons' 
 // import { library } from '@fortawesome/fontawesome-svg-core'
 // import { faCoffee as fasrFaCoffee } from '@fortawesome/sharp-regular-svg-icons'import reactStringReplace from 'react-string-replace';
 import Popup from 'reactjs-popup';
@@ -167,9 +168,9 @@ const handleChange = (event) => {
     else{
         setSearched(false)
     }
-
+    const arrowLeft = <FontAwesomeIcon icon={faArrowLeft} />
         const ccc= reactStringReplace(theEntry, value, (match, i) => (
-            `<mark><a href ="#mark-${i + 2}" id="mark-${i}">${match}</a></mark>`
+            `<mark><a href ="#mark-${i + 2}" id="mark-${i}" className="SE--mark--link">${match} <i class="fa-solid fa-arrow-left" className="SE--arrowLeft"></i> </a></mark>`
            ));
      setTheSearchedEntry(ccc.join(""));
     setValue('')

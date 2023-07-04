@@ -453,6 +453,19 @@ footer{
 flex-direction: row;
 }
 
+.SE mark{
+background-color: rgb(255, 183, 0);
+}
+.SE--mark--link{
+  font-weight: 700;
+  color: black;
+}
+
+.SE--mark--link i {
+  font-size: 10px;
+  color:#004068;
+}
+
 .SE--side--container{
   display: 'flex';
    height: '100%';
