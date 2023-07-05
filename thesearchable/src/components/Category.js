@@ -24,7 +24,7 @@ export default function Category(props){
 
   const sk = new Searchkit({
     connection: {
-      host: "http://16.170.253.250:9200",
+      host: "http://localhost:9200",
   
     },
     search_settings: {
