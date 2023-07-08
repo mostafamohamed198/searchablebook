@@ -71,7 +71,7 @@ const handleChange = (event) => {
   function onInput (query) {
    
     
-    axios.post('http://16.171.161.168:9200/entries/_search', {
+    axios.post('http://13.53.171.156:9200/entries/_search', {
       
     query: {
       multi_match: {
