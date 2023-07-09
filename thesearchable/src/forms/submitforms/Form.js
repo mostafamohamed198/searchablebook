@@ -494,7 +494,7 @@ export default function Form(){
        
       }).catch(err => {
           alert('error ');
-          console.log(err)
+   
       })
         
 

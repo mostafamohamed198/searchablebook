@@ -53,7 +53,7 @@ export default function EntryBookForm(){
     },[bookId])
     
   const handleBookChange =(selectedOption) =>{
-console.log(selectedOption)
+
     setBookId(selectedOption.value)
     setBookName(selectedOption.label)
     
@@ -122,7 +122,7 @@ function entrySource(){
   
           }).catch(err => {
           alert('error')
-          console.log(err)
+
           })
           // setFormDisplay(false)
           // setSubmittedDisplay(true)

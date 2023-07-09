@@ -560,8 +560,9 @@ class addDoorViewSet(APIView):
     @csrf_exempt
     def post(self, request, pk, format=None):
         print(request.data)
-        serializer = DoorSerializer(data=request.data)
+        serializer = DoorFormSerializer(data=request.data)
         if serializer.is_valid():
+            print(request.data)
             serializer.save()
             first_value = list(serializer.data.values())[0]
             # print(first_value)

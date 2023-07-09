@@ -7,7 +7,7 @@ const [theDisplay, setTheDisplay] = React.useState(false)
 
 React.useEffect(function(){
     props.relatedParts.map(part =>{
-        console.log(part)
+      
         fetch('/thepart/' + part.id)
         .then(res => res.json())
         .then(data => {

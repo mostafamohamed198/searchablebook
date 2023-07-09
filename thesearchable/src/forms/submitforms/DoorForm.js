@@ -14,6 +14,7 @@ export default function DoorForm (props){
     const [theParts , settheParts] = React.useState([])
     const [doorDisplay, setDoorDisplay] =React.useState(true)
     const [submittedDisplay, setSubmittedDisplay] = React.useState(false)
+    const[selectedParts, setSelectedParts]= React.useState([])
     let handleChange = (i, e) => {
         let newFormValues = [...formValues];
         newFormValues[i][e.target.name] = e.target.value;
@@ -21,15 +22,19 @@ export default function DoorForm (props){
       }
 
         const handlePartChange =(index, choice) =>{  
-            
-         
+        //     console.log(choice[choice.length-1].value)
+        //  setSelectedParts(selected => [...selected, choice[choice.length-1].value])
             let choices = []
             choice.map(onechoice => {
-                
+                choices.push(onechoice.value)
             })
-            let newFormValues = [...formValues];
-            newFormValues[index]['relatedParts'] = choices;
-            setFormValues(newFormValues)
+            setSelectedParts(choices)
+
+            // console.log('changed')
+            // console.log(choice)
+            // let newFormValues = [...formValues];
+            // newFormValues[index]['relatedParts'] = choices;
+            // setFormValues(newFormValues)
 
         // let classArray = []
         // selectedOption.map(option => {
@@ -65,35 +70,57 @@ export default function DoorForm (props){
     //     event.preventDefault();
     //     alert(JSON.stringify(formValues));
     // }
+  
     let handleSubmit = (event) => {
         event.preventDefault();
         
-    
-    //     fetch(`/adddoor/${props.id}/`, {
-    //         method: 'POST',
-    //         body: JSON.stringify({
-    //    content: formValues
-    //  })})
+
     formValues.map(value => {
           
- 
       let form_data = new FormData();
       form_data.append('name', value.name);
-      form_data.append('relatedParts', value.relatedParts)
-      axios.post(`/adddoor/${props.id}/`, form_data, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization':'Bearer ' + String(authTokens.access)
-      }
-      }).then(res => {
+      // form_data.append('relatedParts', value.relatedParts)
+      form_data.append('relatedParts', selectedParts)
+      // axios.post(`/adddoor/${props.id}/`, {
+      //   name: value.name,
+      //   selectedParts: selectedParts
+      // }, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //     'Authorization':'Bearer ' + String(authTokens.access)
+      // }
+      // })
+    //   fetch(`/adddoor/${props.id}/`, {
+    //     method:'POST',
+    //      headers: {
+    //       'Content-Type': 'multipart/form-data',
+    //       'Authorization':'Bearer ' + String(authTokens.access)
+    //   },
+    //     body:{
+    //       'name': value.name,
+    //       'selectedParts': selectedParts
+    //     }
+    // })
+    fetch(`/adddoor/${props.id}/`,{
+      method: 'POST',
+      headers: {
+      'Content-Type': 'application/json',
+      'Authorization':'Bearer ' + String(authTokens.access)
+      },
+      body: JSON.stringify({
+        'name': value.name,
+        'relatedParts': selectedParts 
+          })
+  })
+      .then(res => {
     
       }).catch(err => {
        
       })
             })
       
-     setDoorDisplay(false)
-     setSubmittedDisplay(true)
+    //  setDoorDisplay(false)
+    //  setSubmittedDisplay(true)
 
     
   

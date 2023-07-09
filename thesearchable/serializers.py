@@ -138,6 +138,11 @@ class DoorSerializer(serializers.ModelSerializer):
         model = door
         fields = ('id', 'name', 'relatedParts')
     
+class DoorFormSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model = door
+        fields = ('id', 'name', 'relatedParts')
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = categories
