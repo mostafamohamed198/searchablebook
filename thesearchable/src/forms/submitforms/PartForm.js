@@ -6,6 +6,7 @@ import { faCirclePlus, faCircleMinus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useContext } from "react";
 import AuthContext from "../../authentication/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function PartForm (props){
   let {authTokens, logoutUser} = useContext(AuthContext)
@@ -14,6 +15,7 @@ export default function PartForm (props){
     const [doorDisplay, setDoorDisplay] = React.useState(false)
     const [submittedDisplay,setSubmittedDisplay] = React.useState(false)
     const [partDisplay, setPartDisplay] = React.useState(true)
+    const navigate = useNavigate()
     let handleChange = (i, e) => {
         let newFormValues = [...formValues];
         newFormValues[i][e.target.name] = e.target.value;
@@ -43,28 +45,43 @@ export default function PartForm (props){
     
     let handleSubmit = (event) => {
         event.preventDefault();
-        
-        formValues.map(value => {
-          
- 
-    let form_data = new FormData();
-    form_data.append('name', value.name);
-    axios.post(`/addpart/${props.id}/`, form_data, {
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer ' + String(authTokens.access)
-    }
-    }).then(res => {
+        axios.post(`/addpart/${props.id}/`, JSON.stringify(formValues), {
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':'Bearer ' + String(authTokens.access)
+        }
+        }).then(res => {
       
-        const thePart = {value: res.data.id, label: res.data.name, selected: false}
-        setNewParts(oldArray => [...oldArray, thePart])
-    }).catch(err => {
-        alert('error')
-    })
+          res.data.map(part => {
+            const thePart = {value: part.id, label: part.name, selected: false}
+            setNewParts(oldArray => [...oldArray, thePart])
           })
+
           alert('posted');
           setPartDisplay(false)
-          props.containsDoors ? setDoorDisplay(true) : setSubmittedDisplay(true)
+          props.containsDoors ? setDoorDisplay(true) : navigate(`/book/${props.id}/`);
+            // const thePart = {value: res.data.id, label: res.data.name, selected: false}
+            // setNewParts(oldArray => [...oldArray, thePart])
+        }).catch(err => {
+            alert('error')
+        })
+    //     formValues.map(value => {
+    // let form_data = new FormData();
+    // form_data.append('name', value.name);
+    // axios.post(`/addpart/${props.id}/`, form_data, {
+    //   headers:{
+    //     'Content-Type':'application/json',
+    //     'Authorization':'Bearer ' + String(authTokens.access)
+    // }
+    // }).then(res => {
+      
+    //     const thePart = {value: res.data.id, label: res.data.name, selected: false}
+    //     setNewParts(oldArray => [...oldArray, thePart])
+    // }).catch(err => {
+    //     alert('error')
+    // })
+          // })
+         
     }
     
 

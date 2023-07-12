@@ -482,8 +482,10 @@ def required_book(request, id):
         #      print ('doesnt')
         #      return Response(status=status.HTTP_204_NO_CONTENT)
         # else:
-            print('does')
+            
             serializer = BookSerializer(snippet)
+            print(serializer.data)
+            serializer.data['relatedDoors'] = 0
             return Response(serializer.data)
     
 @api_view(['GET'])
@@ -540,16 +542,14 @@ class addpartViewSet(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def post(self, request, pk, format=None):
-        serializer = PartSerializer(data=request.data)
+        serializer = PartSerializer(data=request.data, many=True)
         if serializer.is_valid():
             serializer.save()
-            first_value = list(serializer.data.values())[0]
-            print(first_value)
             relatedbook = book.objects.get(id=pk)
-            print(f'the book is {relatedbook.id}')
-            
-            relatedbook.relatedParts.add(int(first_value))
-            relatedbook.save()
+            for object in serializer.data: 
+                first_value = list(object.values())[0]
+                relatedbook.relatedParts.add(int(first_value))
+                relatedbook.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -559,44 +559,18 @@ class addDoorViewSet(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def post(self, request, pk, format=None):
-        print(request.data)
-        serializer = DoorFormSerializer(data=request.data)
+        serializer = DoorFormSerializer(data=request.data, many =True)
         if serializer.is_valid():
-            print(request.data)
             serializer.save()
-            first_value = list(serializer.data.values())[0]
-            # print(first_value)
             relatedbook = book.objects.get(id=pk)
-            # print(f'the book is {relatedbook.id}')
-            
-            relatedbook.relatedDoors.add(int(first_value))
-            relatedbook.save()
+            for object in serializer.data: 
+                first_value = list(object.values())[0]
+                relatedbook.relatedDoors.add(int(first_value))
+                relatedbook.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # def post(self, request, pk, format=None):
-    #     # print(request.body)
-    #     data = json.loads(request.body)
-    #     content = data.get('content')
-    #     # print(list(data.values())[0])
-    #     #             print('ok')
-    #     # for one in list(data.values())[0]:
-    #     for one in list(data.values())[0]:
-    #         print('working')
-    #         serializer = DoorSerializer(data=one)
-    #         if serializer.is_valid():
-    #             serializer.save()
-    #         #     first_value = list(serializer.data.values())[0]
-    #         #     print(first_value)
-    #         #     relatedbook = book.objects.get(id=pk)
-    #         #     relatedbook.relatedDoors.add(int(first_value))
-    #         #     return Response(serializer.data,status=status.HTTP_201_CREATED)
-    #         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #         return Response('working')
-
-# wkhtml_to_pdf = os.path.join(
-#     settings.BASE_DIR, "wkhtmltopdf.exe")
-
+    
 wkhtml_to_pdf = os.path.join(settings.BASE_DIR,"wkhtmltopdf-0.9.9-static-amd64.tar.bz2")
 # wkhtml_to_pdf = 'C:/Users/mostafa mohamed/newsearch/searchablebooks/wkhtmltopdf.exe'
 

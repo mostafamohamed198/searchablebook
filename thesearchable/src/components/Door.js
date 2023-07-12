@@ -5,24 +5,24 @@ export default function Door(props){
 const [doorParts, setDoorParts] = React.useState([])
 const [theDisplay, setTheDisplay] = React.useState(false)
 
-React.useEffect(function(){
-    props.relatedParts.map(part =>{
+// React.useEffect(function(){
+//     props.relatedParts.map(part =>{
       
-        fetch('/thepart/' + part.id)
-        .then(res => res.json())
-        .then(data => {
-            let newDoorPart = {
-                name: data.name,
-                relatedEntries: data.relatedEntries
-            }
-            setDoorParts(oldArray => [...oldArray, newDoorPart]);
-        })
+//         fetch('/thepart/' + part.id)
+//         .then(res => res.json())
+//         .then(data => {
+//             let newDoorPart = {
+//                 name: data.name,
+//                 relatedEntries: data.relatedEntries
+//             }
+//             setDoorParts(oldArray => [...oldArray, newDoorPart]);
+//         })
     
-    })
-}, [])
+//     })
+// }, [])
 
 
-    const returnedDoorParts = doorParts.map(thepart => {
+    const returnedDoorParts = props.relatedParts.map(thepart => {
         return (
             <Part relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )

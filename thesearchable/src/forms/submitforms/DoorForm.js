@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { style } from "@mui/system";
 import { useContext } from "react";
 import AuthContext from "../../authentication/AuthContext";
-
+import { useNavigate } from "react-router-dom";
 export default function DoorForm (props){
   let {authTokens, logoutUser} = useContext(AuthContext)
     const [formValues, setFormValues] = React.useState([{ name: "" , relatedParts: []}])
@@ -15,6 +15,7 @@ export default function DoorForm (props){
     const [doorDisplay, setDoorDisplay] =React.useState(true)
     const [submittedDisplay, setSubmittedDisplay] = React.useState(false)
     const[selectedParts, setSelectedParts]= React.useState([])
+    const navigate = useNavigate()
     let handleChange = (i, e) => {
         let newFormValues = [...formValues];
         newFormValues[i][e.target.name] = e.target.value;
@@ -22,39 +23,31 @@ export default function DoorForm (props){
       }
 
         const handlePartChange =(index, choice) =>{  
-        //     console.log(choice[choice.length-1].value)
-        //  setSelectedParts(selected => [...selected, choice[choice.length-1].value])
+            // let choices = []
+            // choice.map(onechoice => {
+            //     choices.push(onechoice.value)
+            // })
+            // setSelectedParts(choices)
+            // console.log(choices)
+            // console.log(formValues)
+
             let choices = []
             choice.map(onechoice => {
+                console.log(onechoice.value)
                 choices.push(onechoice.value)
             })
-            setSelectedParts(choices)
+            
+            let newFormValues = [...formValues];
+            newFormValues[index]['relatedParts'] = choices;
+            setFormValues(newFormValues)
+            console.log(choices)
+            console.log(formValues)
 
-            // console.log('changed')
-            // console.log(choice)
-            // let newFormValues = [...formValues];
-            // newFormValues[index]['relatedParts'] = choices;
-            // setFormValues(newFormValues)
-
-        // let classArray = []
-        // selectedOption.map(option => {
-        //   classArray.push(option.value)
-        // })
-        // let newFormValues = [...formValues];
-        // newFormValues[i]['relatedParts'] = classArray;
-        // setFormValues(newFormValues);
         
         // setFormValues([...formValues, {relatedParts: classArray}])
       }
 
-    //   const handlePartChange =(i, selectedOption) =>{    
-    //     let classArray = []
-    //     selectedOption.map(option => {
-    //       classArray.push(option.value)
-    //     })
-        
-    //     setFormValues([...formValues, {relatedParts: classArray}])
-    //   }
+   
     
     let addFormFields = () => {
         setFormValues([...formValues, { name: "", relatedParts: []}])
@@ -73,54 +66,23 @@ export default function DoorForm (props){
   
     let handleSubmit = (event) => {
         event.preventDefault();
-        
-
-    formValues.map(value => {
-          
-      let form_data = new FormData();
-      form_data.append('name', value.name);
-      // form_data.append('relatedParts', value.relatedParts)
-      form_data.append('relatedParts', selectedParts)
-      // axios.post(`/adddoor/${props.id}/`, {
-      //   name: value.name,
-      //   selectedParts: selectedParts
-      // }, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //     'Authorization':'Bearer ' + String(authTokens.access)
-      // }
-      // })
-    //   fetch(`/adddoor/${props.id}/`, {
-    //     method:'POST',
-    //      headers: {
-    //       'Content-Type': 'multipart/form-data',
-    //       'Authorization':'Bearer ' + String(authTokens.access)
-    //   },
-    //     body:{
-    //       'name': value.name,
-    //       'selectedParts': selectedParts
-    //     }
-    // })
-    fetch(`/adddoor/${props.id}/`,{
-      method: 'POST',
-      headers: {
-      'Content-Type': 'application/json',
-      'Authorization':'Bearer ' + String(authTokens.access)
-      },
-      body: JSON.stringify({
-        'name': value.name,
-        'relatedParts': selectedParts 
-          })
-  })
-      .then(res => {
-    
-      }).catch(err => {
-       
+        axios.post(`/adddoor/${props.id}/`, JSON.stringify(formValues), {
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization':'Bearer ' + String(authTokens.access)
+          }
       })
-            })
+    
       
-    //  setDoorDisplay(false)
-    //  setSubmittedDisplay(true)
+      .then(res => {
+        alert('posted');
+        navigate(`/book/${props.id}/`)
+      })
+      .catch(err => {
+       alert('error')
+            })
+
+  
 
     
   
