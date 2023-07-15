@@ -33,15 +33,14 @@ export default function DoorForm (props){
 
             let choices = []
             choice.map(onechoice => {
-                console.log(onechoice.value)
+            
                 choices.push(onechoice.value)
             })
             
             let newFormValues = [...formValues];
             newFormValues[index]['relatedParts'] = choices;
             setFormValues(newFormValues)
-            console.log(choices)
-            console.log(formValues)
+        
 
         
         // setFormValues([...formValues, {relatedParts: classArray}])

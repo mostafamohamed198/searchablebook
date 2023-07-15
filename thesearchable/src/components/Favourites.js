@@ -882,7 +882,7 @@ const searchClient = Client(sk, {
  
     let thestring = ''
     tags.map(tag => {
-      console.log(tag.name)
+    
  
       if(tag.name != 'AND' && tag.name != 'OR' && tag.name != 'NOT'){
       thestring = `${thestring} (${tag.name})`

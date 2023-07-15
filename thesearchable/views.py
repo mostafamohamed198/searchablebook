@@ -63,8 +63,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         theuserInfo = userInfo.objects.get(user = user)
-        print(theuserInfo.approvedcategories.all())
-       
+      
         countriesArray = []
         categoriesArray = []
         for country in theuserInfo.approvedcountries.all():
@@ -333,7 +332,7 @@ class EntryBookFormViewSet(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     @csrf_exempt
     def post(self, request, format=None):
-        print('working')
+      
         data = json.loads(request.body)
         serializer = EntryFormSerializer(data=data)
         if serializer.is_valid():
@@ -346,12 +345,12 @@ class EntryBookFormViewSet(APIView):
                 partId = data.get('part')
                 source = data.get('source')
                 theBook = book.objects.get(id = int(bookId))
-                print(theBook.bookOrigin.id)
+              
                 theBookOrigin = theBook.bookOrigin
                 theBookCategory = theBook.bookCategory
                 theBookClassification = theBook.bookClassification.all()
                 theBookCover = theBook.cover.url[6:]
-                print (theBookCover[6:])
+               
                 theBookAuthors = theBook.author.all()
                 # print(theBookAuthors)
                 
@@ -370,7 +369,7 @@ class EntryBookFormViewSet(APIView):
                     thePart.save()
                 theBook.relatedChapters.add(newEntry)
                 theBook.save()
-                print(newEntry.id)
+              
                 theuserInfo.submittedentries.add(int(newEntry.id))
                 theuserInfo.save()
             return Response(serializer.data ,status=status.HTTP_201_CREATED)
@@ -387,7 +386,7 @@ class BookFormViewSet(APIView):
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def post(self, request, format=None):
-        print(request.data)
+     
         serializer = BookFormSerializer(data=request.data, partial=True)
         theuserInfo = userInfo.objects.get(user = request.user)
         if serializer.is_valid() and theuserInfo.is_admin is True:
@@ -450,7 +449,7 @@ class Entry_change(APIView):
     def put(self, request, pk):
         theentry = entry.objects.get(pk = pk)
         thedata = request.data
-        print(thedata)
+       
         theuserInfo = userInfo.objects.get(user = request.user)
         serializer = EntryFormSerializer(theentry, data= thedata, partial = True)
         if serializer.is_valid() and theuserInfo.is_admin is True:
@@ -475,7 +474,7 @@ def required_book(request, id):
         for chapter in object.relatedChapters.all():
             if int(chapter.id) == int(id):
                 snippet = book.objects.get(id = object.id)
-                print(object.id)
+               
 
     if request.method == 'GET':
         # if snippet.DoesNotExist:
@@ -484,7 +483,7 @@ def required_book(request, id):
         # else:
             
             serializer = BookSerializer(snippet)
-            print(serializer.data)
+           
             serializer.data['relatedDoors'] = 0
             return Response(serializer.data)
     
@@ -611,7 +610,7 @@ def author_info(request, authid):
             y.append(entrycategoriess)
               
     # y = list(set(y)) 
-    print(y)
+
     return Response ({"id": theauthor.id, "name": theauthor.name, 'degree':theauthor.degree, 'about': theauthor.about,'picture':theauthor.picture.url, 'relatedEntries':x, 'categories': y})
 
 @api_view(['GET',  'DELETE'])
@@ -635,7 +634,7 @@ class putFavourites(APIView):
             for chapter in object.relatedChapters.all():
                 if int(chapter.id) == int(id):
                     snippet = book.objects.get(id = object.id)
-                    print(object.id)
+                  
         if data['fav'] == True:
             favouriteEntry.favouriteusers.remove(user)
             
@@ -694,7 +693,7 @@ class userform(APIView):
         if request.user.is_superuser:
             data = request.data
             userid = data['id']
-            print(data)
+        
             theUserInfo = userInfo.objects.get(user = userid)
             serializer = UserInfoPutSerializer(theUserInfo, data=data, partial=True)
             if serializer.is_valid():
