@@ -57,6 +57,7 @@ export default function SingleEntry (props){
     const [requestUser, setRequestUser] = React.useState('')
     const [inFavourites ,setInFavourites] = React.useState(false)
     const [favouriteUsers , setFavouriteUsers] = React.useState([])
+    const [headings, setHeadings] = React.useState([]);
     const [largeWindow, setLargeWindow] = React.useState(true)
     const [loaded, setLoaded] = React.useState(false)
     const [entryOrigin , setEntryOrigin] = React.useState(0)
@@ -97,18 +98,7 @@ export default function SingleEntry (props){
                
              }
              ,[])
-            React.useEffect(function(){
-                fetch('/entries/' + props.id)
-                .then(res => res.json())
-                .then(data => {
-                setTheEntry(`${data.body}`)
-                setTheTitle(`${data.title}`)
-                setBibilography(`${data.bibiliography}`)
-                setFavouriteUsers(data.favouriteusers)})
-              setSearched(false)
-         
-        
-            }, [props.id])
+
              React.useEffect(()=>{
                 const fetchData = async () =>{
                     setInFavourites(false)
@@ -120,24 +110,128 @@ export default function SingleEntry (props){
                 fetchData()
                 
              },[requestUser, favouriteUsers, props.id])
-       
+
+
+
+React.useEffect(function () {
+
+  // if (loaded){
+  setHeadings([])
+  const elements = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"))
+      .filter((element) => element.id)
+      .map((element) => ({
+        id: element.id,
+        text: element.textContent ?? "",
+        level: Number(element.tagName.substring(1))
+      }
+      ));
+  setHeadings(elements);
+  setLoaded(false)
+
+// }
+
+}, [theEntry])
+
+React.useEffect(function(){
+  // setLoaded(false)
+    fetch('/entries/' + props.id)
+    .then(res => res.json())
+    .then(data => {
+    setTheEntry(`${data.body}`)
+    setTheTitle(`${data.title}`)
+    setBibilography(`${data.bibiliography}`)
+    setFavouriteUsers(data.favouriteusers)})
+
+
+
+
+}, [props.id])
+
+// function theTable (){
+
+//   const headingsmap = headings.map(heading => (
+//     <li 
+//       key={heading.id} 
+//       style={{ marginRight: `${heading.level - 2}em` }}
+//     >
+//       <a href={`#${heading.id}`}>
+//         {heading.text}
+//       </a>
+//     </li>
+//   ))
+//   return(
+//   <nav>
+//       <ul>
+//         {headingsmap}
+//       </ul>
+//     </nav>
+//   )
+// }
+
+
+function theTable (){
+
+  const headingsmap = headings.map((heading, index, elements) => {
+    if (heading.text != 'Footnotes'){
+    return (
+      <a href={`#${heading.id}`}>
+         {/* <MenuItem  key={heading.id} style={{ marginRight: `${heading.level - 2}em` }} >{heading.text}</MenuItem> */}
+         <MenuItem  key={heading.id} style={{ paddingRight: `${30 + (heading.level * 8)}px` , color: 'black', textDecoration:'underline'}} >{heading.text}</MenuItem>
+      </a>
+    )
+    }
+  //  console.log(elements[index+1])
+  //  if (elements)
+  // let next = 
+  // if (elements[index+1] != null){
+  //   if (parseInt(elements[index+1].level) > parseInt(heading.level)){
+  //     return (
+  //       <SubMenu style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden'}}  label={heading.text}>
+  //            <MenuItem>{heading.text}</MenuItem>
+  //           </SubMenu>
+  //     )
+  //   }
+  // //   return (
+  // //   <li 
+  // //     key={heading.id} 
+  // //     style={{ marginRight: `${heading.level - 2}em` }}
+  // //   >
+  // //     <a href={`#${heading.id}`}>
+  // //       {heading.text}
+  // //     </a>
+  // //   </li>
+  // // )
+  // }
+})
+    
+  return(
+  <nav>
+      <ul>
+        {headingsmap}
+      </ul>
+    </nav>
+  )
+}
+
+
+
 
     const returnedParts = parts.map(thepart => {
         
         return (
-            <Part relatedEntries={thepart.relatedEntries} name={thepart.name}/>
+            <Part activeEntry={props.id} tableofContent={theTable} relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )
     })
 
 const returnedDoors =   doors.map(thedoor => {
     return (
-        <Door relatedParts={thedoor.relatedParts} name={thedoor.name} id={thedoor.id}/>
+        <Door activeEntry={props.id} tableofContent={theTable}  relatedParts={thedoor.relatedParts} name={thedoor.name} id={thedoor.id}/>
     )
 })
 
 const returnedChapters = chapters.map(thechapter => {
     return (
-        <Chapter chapterid = {thechapter.id} title= {thechapter.title} />
+        <Chapter activeEntry={props.id} tableofContent={theTable} chapterid = {thechapter.id} title= {thechapter.title} />
     )
 })
 
@@ -233,21 +327,7 @@ function iconStar(){
         )
     }
 }
-  
 
-  const styles = StyleSheet.create({
-    page: {
-      flexDirection: 'row',
-      backgroundColor: '#E4E4E4'
-    },
-    section: {
-      margin: 10,
-      padding: 10,
-      flexGrow: 1
-    }
-  });
-
-  
  
   const theauthors = authors.map(author =>{
     const redirect = `/authordetails/${author.id}`
@@ -266,9 +346,13 @@ function iconStar(){
     }
   }
 
+
+
  return (
         
     	<div id="SEforpdf" className="SE">
+
+
                  <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
                
 <Menu>
@@ -330,8 +414,35 @@ function iconStar(){
                     </div>
                     </div>
                 </div>
-                <ReactMarkdown className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry} remarkPlugins={[remarkGfm]} />
+                
+               
+                {/* <div  onBlur = {() => setLoaded(!loaded)}> */}
+                <ReactMarkdown 
+               
+              
+                components={{
+                  h2: ({ node, ...props }) => (
+                    <h2 id={`${props.children[0]}`} {...props}></h2>
+                  ),
+                  h3: ({ node, ...props }) => (
+                    <h3 id={`${props.children[0]}`} {...props}></h3>
+                  ),
+                  h4: ({ node, ...props }) => (
+                    <h4 id={`${props.children[0]}`} {...props}></h4>
+                  ),
+                  h5: ({ node, ...props }) => (
+                    <h5 id={`${props.children[0]}`} {...props}></h5>
+                  ),
+                 h6: ({ node, ...props }) => (
+                    <h6 id={`${props.children[0]}`} {...props}></h6>
+                  ),
+                }} 
+         className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} />
+            {/* </div> */}
             </div>
+            {/* </div> */}
+            
+            {/* {setLoaded(true)} */}
 
   
         </div>

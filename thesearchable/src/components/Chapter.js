@@ -8,12 +8,24 @@ import {
   } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 export default function Chapter(props){
+  function returnTOC (){
+   if (props.activeEntry == props.chapterid){
  
+    return (
+      // <MenuItem style={{height: '100%'}}>
+      // <div style={{height: '100%'}}>
+      // {props.tableofContent()}
+      // </div>
+
+      //       </MenuItem> 
+      props.tableofContent()
+    )
+   }
+  }
     const url = `/entry/${props.chapterid}`
     
        return(
-       
-        <Link key={props.chapterid} style={{color: 'black'}} to={url}><MenuItem>{props.title}</MenuItem></Link>
-        
+          // <SubMenu label={props.title} style={{fontSize: '16px', paddingRight: '30px', outline: 'none'}} component={<Link to= {url} />}>{returnTOC()}</SubMenu>
+          <SubMenu label={props.title} style={{paddingRight: '35px'}} component={<Link to= {url} />}>{returnTOC()}</SubMenu>
        )
 }

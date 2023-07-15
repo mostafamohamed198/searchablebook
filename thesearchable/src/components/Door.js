@@ -24,7 +24,7 @@ const [theDisplay, setTheDisplay] = React.useState(false)
 
     const returnedDoorParts = props.relatedParts.map(thepart => {
         return (
-            <Part relatedEntries={thepart.relatedEntries} name={thepart.name}/>
+            <Part activeEntry={props.activeEntry} tableofContent={props.tableofContent}  relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )
     })
  
@@ -43,7 +43,7 @@ const [theDisplay, setTheDisplay] = React.useState(false)
     else{
         return(
 
-            <SubMenu style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden'}} defaultOpen={true} label={props.name}>
+            <SubMenu style={{fontSize:'18px',fontWeight:'700',color:'#087cc4'}} defaultOpen={false} label={props.name}>
               {returnedDoorParts}
             </SubMenu>
          
