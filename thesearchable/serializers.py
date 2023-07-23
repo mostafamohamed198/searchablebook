@@ -34,37 +34,52 @@ class EntrySerializer(serializers.ModelSerializer):
             'favouriteusers', 
         )
 
+class EntryBookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = entry
+        fields = (
+            'id',
+            'title',
+            'entryCover',
+           
+        )
+class PartSerializer(serializers.ModelSerializer):
+
+    relatedEntries = serializers.SerializerMethodField()
+    class Meta:
+        model = part
+        fields = '__all__'
+
+    def get_relatedEntries(self, instance):
+        entry = instance.relatedEntries.order_by('id')
+        return EntryBookSerializer(entry, many=True).data
+       
+
 class DoorSerializer(serializers.ModelSerializer):
-    relatedParts = serializers.SlugRelatedField(
-        many=True,
-        read_only = True,
-        slug_field='part_related_dictionary'
-    )
+    relatedParts = serializers.SerializerMethodField()
 
     class Meta:
         model = door
+       
         fields = ('id', 'name', 'relatedParts')
     
-    
+    def get_relatedParts(self, instance):
+        part = instance.relatedParts.order_by('id')
+        return PartSerializer(part, many=True).data
+
+
+
+
 class BookSerializer(serializers.ModelSerializer):
-    relatedParts = serializers.SlugRelatedField(
-        many=True,
-        read_only = True,
-        slug_field='part_related_dictionary'
-    )
-    # relatedDoors = serializers.SlugRelatedField(
-    #     many=True,
-    #     read_only = True,
-    #     slug_field='door_related_dictionary'
-    # )
+    
 
-    relatedDoors = DoorSerializer(many = True, read_only = True)
+    relatedDoors = serializers.SerializerMethodField()
 
-    relatedChapters = serializers.SlugRelatedField(
-        many=True,
-        read_only = True,
-        slug_field='entry_dictionary'
-    )
+    
+    relatedParts = serializers.SerializerMethodField()
+
+    relatedChapters = serializers.SerializerMethodField()
+
     bookCategory = serializers.SlugRelatedField(
      
         read_only = True,
@@ -91,12 +106,26 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = book
         fields = '__all__'
+
+    def get_relatedDoors(self, instance):
+        doors = instance.relatedDoors.order_by('id')
+        return DoorSerializer(doors, many=True).data
+    
+    def get_relatedParts(self, instance):
+        part = instance.relatedParts.order_by('id')
+        return PartSerializer(part, many=True).data
+
+    def get_relatedChapters(self, instance):
+        entry = instance.relatedChapters.order_by('id')
+        return EntryBookSerializer(entry, many=True).data
+       
         # fields = ['id', 'name', 'author', 'containsParts', 'containsDoors', 'bookCategory', 'bookClassification', 'publicationDate', 'cover', 'relatedChapters', 'relatedParts', 'relatedDoors' ]
                                                                                                      
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+
 
 # UserModel = get_user_model()
 
@@ -130,16 +159,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         model = author
         fields = ('id','name', 'picture', 'degree', 'about')
 
-class PartSerializer(serializers.ModelSerializer):
 
-    relatedEntries = serializers.SlugRelatedField(
-        many=True,
-        read_only = True,
-        slug_field='entry_dictionary'
-    )
-    class Meta:
-        model = part
-        fields = '__all__'
     
 
 class DoorFormSerializer(serializers.ModelSerializer):

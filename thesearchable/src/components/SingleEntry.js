@@ -117,7 +117,7 @@ React.useEffect(function () {
 
   // if (loaded){
   setHeadings([])
-  const elements = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"))
+  const elements = Array.from(document.querySelectorAll("h2, h3, h4"))
       .filter((element) => element.id)
       .map((element) => ({
         id: element.id,
@@ -147,26 +147,7 @@ React.useEffect(function(){
 
 }, [props.id])
 
-// function theTable (){
 
-//   const headingsmap = headings.map(heading => (
-//     <li 
-//       key={heading.id} 
-//       style={{ marginRight: `${heading.level - 2}em` }}
-//     >
-//       <a href={`#${heading.id}`}>
-//         {heading.text}
-//       </a>
-//     </li>
-//   ))
-//   return(
-//   <nav>
-//       <ul>
-//         {headingsmap}
-//       </ul>
-//     </nav>
-//   )
-// }
 
 
 function theTable (){
@@ -176,32 +157,11 @@ function theTable (){
     return (
       <a href={`#${heading.id}`}>
          {/* <MenuItem  key={heading.id} style={{ marginRight: `${heading.level - 2}em` }} >{heading.text}</MenuItem> */}
-         <MenuItem  key={heading.id} style={{ paddingRight: `${30 + (heading.level * 8)}px` , color: 'black', textDecoration:'underline'}} >{heading.text}</MenuItem>
+         <MenuItem  key={heading.id} style={{fontSize:'18px', paddingRight: `${30 + (heading.level * 8)}px` , color: 'rgb(81, 81, 81)', }} >{heading.text}</MenuItem>
       </a>
     )
     }
-  //  console.log(elements[index+1])
-  //  if (elements)
-  // let next = 
-  // if (elements[index+1] != null){
-  //   if (parseInt(elements[index+1].level) > parseInt(heading.level)){
-  //     return (
-  //       <SubMenu style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden'}}  label={heading.text}>
-  //            <MenuItem>{heading.text}</MenuItem>
-  //           </SubMenu>
-  //     )
-  //   }
-  // //   return (
-  // //   <li 
-  // //     key={heading.id} 
-  // //     style={{ marginRight: `${heading.level - 2}em` }}
-  // //   >
-  // //     <a href={`#${heading.id}`}>
-  // //       {heading.text}
-  // //     </a>
-  // //   </li>
-  // // )
-  // }
+
 })
     
   return(

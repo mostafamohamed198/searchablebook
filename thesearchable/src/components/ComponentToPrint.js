@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
+
 
 export const ComponentToPrint = React.forwardRef((props, ref) => {
 
@@ -18,7 +21,8 @@ export const ComponentToPrint = React.forwardRef((props, ref) => {
                 <div className="DP--container">
                     <div className="DP--TC">
                 <div className="DP--title">{props.title}</div>
-                <ReactMarkdown className="DP--content">{props.content}</ReactMarkdown>
+                {/* <ReactMarkdown className="DP--content">{props.content}</ReactMarkdown> */}
+                <ReactMarkdown  className="DP--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={props.content}  remarkPlugins={[remarkGfm]} />
                 </div>
                 <div className="DP--bibilography">
                     <div className="DP--doc--info">

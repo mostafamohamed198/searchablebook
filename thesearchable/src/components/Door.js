@@ -5,21 +5,7 @@ export default function Door(props){
 const [doorParts, setDoorParts] = React.useState([])
 const [theDisplay, setTheDisplay] = React.useState(false)
 
-// React.useEffect(function(){
-//     props.relatedParts.map(part =>{
-      
-//         fetch('/thepart/' + part.id)
-//         .then(res => res.json())
-//         .then(data => {
-//             let newDoorPart = {
-//                 name: data.name,
-//                 relatedEntries: data.relatedEntries
-//             }
-//             setDoorParts(oldArray => [...oldArray, newDoorPart]);
-//         })
-    
-//     })
-// }, [])
+
 
 
     const returnedDoorParts = props.relatedParts.map(thepart => {
@@ -43,7 +29,7 @@ const [theDisplay, setTheDisplay] = React.useState(false)
     else{
         return(
 
-            <SubMenu style={{fontSize:'18px',fontWeight:'700',color:'#087cc4'}} defaultOpen={false} label={props.name}>
+            <SubMenu style={{fontSize:'18px',color:'rgb(81, 81, 81)', fontWeight: '500'}} defaultOpen={false} label={props.name}>
               {returnedDoorParts}
             </SubMenu>
          

@@ -178,7 +178,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'es'
+        'hosts': 'es',
+        'timeout': 120
     },
 }
 

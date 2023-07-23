@@ -44,7 +44,7 @@ export default function Part(props){
     else{
        return(
             // <SubMenu style={{paddingRight:'25px', fontSize:'16px',color:'#087cc4',overflow: 'hidden'}} label={props.name}>
-            <SubMenu style={{paddingRight:'25px', fontSize:'16px',color:'#087cc4',overflow: 'hidden'}} label={props.name}>
+            <SubMenu style={{paddingRight:'25px', fontSize:'18px', color:'rgb(81, 81, 81)',overflow: 'hidden'}} label={props.name}>
 
                {entry}
            

@@ -2,7 +2,7 @@ from django_elasticsearch_dsl import Document, fields, Index
 from django_elasticsearch_dsl.registries import registry
 from django.conf import settings
 from .models import *
-from elasticsearch_dsl import analyzer, tokenizer
+from elasticsearch_dsl import analyzer, tokenizer, connections
 
 
 autocomplete_analyzer = analyzer('autocomplete_analyzer',
