@@ -68,8 +68,6 @@ class DoorSerializer(serializers.ModelSerializer):
         return PartSerializer(part, many=True).data
 
 
-
-
 class BookSerializer(serializers.ModelSerializer):
     
 

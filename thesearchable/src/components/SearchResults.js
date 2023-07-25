@@ -105,6 +105,7 @@ export default function SearchResults(){
   const sk = new Searchkit({
     connection: {
       host: "http://13.53.171.156:9200",
+      
   
     },
     search_settings: {

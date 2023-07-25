@@ -313,7 +313,7 @@ function iconStar(){
     	<div id="SEforpdf" className="SE">
 
 
-                 <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
+                 <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{ zIndex:0}}>
                
 <Menu>
        <MenuItem

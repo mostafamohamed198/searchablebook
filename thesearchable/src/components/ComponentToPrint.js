@@ -22,7 +22,14 @@ export const ComponentToPrint = React.forwardRef((props, ref) => {
                     <div className="DP--TC">
                 <div className="DP--title">{props.title}</div>
                 {/* <ReactMarkdown className="DP--content">{props.content}</ReactMarkdown> */}
-                <ReactMarkdown  className="DP--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={props.content}  remarkPlugins={[remarkGfm]} />
+                <ReactMarkdown
+                  components={{
+                    li: ({ node, ...props }) => (
+                      <li {...props} id='printingid'></li>
+                    ),
+                 
+                  }} 
+                  className="DP--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={props.content}  remarkPlugins={[remarkGfm]} />
                 </div>
                 <div className="DP--bibilography">
                     <div className="DP--doc--info">
