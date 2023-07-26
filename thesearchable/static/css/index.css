@@ -551,14 +551,14 @@ height: calc(100vh - 170px);
   padding-right: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(100vh - 360.6px);
+  /* max-height: calc(100vh - 360.6px); */
 }
 
 .SE--final--returned--book{
   padding-right: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: calc(100vh - 270.6px);
+  max-height: calc(100vh - 250px);
 }
 .SE--markdown--content .footnotes{
   font-size: 16px;

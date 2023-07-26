@@ -41,7 +41,7 @@ export default function SingleEntry (props){
     const [favouriteUsers , setFavouriteUsers] = React.useState([])
     const [headings, setHeadings] = React.useState([]);
     let {user, authTokens} = useContext(AuthContext)
-  
+    const bookTitleElement = React.useRef();
      React.useEffect(function(){
        
               
@@ -124,7 +124,7 @@ React.useEffect(function(){
 
 }, [props.id])
 
-
+console.log(bookTitleElement.current?.offsetHeight)
 
 
 function theTable (){
@@ -288,49 +288,37 @@ function iconStar(){
         
        
     	<div id="SEforpdf" className="SE">
-          {/* position: sticky;
-  top: 170px;
-  right: 0px;
-align-self: flex-start; */}
-  
-            {/* <div style={{height: '100vh', backgroundColor: 'blue'}} > */}
-            {/* calc(100vh - 172px) */}
-
-                 <Sidebar  toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden'}}>
-               
-<Menu>
-       <MenuItem
-            icon={<MenuOutlinedIcon />}
-            onClick={() => {
-              collapseSidebar();
-            }}
-            style={{ textAlign: "center" }}
-          >
-            {" "}
-         
-          </MenuItem>
-         
-      <div className="SE--bookName"><Link style={{color: 'black'}} to={`/book/${theBook}`}>{theBookName}</Link></div>
-                <div  className="SE--input--div">
+        <Sidebar  toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden'}}>     
+            <Menu>
+                  <MenuItem
+                        icon={<MenuOutlinedIcon />}
+                        onClick={() => {
+                          collapseSidebar();
+                        }}
+                        style={{ textAlign: "center" }}
+                      >
+                        {" "}
+                    
+                  </MenuItem>
+                  <div ref={bookTitleElement} className="SE--bookName"><Link style={{color: 'black'}} to={`/book/${theBook}`}>{theBookName}</Link></div>
+                  <div  className="SE--input--div">
                     <form  className="SE--input">
                             <input value={value} onChange={handleChange} type="search" placeholder="ابحث عن كلمة في هذا المستند" />
                             <button onClick={handleSubmit}>Search</button>
                     </form>
-                </div>
-                <div className="SE--final--returned">
-            {finalreturned()}
-            </div>
- 
-        </Menu>
+                  </div>
+                  <div style={{height: `calc(100vh - (30px + ${bookTitleElement.current?.offsetHeight}px + 50px + 67px +  172px))`}} className="SE--final--returned">
+                      {finalreturned()}
+                  </div>
+            </Menu>
         
    
       </Sidebar>
-      {/* </div> */}
-             
-            <div className='SE--markdown'>
-                {/* <div>{windowWidth}</div> */}
-                <div className="SE--markdown--title">{theTitle}</div>
-                <div className="SE--icons">
+              
+      <div className='SE--markdown'>
+
+        <div className="SE--markdown--title">{theTitle}</div>
+           <div className="SE--icons">
                 <a href={downloadLink} ><FontAwesomeIcon icon={faDownload} /></a>
                 <div>
                     <a onClick={openpop}><FontAwesomeIcon icon={faShare} /></a>
@@ -339,31 +327,29 @@ align-self: flex-start; */}
                     </ReactModal>
                 </div>
                 <div>
-      <ReactToPrint
-        trigger={() => <a><FontAwesomeIcon icon={faPrint} /></a>}
-        content={() => componentRef.current}
-      />
-          <ComponentToPrint className='SE--printing' ref={componentRef} title={theTitle} content={theEntry} bibilography={bibilography}/>
-    </div>
-    <a>{iconStar()}</a>
+                    <ReactToPrint
+                      trigger={() => <a><FontAwesomeIcon icon={faPrint} /></a>}
+                      content={() => componentRef.current}
+                    />
+                    <ComponentToPrint className='SE--printing' ref={componentRef} title={theTitle} content={theEntry} bibilography={bibilography}/>
                 </div>
+                <a>{iconStar()}</a>
+            </div>
                 <div className="SE--docInfo--container">
-                <div className="SE--document--info">
-                <div style={{fontSize:'20px', fontWeight:'700'}}> معلومات عن المقال </div>
-                    <div className="SE--document--authors">
-                        <div style={{fontSize: '16px',fontWeight:'700', marginLeft:'30px'}}>{authors.length > 1 ? "المؤلفون:" : "المؤلف:"}</div>
-                        <div className="SE--authors--div">
-                            {theauthors}
-                        </div>
-                    </div>
+                    <div className="SE--document--info">
+                          <div style={{fontSize:'20px', fontWeight:'700'}}> معلومات عن المقال </div>
+                              <div className="SE--document--authors">
+                                  <div style={{fontSize: '16px',fontWeight:'700', marginLeft:'30px'}}>{authors.length > 1 ? "المؤلفون:" : "المؤلف:"}</div>
+                                  <div className="SE--authors--div">
+                                      {theauthors}
+                                  </div>
+                          </div>
                     </div>
                 </div>
                 
                
                 {/* <div  onBlur = {() => setLoaded(!loaded)}> */}
                 <ReactMarkdown 
-               
-              
                 components={{
                   h2: ({ node, ...props }) => (
                     <h2 id={`${props.children[0]}`} {...props}></h2>
@@ -381,13 +367,10 @@ align-self: flex-start; */}
                     <h6 id={`${props.children[0]}`} {...props}></h6>
                   ),
                 }} 
-         className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} />
-            {/* </div> */}
+                className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} />
+      
             </div>
-            {/* </div> */}
-            
-            {/* {setLoaded(true)} */}
-
+         
   
         </div>
    
