@@ -2,9 +2,9 @@
 body {
     /* background-color: rgb(240, 239, 239); */
     background-color: white;
-    /* overflow: hidden; */
     overflow-x: hidden;
-    overflow-y: scroll;
+    /* overflow-x: hidden;
+    overflow-y: scroll; */
     outline: none;
 
     -webkit-font-smoothing: antialiased;
@@ -40,10 +40,18 @@ input{
   padding: 0;
 }
 
+.HP--navigation{
+  position:sticky;
+ width: 100%;
+ z-index: 100;
+ top: 0px;
+ background-color: white;
+}
+
 
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
   
 }
 
@@ -74,7 +82,7 @@ ul, ol {
   margin-right: auto;
   /* background-color: #000; */
   /* overflow: scroll; */
-  overflow: hidden
+  /* overflow: hidden */
  
 
   }
@@ -472,6 +480,7 @@ footer{
  /* border: solid rgb(219, 219, 219); */
  border-width: 1.5px;
 flex-direction: row;
+/* overflow: auto */
 }
 
 .SE mark{
@@ -529,9 +538,27 @@ margin-left: 40px;
 
 }
 
+.SE--sidebardiv{
+  position: sticky;
+  top: 170px;
+  right: 0px;
+align-self: flex-start;
+height: calc(100vh - 170px);
+  
+
+}
 .SE--final--returned{
   padding-right: 10px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 360.6px);
+}
+
+.SE--final--returned--book{
+  padding-right: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 270.6px);
 }
 .SE--markdown--content .footnotes{
   font-size: 16px;
@@ -702,6 +729,7 @@ margin-left: 40px;
 }
 .ps-sidebar-root {
   z-index: 1;
+  overflow: hidden;
 }
 
 
@@ -2518,6 +2546,10 @@ background-color: blue;
 /**
  * Hits
  */
+ .ais-Hits{
+  margin-top: 20px;
+
+ }
 .ais-Hits-item,
 .ais-InfiniteHits-item {
   -webkit-box-align: center;
@@ -2801,6 +2833,7 @@ font-size: 18px;
 .SR--pandel--div .ps-sidebar-root{
   border-left: solid rgb(220, 220, 220);
   border-width:2px;
+  overflow: hidden;
 }
 
 

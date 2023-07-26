@@ -1,10 +1,9 @@
-import React, { Component, useRef }from "react";
-import { useState } from "react";	
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useContext } from "react";
 import AuthContext from "../authentication/AuthContext";
-import {Route, Link, Routes, useParams} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import Part from "./part";
 import Door from "./Door";
 import Chapter from "./Chapter";
@@ -13,30 +12,15 @@ import rehypeRaw from "rehype-raw";
 import reactStringReplace from 'react-string-replace';
 import { ComponentToPrint } from "./ComponentToPrint";
 import ReactToPrint from 'react-to-print';
-import { useReactToPrint } from "react-to-print";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faArrowLeft ,faDownload, faPrint, faShare, faStar as fasolidstar } from '@fortawesome/free-solid-svg-icons'
-// import {faArrowRight } from '@fortawesome/free-regular-svg-icons' 
-// import { library } from '@fortawesome/fontawesome-svg-core'
-// import { faCoffee as fasrFaCoffee } from '@fortawesome/sharp-regular-svg-icons'import reactStringReplace from 'react-string-replace';
-import Popup from 'reactjs-popup';
-import { ProSidebarProvider } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import ReactModal from 'react-modal';
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-
 import axios from "axios";
-import LoginPage from "../authentication/LoginPage";
-import { Login } from "@mui/icons-material";
-
-
-
-
 
 export default function SingleEntry (props){
 
-    // const params = useParams();
     const [theEntry, setTheEntry] = React.useState()
     const [theSearchedEntry, setTheSearchedEntry] = React.useState()
     const [searched, setSearched] = React.useState(false)
@@ -53,15 +37,9 @@ export default function SingleEntry (props){
     const [bibilography, setBibilography] = React.useState('')
     const [isOpen, setIsOpen] = React.useState(false);
     const [authors, setAuthors] = React.useState([])
-    const [authentication, setAuthentication] = React.useState(false)
-    const [requestUser, setRequestUser] = React.useState('')
     const [inFavourites ,setInFavourites] = React.useState(false)
     const [favouriteUsers , setFavouriteUsers] = React.useState([])
     const [headings, setHeadings] = React.useState([]);
-    const [largeWindow, setLargeWindow] = React.useState(true)
-    const [loaded, setLoaded] = React.useState(false)
-    const [entryOrigin , setEntryOrigin] = React.useState(0)
-    const [entryCategory, setEntryCategory] = React.useState(0)
     let {user, authTokens} = useContext(AuthContext)
   
      React.useEffect(function(){
@@ -73,12 +51,11 @@ export default function SingleEntry (props){
                 .then(data => {
                 setTheEntry(`${data.body}`)
                 setTheTitle(`${data.title}`)
-                setEntryCategory(data.entryCategory)
-                setEntryOrigin(data.entryOrigin)
+             
                 setBibilography(`${data.bibiliography}`)
                 setFavouriteUsers(data.favouriteusers)
                 setAuthors(data.entryauthor)
-                setLoaded(true)
+                
 
                 }) 
         
@@ -109,7 +86,7 @@ export default function SingleEntry (props){
                 }
                 fetchData()
                 
-             },[requestUser, favouriteUsers, props.id])
+             },[ favouriteUsers, props.id])
 
 
 
@@ -126,7 +103,7 @@ React.useEffect(function () {
       }
       ));
   setHeadings(elements);
-  setLoaded(false)
+  
 
 // }
 
@@ -222,7 +199,7 @@ const handleChange = (event) => {
     else{
         setSearched(false)
     }
-    const arrowLeft = <FontAwesomeIcon icon={faArrowLeft} />
+   
         const ccc= reactStringReplace(theEntry, value, (match, i) => (
             `<mark><a href ="#mark-${i + 2}" id="mark-${i}" className="SE--mark--link">${match} <i class="fa-solid fa-arrow-left" className="SE--arrowLeft"></i> </a></mark>`
            ));
@@ -235,9 +212,7 @@ const handleChange = (event) => {
 
   const downloadLink = `/articlepdf/${props.id}`;
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-  });
+
 const componentRef = React.useRef();
 function openpop (){
     setIsOpen(true)
@@ -310,10 +285,18 @@ function iconStar(){
 
  return (
         
+        
+       
     	<div id="SEforpdf" className="SE">
+          {/* position: sticky;
+  top: 170px;
+  right: 0px;
+align-self: flex-start; */}
+  
+            {/* <div style={{height: '100vh', backgroundColor: 'blue'}} > */}
+            {/* calc(100vh - 172px) */}
 
-
-                 <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{ zIndex:0}}>
+                 <Sidebar  toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden'}}>
                
 <Menu>
        <MenuItem
@@ -342,6 +325,7 @@ function iconStar(){
         
    
       </Sidebar>
+      {/* </div> */}
              
             <div className='SE--markdown'>
                 {/* <div>{windowWidth}</div> */}
@@ -406,7 +390,7 @@ function iconStar(){
 
   
         </div>
-
+   
     )
 }
 

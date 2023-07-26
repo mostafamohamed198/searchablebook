@@ -99,11 +99,12 @@ return(
     )
   }
 }
-const requiresAuthentication = location.pathname !== "/login";
+
 
     return (
 
-        <div className="container" > 
+        <div className="container" >
+          <div className="HP--navigation">
         <div className="first--nav">  
             <div className="logoandtitle">
              <Link to="/"  style={{'color': 'black'}}>
@@ -183,7 +184,7 @@ const requiresAuthentication = location.pathname !== "/login";
 
      
         </nav>
-
+        </div> 
 <div >
 
         <Routes> 

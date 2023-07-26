@@ -1,7 +1,7 @@
 import React from "react";
 import { useContext } from "react";
 import SingleEntry from "../components/SingleEntry";
-import {Route, Redirect, Navigate, Outlet} from 'react-router-dom'
+import { Navigate} from 'react-router-dom'
 import AuthContext from "../authentication/AuthContext";
 import { useParams } from "react-router-dom";
 const EntryPrivateRoute = () => {

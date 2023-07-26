@@ -234,7 +234,7 @@ function collapsedWidth(){
  return (
    
     <div id="SEforpdf" className="SE">
-                 <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
+                 <Sidebar toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden'}}>
                  {/* <Sidebar toggled={false}  rtl={true} style={{  zIndex:0}}> */}
       
 <Menu>
@@ -248,7 +248,7 @@ function collapsedWidth(){
             {" "}
          
           </MenuItem>
-          <div className="SE--final--returned">
+          <div className="SE--final--returned--book">
             {finalreturned()}
             </div>
  
