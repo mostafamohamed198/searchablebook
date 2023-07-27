@@ -72,7 +72,7 @@ export default function SearchResults(){
   function onInput (query) {
    
     
-    axios.post('http://13.53.171.156:9200/entries/_search', {
+    axios.post('http://16.16.80.92:9200/entries/_search', {
       
     query: {
       multi_match: {
@@ -104,7 +104,7 @@ export default function SearchResults(){
 
   const sk = new Searchkit({
     connection: {
-      host: "http://13.53.171.156:9200",
+      host: "http://16.16.80.92:9200",
       
   
     },
