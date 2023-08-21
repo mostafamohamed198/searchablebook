@@ -6,9 +6,13 @@ from elasticsearch_dsl import analyzer, tokenizer, connections
 
 
 autocomplete_analyzer = analyzer('autocomplete_analyzer',
-            tokenizer=tokenizer('trigram', 'ngram', min_gram=1, max_gram=20),
+            tokenizer=tokenizer('trigram', 'ngram', min_gram=3, max_gram=20),
             filter=['lowercase']
         )
+arabic_analyzer = analyzer("rebuilt_arabic", 
+                           tokenizer=tokenizer('trigram','ngram', min_gram=3, max_gram=10),
+                        #    filter=["lowercase","decimal_digit", "arabic_normalization"]
+                           )
 entry_index=Index('entries')
 
 # See Elasticsearch Indices API reference for available settings

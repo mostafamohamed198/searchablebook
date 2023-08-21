@@ -23,15 +23,17 @@ services:
     ports:
       - "5432:5432"
   es:
-    image: elasticsearch:7.9.1
+    # image: elasticsearch:7.9.1
+    image: elasticsearch:8.7.1
     environment:
       xpack.security.enabled: false
       discovery.type: single-node
       http.cors.enabled: true
-      http.cors.allow-origin: "*"
+      http.cors.allow-origin: "http://localhost"
       http.cors.allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
       http.cors.allow-headers:  Authorization, X-Requested-With,X-Auth-Token,Content-Type, Content-Length
       http.cors.allow-credentials: true
+      ES_JAVA_OPTS: -Xmx2g -Xms2g
   
     ports:
       - "9200:9200"
@@ -46,10 +48,10 @@ services:
     build: 
       context: .
       target: web
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:80
     
     ports:
-      - "8000:8000"
+      - "80:80"
     environment:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
@@ -74,3 +76,83 @@ networks:
     driver: bridge
   heritage-network:
     driver: bridge
+
+
+
+# services:
+
+#   dab:
+#     image: postgres:13
+#     # image: postgres:15-alpine
+#     container_name: dab
+#     # networks:
+#     #           - djangonetwork
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data/
+#       # - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+#     environment:
+#       # - POSTGRES_HOST_AUTH_METHOD=trust
+#       # - POSTGRES_NAME=admin
+#       # - POSTGRES_USER=postgres
+#       POSTGRES_PASSWORD: web1@alk@fyye1a12p3p
+#       # - POSTGRES_USER=root
+#       # - POSTGRES_PASSWORD=root
+#       # - POSTGRES_DATABASE=db
+#       # - listen_addresses='0.0.0.0'
+#     networks:
+#       - heritage-network
+#     ports:
+#       - "5432:5432"
+#   es:
+#     image: elasticsearch:8.8.1
+#     environment:
+#       xpack.security.enabled: false
+#       discovery.type: single-node
+#       http.cors.enabled: true
+#       # http.cors.allow-origin: "*"
+#       http.cors.allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
+#       http.cors.allow-headers:  Authorization, X-Requested-With,X-Auth-Token,Content-Type, Content-Length
+#       http.cors.allow-credentials: true
+#       ES_JAVA_OPTS: -Xmx2g -Xms2g
+
+#     ports:
+#       - "9200:9200"
+#       - "9300:9300"
+#     networks:
+#       - elastic
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data/
+ 
+      
+#   web:
+#     build: 
+#       context: .
+#       target: web
+#     command: python manage.py runserver 0.0.0.0:8000
+    
+#     ports:
+#       - "8000:8000"
+#     environment:
+#       - POSTGRES_NAME=postgres
+#       - POSTGRES_USER=postgres
+#       # - POSTGRES_PASSWORD=postgres
+#     volumes:
+#       - .:/app
+#     #   - /tmp/app/mysqld:/run/mysqld
+#     depends_on:
+#       - dab
+#       - es
+#     networks:
+#       - elastic
+#       - heritage-network
+
+  
+
+# volumes:
+#   postgres_data:
+
+# networks:
+#   elastic:
+#     driver: bridge
+#   heritage-network:
+#     driver: bridge

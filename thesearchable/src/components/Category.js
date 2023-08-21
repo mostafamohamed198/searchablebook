@@ -1,17 +1,16 @@
 
 
-import React, { Component } from "react";
-import {Route, Link, Routes, useParams} from 'react-router-dom';
+import React from "react";
+import { Link} from 'react-router-dom';
 // import { ReactiveBase, DataSearch, SearchBox, MultiList } from "@appbaseio/reactivesearch";
 import Client from "@searchkit/instantsearch-client";
 import Searchkit from "searchkit";
-import {ProSidebarProvider, Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
+import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import {Configure, HierarchicalMenu, ToggleRefinement, MenuSelect, Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet } from "react-instantsearch-dom";
+import {Configure, Pagination, Panel,InstantSearch,  RefinementList, Snippet, Hits } from "react-instantsearch-dom";
 
 export default function Category(props){
   // const params = useParams();
-  const [largeWindow, setLargeWindow] = React.useState(true)
   const [categoryName, setCategoryName] = React.useState('')
 
   React.useEffect(function(){
@@ -24,11 +23,12 @@ export default function Category(props){
 
   const sk = new Searchkit({
     connection: {
-      host: "http://16.16.80.92:9200",
+      host: "http://localhost:9200",
   
     },
     search_settings: {
       highlight_attributes: ["name"],
+      sorting: {default: {field: 'publicationDate', order: 'desc'}},
       snippet_attributes: ['name'],
       search_attributes: [{ field: "name", weight: 3 }],
       result_attributes: ['id',"name", 'cover', 'author', 'bookCategory', 'publicationDate'],
@@ -41,7 +41,10 @@ export default function Category(props){
       return {
         query_string: {
           fields:["name^3"],
-          query: query
+          query: query,
+        //   sort : [
+        //     {publicationDate : {"order" : "asc"}}
+        //  ]
        }
     }
   }}, { debug: true });
@@ -150,11 +153,11 @@ export default function Category(props){
       </Panel>
       </SubMenu>
       <div style={{'display': 'none'}}>
-      <SubMenu style={{display: 'hidden',fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='الفئة:'>
+      {/* <SubMenu style={{display: 'hidden',fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='الفئة:'>
       <Panel>
         <RefinementList attribute='bookCategory.thecategory.key'  defaultRefinement={[`${categoryName}`]} searchable={true} limit={20} />
       </Panel>
-      </SubMenu>
+      </SubMenu> */}
       </div>
       <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='المؤلف:'>
       <Panel>
@@ -171,6 +174,7 @@ export default function Category(props){
     
       </div>
       <Configure
+      filters={`bookCategory.thecategory.key:${categoryName}`}
 
   hitsPerPage={15}
 />

@@ -9,7 +9,8 @@ body {
 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-family: sakkal
+    font-family: sakkal;
+    /* scroll-padding-top: 500px; */
     /* background-color: red; */
     
 }
@@ -489,6 +490,7 @@ background-color: rgb(255, 183, 0);
 .SE--mark--link{
   font-weight: 700;
   color: black;
+  scroll-margin-top: 180px
 }
 
 .SE--mark--link i {
@@ -522,6 +524,7 @@ background-color: rgb(255, 183, 0);
 }
 
 .SE--markdown--content{
+  /* scroll-margin-top: 1000px; */
 text-align: right;
 color:rgb(81, 81, 81);
 font-size: 20px;
@@ -861,8 +864,8 @@ width: 95%;
 .LP--table--div{
   background-color: white;
   position: absolute;
-  top:-80px;
-  right:10px;
+  top:130px;
+  right:71%;
   z-index: 10;
 }
 .LP--search--div{
@@ -2260,9 +2263,10 @@ background-color: blue;
 .SR--table--div{
   background-color: white;
   position: absolute;
-  top:-80px;
-  right:10px;
+  top: 130px;
+  right:71%;
   z-index: 10;
+  /* width:400px; */
 }
 
 

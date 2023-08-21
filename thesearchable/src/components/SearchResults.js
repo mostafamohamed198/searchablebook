@@ -24,6 +24,8 @@ export default function SearchResults(){
     display: displayTable ? 'block': 'none'
   }
 
+  
+
   function collapsedWidth(){
     const windowWidth = React.useRef(window.innerWidth);
     if (windowWidth.current >= 390){
@@ -72,7 +74,7 @@ export default function SearchResults(){
   function onInput (query) {
    
     
-    axios.post('http://16.16.80.92:9200/entries/_search', {
+    axios.post('http://localhost:9200/entries/_search', {
       
     query: {
       multi_match: {
@@ -104,12 +106,13 @@ export default function SearchResults(){
 
   const sk = new Searchkit({
     connection: {
-      host: "http://16.16.80.92:9200",
+      host: "http://localhost:9200",
       
   
     },
     search_settings: {
       highlight_attributes: ["title", 'body'],
+      
       snippet_attributes: ['title',"body"],
       search_attributes: [{ field: "title", weight: 3 }, "body", "bibiliography", "source"],
       // search_attributes: ["source"],
@@ -123,7 +126,7 @@ export default function SearchResults(){
     getQuery: (query, search_attributes) => {
       return {
         query_string: {
-          fields:["title^3", "body", "bibiliography","source", "entryauthor.name"],
+          fields:["title.raw", "body.raw", "bibiliography","source", "entryauthor.name"],
           query: query
        }
   
@@ -131,7 +134,7 @@ export default function SearchResults(){
     }
   }}, { debug: true });
 
-
+  console.log('it worke32d21بلي')
   
   const { collapseSidebar, rtl } = useProSidebar();
   // const searchClient = Client(sk);

@@ -747,16 +747,7 @@ export default function Favourites(){
 
   const [tags, setTags] = useState([])
 
-  const reactTags = useRef()
-  const params = useParams();
-
   let {user} = React.useContext(AuthContext)
-
-
-  const tableStyle = {
-    display: displayTable ? 'block': 'none'
-  }
-
 
 
   function collapsedWidth(){
@@ -780,7 +771,7 @@ export default function Favourites(){
   
   const sk = new Searchkit({
     connection: {
-      host: "http://16.16.80.92:9200",
+      host: "http://localhost:9200",
   
     },
     search_settings: {

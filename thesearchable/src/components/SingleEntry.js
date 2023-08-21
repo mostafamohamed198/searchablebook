@@ -124,7 +124,6 @@ React.useEffect(function(){
 
 }, [props.id])
 
-console.log(bookTitleElement.current?.offsetHeight)
 
 
 function theTable (){
@@ -282,7 +281,6 @@ function iconStar(){
   }
 
 
-
  return (
         
         
@@ -352,13 +350,13 @@ function iconStar(){
                 <ReactMarkdown 
                 components={{
                   h2: ({ node, ...props }) => (
-                    <h2 id={`${props.children[0]}`} {...props}></h2>
+                    <h2 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h2>
                   ),
                   h3: ({ node, ...props }) => (
-                    <h3 id={`${props.children[0]}`} {...props}></h3>
+                    <h3 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h3>
                   ),
                   h4: ({ node, ...props }) => (
-                    <h4 id={`${props.children[0]}`} {...props}></h4>
+                    <h4 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h4>
                   ),
                   h5: ({ node, ...props }) => (
                     <h5 id={`${props.children[0]}`} {...props}></h5>
@@ -367,7 +365,7 @@ function iconStar(){
                     <h6 id={`${props.children[0]}`} {...props}></h6>
                   ),
                 }} 
-                className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} />
+                className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} style={{scrollMarginTop: '10rem'}}/>
       
             </div>
          
