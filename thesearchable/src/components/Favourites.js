@@ -771,7 +771,7 @@ export default function Favourites(){
   
   const sk = new Searchkit({
     connection: {
-      host: "http://localhost:9200",
+      host: "http://172.31.10.200:9200",
   
     },
     search_settings: {

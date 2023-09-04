@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { Link} from 'react-router-dom';
 // import { ReactiveBase, DataSearch, SearchBox, MultiList } from "@appbaseio/reactivesearch";
@@ -23,7 +21,7 @@ export default function Category(props){
 
   const sk = new Searchkit({
     connection: {
-      host: "http://localhost:9200",
+      host: "http://172.31.10.200:9200",
   
     },
     search_settings: {
@@ -126,63 +124,89 @@ export default function Category(props){
     return (
       
       // <div className="LP">
-        <div className="ais-InstantSearch">
-    <InstantSearch  indexName="books" searchClient={searchClient}>
-   
-      <div className="SR--pandel--div" >
-       <Sidebar defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
-     <Menu>
-       <MenuItem
-            icon={<MenuOutlinedIcon />}
-            onClick={() => {
-              collapseSidebar();
-            }}
-            style={{ textAlign: "center" }}
-          >
-            {" "}
-         
-          </MenuItem>
-     <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}}label='الدولة:'>
-        <Panel>
-      <RefinementList translations={{ placeholder: "ادخل اسم البلد" }} attribute='bookOrigin.country.raw' searchable={true} limit={20} />
-      </Panel>
-      </SubMenu>
-      <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='التصنيف:'>
-      <Panel>
-      <RefinementList translations={{ placeholder: 'ادخل اسم التصنيف' }} attribute='bookClassification.theclass.key' searchable={true} limit={20} />
-      </Panel>
-      </SubMenu>
-      <div style={{'display': 'none'}}>
-      {/* <SubMenu style={{display: 'hidden',fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='الفئة:'>
-      <Panel>
-        <RefinementList attribute='bookCategory.thecategory.key'  defaultRefinement={[`${categoryName}`]} searchable={true} limit={20} />
-      </Panel>
-      </SubMenu> */}
-      </div>
-      <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='المؤلف:'>
-      <Panel>
-
-        <RefinementList translations={{ placeholder: "ادخل اسم المؤلف" }} attribute='author.name.key' searchable={true} limit={20} />
-      </Panel>
-      </SubMenu>
-        </Menu> 
-      </Sidebar>
-      {/* </div> */}
-      <div className="right-panel">
-    <div className="Cat--div">
-        <h2>{categoryName}</h2>
-    
-      </div>
-      <Configure
-      filters={`bookCategory.thecategory.key:${categoryName}`}
-
-  hitsPerPage={15}
-/>
-      <Hits hitComponent={hitView} /> 
-      <Pagination />
-      </div>
-      </div>
-  </InstantSearch>
-</div>
+      <div className="ais-InstantSearch">
+      <InstantSearch indexName="books" searchClient={searchClient}>
+        <div className="SR--pandel--div">
+          {/* Sidebar */}
+          <Sidebar defaultCollapsed={collapsedWidth()} rtl={true} style={{ zIndex: 0 }}>
+            <Menu>
+              <MenuItem
+                icon={<MenuOutlinedIcon />}
+                onClick={() => {
+                  collapseSidebar();
+                }}
+                style={{ textAlign: "center" }}
+              >
+                {" "}
+              </MenuItem>
+              <SubMenu
+                defaultOpen={true}
+                style={{
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  color: '#087cc4',
+                  overflow: 'hidden',
+                  borderBottom: 'solid rgb(220, 220, 220)',
+                  borderWidth: '2px'
+                }}
+                label='الدولة:'
+              >
+                <Panel>
+                  <RefinementList translations={{ placeholder: "ادخل اسم البلد" }} attribute='bookOrigin.country.raw' searchable={true} limit={20} />
+                </Panel>
+              </SubMenu>
+              <SubMenu
+                defaultOpen={true}
+                style={{
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  color: '#087cc4',
+                  overflow: 'hidden',
+                  borderBottom: 'solid rgb(220, 220, 220)',
+                  borderWidth: '2px'
+                }}
+                label='التصنيف:'
+              >
+                <Panel>
+                  <RefinementList translations={{ placeholder: 'ادخل اسم التصنيف' }} attribute='bookClassification.theclass.key' searchable={true} limit={20} />
+                </Panel>
+              </SubMenu>
+              <div style={{ 'display': 'none' }}>
+                {/* <SubMenu style={{display: 'hidden',fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='الفئة:'>
+                <Panel>
+                  <RefinementList attribute='bookCategory.thecategory.key'  defaultRefinement={[`${categoryName}`]} searchable={true} limit={20} />
+                </Panel>
+                </SubMenu> */}
+              </div>
+              <SubMenu
+                defaultOpen={true}
+                style={{
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  color: '#087cc4',
+                  overflow: 'hidden',
+                  borderBottom: 'solid rgb(220, 220, 220)',
+                  borderWidth: '2px'
+                }}
+                label='المؤلف:'
+              >
+                <Panel>
+                  <RefinementList translations={{ placeholder: "ادخل اسم المؤلف" }} attribute='author.name.key' searchable={true} limit={20} />
+                </Panel>
+              </SubMenu>
+            </Menu>
+          </Sidebar>
+          {/* Right Panel */}
+          <div className="right-panel">
+            <div className="Cat--div">
+              <h2>{categoryName}</h2>
+            </div>
+            <Configure filters={`bookCategory.thecategory.key:${categoryName}`} hitsPerPage={15} />
+            <Hits hitComponent={hitView} />
+            <Pagination />
+          </div>
+        </div>
+      </InstantSearch>
+    </div>
     )
 }
