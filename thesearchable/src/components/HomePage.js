@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Suspense } from "react";
 import { useState, useEffect } from "react";
 import LandingPage from "./LandingPage";
 import SearchResults from "./SearchResults";

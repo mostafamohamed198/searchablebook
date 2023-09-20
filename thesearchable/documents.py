@@ -7,7 +7,7 @@ from elasticsearch_dsl import analyzer, tokenizer, connections
 
 autocomplete_analyzer = analyzer('autocomplete_analyzer',
             tokenizer=tokenizer('trigram', 'ngram', min_gram=3, max_gram=20),
-            filter=['lowercase']
+            filter=['lowercase', "arabic_normalization"]
         )
 arabic_analyzer = analyzer("rebuilt_arabic", 
                            tokenizer=tokenizer('trigram','ngram', min_gram=3, max_gram=10),
@@ -19,6 +19,11 @@ entry_index=Index('entries')
 # entry_index.settings(
 #     number_of_shards=1,
 #     number_of_replicas=0
+# )
+
+# autocomplete_analyzer = analyzer('autocomplete_analyzer',
+#     tokenizer="standard",
+#     filter=["lowercase", "arabic_normalization"]
 # )
 
 # @entry_index.document

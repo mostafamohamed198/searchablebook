@@ -1,29 +1,35 @@
 import React from "react";
 import Part from "./part";
-import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
+import {  SubMenu,  } from 'react-pro-sidebar';
 export default function Door(props){
 const [doorParts, setDoorParts] = React.useState([])
 const [theDisplay, setTheDisplay] = React.useState(false)
+// console.log(`in door the selected entry id is ${props.selectedEntryId}`)
 
 
+// console.log(props.chapterClicked)
+        
+        // function chapterClicked(){
+        //     return props.chapterClicked
+        // }
 
-
+        // function tableofContent(){
+        //     return props.tableofContent
+        // }
     const returnedDoorParts = props.relatedParts.map(thepart => {
         return (
-            <Part activeEntry={props.activeEntry} tableofContent={props.tableofContent}  relatedEntries={thepart.relatedEntries} name={thepart.name}/>
+            <Part  headingsArray={props.headingsArray} selectedEntryId={props.selectedEntryId} activeEntry={props.activeEntry} chapterClicked={selected => props.chapterClicked(selected)}  relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )
     })
  
 
-    const styles = {
-        display : theDisplay ? 'block' : 'none'
-    }
+    // const styles = {
+    //     display : theDisplay ? 'block' : 'none'
+    // }
     if (props.name[0]== 'v' && props.name[1] == 'o' && props.name[2] == 'i' && props.name[3] == 'd'){
    
         return(
-          
                returnedDoorParts
-             
        )
     }
     else{

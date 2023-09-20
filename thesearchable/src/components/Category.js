@@ -5,7 +5,7 @@ import Client from "@searchkit/instantsearch-client";
 import Searchkit from "searchkit";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import {Configure, Pagination, Panel,InstantSearch,  RefinementList, Snippet, Hits } from "react-instantsearch-dom";
+import {Configure, Pagination, Panel,InstantSearch,  RefinementList, Snippet, Hits, SortBy, SearchBox } from "react-instantsearch-dom";
 
 export default function Category(props){
   // const params = useParams();
@@ -27,7 +27,8 @@ export default function Category(props){
     },
     search_settings: {
       highlight_attributes: ["name"],
-      sorting: {default: {field: 'publicationDate', order: 'desc'}},
+      // sorting: {default: {field: 'publicationDate', order: 'desc'}}, _name_asc: {field: 'name', order: 'asc'}, _name_desc: {field: 'name', order: 'desc'},
+      sorting: {default: {field: 'publicationDate', order: 'desc'}, _name_asc: {field: 'name', order: 'asc'}, _name_desc: {field: 'name', order: 'desc'}},
       snippet_attributes: ['name'],
       search_attributes: [{ field: "name", weight: 3 }],
       result_attributes: ['id',"name", 'cover', 'author', 'bookCategory', 'publicationDate'],
@@ -84,6 +85,7 @@ export default function Category(props){
     }
 // console.log(hit)
 // console.log(hit.publicationDate)
+
   
     const theID = `/book/${hit.id}` 
     return (
@@ -201,7 +203,20 @@ export default function Category(props){
           <div className="right-panel">
             <div className="Cat--div">
               <h2>{categoryName}</h2>
+              <SearchBox
+              translations={{ placeholder: 'ابحث هنا' }}
+                searchAsYouType={false}
+                
+              />
             </div>
+            {/* <SortBy
+              indexName='books'
+              items={[
+                // { label: 'publicationDate', value: 'books' },
+                { label: 'name (asc)', value: 'books_name_asc' },
+                { label: 'name (desc)', value: 'books_name_desc' },
+              ]}
+            /> */}
             <Configure filters={`bookCategory.thecategory.key:${categoryName}`} hitsPerPage={15} />
             <Hits hitComponent={hitView} />
             <Pagination />

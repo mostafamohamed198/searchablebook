@@ -44,6 +44,7 @@ import os
 from PIL import Image
 from docx import *
 from .forms import *
+from django.http import Http404
 
 
 import io
@@ -224,6 +225,9 @@ class ClassificationList(generics.ListCreateAPIView):
 class EntryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = entry.objects.all()
     serializer_class = EntrySerializer
+    
+
+
 
 
 class AuthorDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -247,7 +251,32 @@ class EntryEditDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EntryEditFormSerializer
 
 
-
+class EntryWithBookDetail(APIView):
+    # permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+    def get_entry(self, id):
+        try:
+            return entry.objects.get(id = id)
+        except entry.DoesNotExist:
+            raise Http404
+    
+    def get_book(self, id):
+        thebook = book.objects.filter(relatedChapters = id).last()
+        return thebook
+    
+    def get(self, request,id, format=None):
+        entry = self.get_entry(id)
+        book = self.get_book(id)
+        entry_serialzier =EntrySerializer(entry)
+        book_serializer = BookSerializer(book)
+        # return Response({'entry': entry_serialzier.data, 'book': book_serializer})
+        return Response({'entry': entry_serialzier.data, 'book': book_serializer.data})
+        
+# serializer = BookSerializer(snippet)
+           
+#             serializer.data['relatedDoors'] = 0
+#             return Response(serializer.data)
     
 class EntryFormViewSet(APIView):
     permission_classes = [IsAuthenticated]

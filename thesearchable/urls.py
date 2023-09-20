@@ -78,7 +78,8 @@ urlpatterns = [
      path('entrychange/<int:pk>/', views.Entry_change.as_view(), name='entrychange'),
      path('adminPageLinks/', views.landing, name="adminPage"),
      path('editPageLinks/', views.landing, name="adminPage"),
-     path('book/<int:id>', views.index, name='book')
+     path('book/<int:id>', views.index, name='book'),
+     path('entry-book/<int:id>' ,views.EntryWithBookDetail.as_view(), name='entry-book')
     
 ]
 

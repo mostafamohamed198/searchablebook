@@ -531,14 +531,77 @@ font-size: 20px;
 margin-left: 40px;
 
 }
+.SE--markdown--content ol{
+  list-style: arabic-indic;
+  
+
+}
+
+.SE--markdown--content h1{
+  /* scroll-margin-top: 1000px; */
+  font-size: 38px;
+
+}
+
+.SE--markdown--content h2{
+  /* scroll-margin-top: 1000px; */
+  font-size: 32px;
+
+}
+
+.SE--markdown--content h3{
+  /* scroll-margin-top: 1000px; */
+  font-size: 30px;
+
+}
+
+.SE--markdown--content h4{
+  /* scroll-margin-top: 1000px; */
+  font-size: 27px;
+
+}
+.SE--markdown--content h5{
+  /* scroll-margin-top: 1000px; */
+  font-size: 24px;
+
+}
+
+.SE--markdown--content h6{
+  /* scroll-margin-top: 1000px; */
+  font-size: 21px;
+
+}
+
 
 .SE--markdown--content hr{
   height: 0.5px;
   border: none;
   background-color: rgb(201, 198, 198);
   color: rgb(201, 198, 198);
+  margin-top: -15px;
+  margin-bottom: -15px;
   /* color:rgb(166, 166, 166); */
 
+}
+
+.SE--markdown--content p{
+  margin:  15px 0px 15px 0px;
+  padding:0;
+  text-justify: inter-word;
+  text-align: justify;
+
+}
+
+.SE--markdown--content ul,ol{
+  margin:  15px 60px 15px 0px;
+  padding:0
+
+}
+
+
+.SE--markdown--content h1,h2,h3,h4,h5,h6{
+  margin:  15px 0px 15px 0px;
+  padding:0
 }
 
 .SE--sidebardiv{
@@ -1061,7 +1124,9 @@ text-align: center;
 }
 .pageNumber{
   text-align: center;
-  color:rgb(166, 166, 166)
+  color:rgb(166, 166, 166);
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 /* searchresults.js style */
@@ -3076,6 +3141,34 @@ font-size: 18px;
   display:flex;
   flex-wrap: wrap;
   margin-top: 25px;
+  justify-content: space-between;
+
+}
+
+.Cat--div .ais-SearchBox-input{
+  
+  height: 40px;
+  width: 250px;
+  border: solid rgb(201, 198, 198);
+  border-width: 1px;
+}
+.Cat--div .ais-SearchBox-reset{
+ display: none;
+}
+
+.Cat--div .ais-SearchBox-submit{
+  
+  position: relative;
+  left:25px;
+  
+}
+
+.Cat--div .ais-SearchBox-form{
+  margin-left: 100px;
+  /* height: 40px;
+  width: 200px; */
+
+  
 }
 
 .Cat--div .LP--product--card{

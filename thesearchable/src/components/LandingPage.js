@@ -67,7 +67,7 @@ const handleChange = (event) => {
 
     setSuggestions([])
   }, [tags])
-  console.log('workint')
+
 
   function onInput (query) {
    

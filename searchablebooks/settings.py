@@ -52,7 +52,7 @@ INSTALLED_APPS = [
      'django_elasticsearch_dsl_drf',
      'corsheaders',
           'markdownify.apps.MarkdownifyConfig',
- 
+    
      'rest_framework_simplejwt.token_blacklist'
 ]
 
@@ -179,7 +179,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 ELASTICSEARCH_DSL = {
     'default': {
         'hosts': 'es',
-        'timeout': 800
+        'timeout': 5000
     },
 }
 

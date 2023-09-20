@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Suspense, lazy} from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useContext } from "react";
@@ -19,8 +19,10 @@ import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sideb
 import ReactModal from 'react-modal';
 import axios from "axios";
 
-export default function SingleEntry (props){
+// const EntryMarkdown = lazy(() => import('./EntryMarkdown'));
 
+export default function SingleEntry (props){
+    const [theEntryId, setTheEntryId] = React.useState(0)
     const [theEntry, setTheEntry] = React.useState()
     const [theSearchedEntry, setTheSearchedEntry] = React.useState()
     const [searched, setSearched] = React.useState(false)
@@ -40,60 +42,65 @@ export default function SingleEntry (props){
     const [inFavourites ,setInFavourites] = React.useState(false)
     const [favouriteUsers , setFavouriteUsers] = React.useState([])
     const [headings, setHeadings] = React.useState([]);
+    const [entryLoaded, setEntryLoaded] = React.useState(false)
+    const [entryReLoaded, setEntryReLoaded] = React.useState(true)
     let {user, authTokens} = useContext(AuthContext)
     const bookTitleElement = React.useRef();
-     React.useEffect(function(){
-       
-              
-                fetch('/entries/' + props.id)
-                // fetch('/entries/' + 4)
-                .then(res => res.json())
-                .then(data => {
-                setTheEntry(`${data.body}`)
-                setTheTitle(`${data.title}`)
-             
-                setBibilography(`${data.bibiliography}`)
-                setFavouriteUsers(data.favouriteusers)
-                setAuthors(data.entryauthor)
-                
+    const headingsRef = React.useRef([])
+React.useEffect(function(){
 
-                }) 
+
+axios.get('/entry-book/' + props.id)
+.then(response => {
+  const data = response.data;
+  setTheEntryId(data.entry.id);
+  setTheEntry(`${data.entry.body}`);
+  setTheTitle(`${data.entry.title}`);
+  setBibilography(`${data.entry.bibiliography}`);
+  setFavouriteUsers(data.entry.favouriteusers);
+  setAuthors(data.entry.entryauthor);
+  setTheBook(data.book.id);
+  setTheBookName(data.book.name);
+  setContainsDoors(data.book.containsDoors);
+  setContainsParts(data.book.containsParts);
+  setParts(data.book.relatedParts);
+  setDoors(data.book.relatedDoors);
+  setChapters(data.book.relatedChapters);
+  
+
+})
+
+.catch(error => {
+  // Handle errors here
+  console.error('Error:', error);
+})
+.then(() => {
+  setEntryLoaded(true);
+  setEntryReLoaded(true)
+})
+
+
+
+}
+,[])
+
+  React.useEffect(()=>{
+    const fetchData = async () =>{
+        setInFavourites(false)
+            favouriteUsers.map(theuser =>{
+                if(theuser == user.user_id) { setInFavourites(true) }
+            })
         
-                fetch('/thebook/' + props.id)
-                .then(res => res.json())
-                .then(data => {
-                setTheBook(data.id)
-                setTheBookName(data.name)
-                setContainsDoors(data.containsDoors)
-                setContainsParts(data.containsParts)
-                setParts(data.relatedParts)
-                setDoors(data.relatedDoors)
-                setChapters(data.relatedChapters)
-      
-               }) 
-               
-               
-             }
-             ,[])
-
-             React.useEffect(()=>{
-                const fetchData = async () =>{
-                    setInFavourites(false)
-                        favouriteUsers.map(theuser =>{
-                            if(theuser == user.user_id) { setInFavourites(true) }
-                        })
-                    
-                }
-                fetchData()
-                
-             },[ favouriteUsers, props.id])
-
+    }
+    fetchData()
+    
+  },[ favouriteUsers, props.id])
 
 
 React.useEffect(function () {
-
-  // if (loaded){
   setHeadings([])
+  if (entryReLoaded){
+  // setHeadings([])
   const elements = Array.from(document.querySelectorAll("h2, h3, h4"))
       .filter((element) => element.id)
       .map((element) => ({
@@ -103,75 +110,142 @@ React.useEffect(function () {
       }
       ));
   setHeadings(elements);
+  // console.log(elements)
   
 
-// }
-
-}, [theEntry])
-
-React.useEffect(function(){
-  // setLoaded(false)
-    fetch('/entries/' + props.id)
-    .then(res => res.json())
-    .then(data => {
-    setTheEntry(`${data.body}`)
-    setTheTitle(`${data.title}`)
-    setBibilography(`${data.bibiliography}`)
-    setFavouriteUsers(data.favouriteusers)})
-
-
-
-
-}, [props.id])
-
-
-
-function theTable (){
-
-  const headingsmap = headings.map((heading, index, elements) => {
-    if (heading.text != 'Footnotes'){
-    return (
-      <a href={`#${heading.id}`}>
-         {/* <MenuItem  key={heading.id} style={{ marginRight: `${heading.level - 2}em` }} >{heading.text}</MenuItem> */}
-         <MenuItem  key={heading.id} style={{fontSize:'18px', paddingRight: `${30 + (heading.level * 8)}px` , color: 'rgb(81, 81, 81)', }} >{heading.text}</MenuItem>
-      </a>
-    )
-    }
-
-})
-    
-  return(
-  <nav>
-      <ul>
-        {headingsmap}
-      </ul>
-    </nav>
-  )
 }
 
+}, [theEntry, entryReLoaded,entryLoaded])
+// function toc() {
+//   // setHeadings([])
+//   // if (entryReLoaded){
+//   // setHeadings([])
+//   const elements = Array.from(document.querySelectorAll("h2, h3, h4"))
+//       .filter((element) => element.id)
+//       .map((element) => ({
+//         id: element.id,
+//         text: element.textContent ?? "",
+//         level: Number(element.tagName.substring(1))
+//       }
+//       ));
+//   setHeadings(elements);
+//   console.log(elements)
+//     }
 
+
+// React.useEffect(function(){
+    
+//   // setLoaded(false)
+//     axios.get('/entries/' + props.id)
+    
+//     .then(response => {
+//       const data = response.data
+//       setTheEntryId(data.id)
+//       setTheEntry(`${data.body}`)
+//       setTheTitle(`${data.title}`)
+//       setBibilography(`${data.bibiliography}`)
+//       setFavouriteUsers(data.favouriteusers)
+//   }
+//     )
+//     .then(() => {
+//       setEntryReLoaded(true)
+
+//     })
+    
+// }, [props.id])
+
+React.useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`/entries/${props.id}`);
+      const data = response.data;
+
+      setTheEntryId(data.id);
+      setTheEntry(data.body);
+      setTheTitle(data.title);
+      setBibilography(data.bibiliography);
+      setFavouriteUsers(data.favouriteusers);
+      setEntryReLoaded(true);
+    } catch (error) {
+      // Handle errors here
+      console.error(error);
+    }
+  };
+
+  fetchData();
+}, [props.id]);
+
+
+
+
+// function theTable (){
+
+//   const headingsmap = headings.map((heading, index, elements) => {
+//     const scrollToSection = (sectionId) => {
+//       const section = document.getElementById(sectionId);
+  
+//       if (section) {
+//         section.scrollIntoView({ behavior: 'smooth' });
+
+//       }
+      
+//     };
+//     if (heading.text != 'Footnotes'){
+
+      
+//     return (
+//       <a onClick={() => scrollToSection(heading.id)} >
+//         {/* <a href={`#${heading.id}`}> */}
+//          {/* <MenuItem  key={heading.id} style={{ marginRight: `${heading.level - 2}em` }} >{heading.text}</MenuItem> */}
+//          <MenuItem  key={heading.id} style={{fontSize:'18px', paddingRight: `${30 + (heading.level * 8)}px` , color: 'rgb(81, 81, 81)', }} >{heading.text}</MenuItem>
+//       </a>
+//     )
+//     }
+
+// })
+    
+//   return(
+//   <nav>
+//       <ul>
+//         {headingsmap}
+//       </ul>
+//     </nav>
+//   )
+// }
+
+
+function chapterClicked(selected){
+  // console.log(selected)
+  if (selected != props.id){
+    setHeadings([])
+    setEntryReLoaded(false)
+  } 
+}
+
+console.log('wSEkl')
 
 
     const returnedParts = parts.map(thepart => {
         
         return (
-            <Part activeEntry={props.id} tableofContent={theTable} relatedEntries={thepart.relatedEntries} name={thepart.name}/>
+            <Part headingsArray={headings} activeEntry={props.id} selectedEntryId={theEntryId}  chapterClicked={selected => chapterClicked(selected)} relatedEntries={thepart.relatedEntries} name={thepart.name}/>
         )
     })
 
 const returnedDoors =   doors.map(thedoor => {
     return (
-        <Door activeEntry={props.id} tableofContent={theTable}  relatedParts={thedoor.relatedParts} name={thedoor.name} id={thedoor.id}/>
+        <Door headingsArray={headings} activeEntry={props.id} selectedEntryId={theEntryId}  chapterClicked={selected => chapterClicked(selected)} relatedParts={thedoor.relatedParts} name={thedoor.name} id={thedoor.id}/>
     )
 })
 
 const returnedChapters = chapters.map(thechapter => {
     return (
-        <Chapter activeEntry={props.id} tableofContent={theTable} chapterid = {thechapter.id} title= {thechapter.title} />
+        <Chapter headingsArray={headings} activeEntry={props.id} selectedEntryId={theEntryId}  chapterClicked={selected => chapterClicked(selected)} chapterid = {thechapter.id} title= {thechapter.title} />
     )
 })
 
 function finalreturned(){
+
     if(containsDoors && containsParts){
         return(returnedDoors)
     }
@@ -181,7 +255,8 @@ function finalreturned(){
     }
     else {
         return(returnedChapters)
-    }
+    
+}
 }
 
 const handleChange = (event) => {
@@ -237,7 +312,6 @@ const customStyles = {
   };
 
 
-
 function changeFavourites(){
     setInFavourites(!inFavourites);
 
@@ -280,14 +354,20 @@ function iconStar(){
     }
   }
 
+  // function entrySidebar(){
+  //   <Sidebar  toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden'}}>
+      
+  //   </Sidebar>
+  // }
+ 
+  if (!entryLoaded) {
+    return <div>...</div>; // You can replace this with your loading indicator
+  }
 
  return (
-        
-        
-       
-    	<div id="SEforpdf" className="SE">
-        <Sidebar  toggled={false} defaultCollapsed={collapsedWidth()} rtl={true} style={{height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden'}}>     
-            <Menu>
+  <div id="SEforpdf" className="SE">
+    <Sidebar  toggled={false}  rtl={true} style={{height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden'}}>
+    <Menu>
                   <MenuItem
                         icon={<MenuOutlinedIcon />}
                         onClick={() => {
@@ -309,69 +389,70 @@ function iconStar(){
                       {finalreturned()}
                   </div>
             </Menu>
-        
-   
-      </Sidebar>
-              
-      <div className='SE--markdown'>
-
-        <div className="SE--markdown--title">{theTitle}</div>
-           <div className="SE--icons">
-                <a href={downloadLink} ><FontAwesomeIcon icon={faDownload} /></a>
-                <div>
-                    <a onClick={openpop}><FontAwesomeIcon icon={faShare} /></a>
-                    <ReactModal isOpen={isOpen} contentLabel='Example Modal' style={customStyles} onRequestClose={closeModal}>
-                        <Share />
-                    </ReactModal>
-                </div>
-                <div>
-                    <ReactToPrint
-                      trigger={() => <a><FontAwesomeIcon icon={faPrint} /></a>}
-                      content={() => componentRef.current}
-                    />
-                    <ComponentToPrint className='SE--printing' ref={componentRef} title={theTitle} content={theEntry} bibilography={bibilography}/>
-                </div>
-                <a>{iconStar()}</a>
-            </div>
-                <div className="SE--docInfo--container">
-                    <div className="SE--document--info">
-                          <div style={{fontSize:'20px', fontWeight:'700'}}> معلومات عن المقال </div>
-                              <div className="SE--document--authors">
-                                  <div style={{fontSize: '16px',fontWeight:'700', marginLeft:'30px'}}>{authors.length > 1 ? "المؤلفون:" : "المؤلف:"}</div>
-                                  <div className="SE--authors--div">
-                                      {theauthors}
-                                  </div>
-                          </div>
-                    </div>
-                </div>
-                
-               
-                {/* <div  onBlur = {() => setLoaded(!loaded)}> */}
-                <ReactMarkdown 
-                components={{
-                  h2: ({ node, ...props }) => (
-                    <h2 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h2>
-                  ),
-                  h3: ({ node, ...props }) => (
-                    <h3 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h3>
-                  ),
-                  h4: ({ node, ...props }) => (
-                    <h4 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h4>
-                  ),
-                  h5: ({ node, ...props }) => (
-                    <h5 id={`${props.children[0]}`} {...props}></h5>
-                  ),
-                 h6: ({ node, ...props }) => (
-                    <h6 id={`${props.children[0]}`} {...props}></h6>
-                  ),
-                }} 
-                className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} style={{scrollMarginTop: '10rem'}}/>
+     </Sidebar>
       
-            </div>
-         
-  
-        </div>
+  <div className='SE--markdown'>
+
+    {entryReLoaded && <div className="SE--markdown--title">{theTitle}</div>}
+    {entryReLoaded &&  <div className="SE--icons">
+          <a href={downloadLink} ><FontAwesomeIcon icon={faDownload} /></a>
+          <div>
+              <a onClick={openpop}><FontAwesomeIcon icon={faShare} /></a>
+              <ReactModal isOpen={isOpen} contentLabel='Example Modal' style={customStyles} onRequestClose={closeModal}>
+                  <Share />
+              </ReactModal>
+          </div>
+          <div>
+              <ReactToPrint
+                trigger={() => <a><FontAwesomeIcon icon={faPrint} /></a>}
+                content={() => componentRef.current}
+              />
+              <ComponentToPrint className='SE--printing' ref={componentRef} title={theTitle} content={theEntry} bibilography={bibilography}/>
+          </div>
+          <a>{iconStar()}</a>
+      </div>}
+          <div className="SE--docInfo--container">
+              <div className="SE--document--info">
+                    <div style={{fontSize:'20px', fontWeight:'700'}}> معلومات عن المقال </div>
+                        <div className="SE--document--authors">
+                            <div style={{fontSize: '16px',fontWeight:'700', marginLeft:'30px'}}>{authors.length > 1 ? "المؤلفون:" : "المؤلف:"}</div>
+                            <div className="SE--authors--div">
+                                {theauthors}
+                            </div>
+                    </div>
+              </div>
+          </div>
+          
+          {/* <Suspense fallback={<div>Loading...</div>}>
+            <EntryMarkdown content={searched ? theSearchedEntry : theEntry} />
+          </Suspense> */}
+          {/* <div  onBlur = {() => setLoaded(!loaded)}> */}
+           
+          {entryReLoaded && <ReactMarkdown 
+      components={{
+        h2: ({ node, ...props }) => (
+          <h2 id={`${props.children[0]}`}  style={{scrollMarginTop: '180px'}} {...props}></h2>
+        ),
+        h3: ({ node, ...props }) => (
+          <h3 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h3>
+        ),
+        h4: ({ node, ...props }) => (
+          <h4 id={`${props.children[0]}`} style={{scrollMarginTop: '180px'}} {...props}></h4>
+        ),
+        h5: ({ node, ...props }) => (
+          <h5 id={`${props.children[0]}`} {...props}></h5>
+        ),
+       h6: ({ node, ...props }) => (
+          <h6 id={`${props.children[0]}`} {...props}></h6>
+        ),
+      }} 
+      className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} style={{scrollMarginTop: '10rem'}}/>
+    }
+          {/* {entryLoaded && <div>{theEntry}</div>} */}
+      </div>
+      </div>
    
     )
+              
 }
 

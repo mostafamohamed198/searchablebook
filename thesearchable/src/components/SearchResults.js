@@ -4,7 +4,7 @@ import Client from "@searchkit/instantsearch-client";
 import Searchkit from "searchkit";
 import {ProSidebarProvider, Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import {SortBy, HierarchicalMenu, Menu as MenuSearch, connectMenu, ToggleRefinement, MenuSelect, Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet , Configure} from "react-instantsearch-dom";
+import { Menu as MenuSearch, connectMenu,  Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet , Configure} from "react-instantsearch-dom";
 import ReactTags from 'react-tag-autocomplete'
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -127,7 +127,7 @@ export default function SearchResults(){
     getQuery: (query, search_attributes) => {
       return {
         query_string: {
-          fields:["title.raw", "body.raw", "bibiliography","source", "entryauthor.name"],
+          fields:["title", "body", "title.raw", "body.raw", "bibiliography","source", "entryauthor.name"],
           query: query
        }
   
@@ -135,8 +135,7 @@ export default function SearchResults(){
     }
   }}, { debug: true });
 
-  console.log('it worke32d21بلي')
-  
+
   const { collapseSidebar, rtl } = useProSidebar();
   // const searchClient = Client(sk);
   const hitView = ({ hit }) => {

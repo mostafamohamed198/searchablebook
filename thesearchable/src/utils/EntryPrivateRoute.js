@@ -1,9 +1,13 @@
-import React from "react";
+import React, {Suspense, lazy} from "react";
 import { useContext } from "react";
-import SingleEntry from "../components/SingleEntry";
+// import SingleEntry from "../components/SingleEntry";
 import { Navigate} from 'react-router-dom'
 import AuthContext from "../authentication/AuthContext";
 import { useParams } from "react-router-dom";
+
+
+const SingleEntry = lazy(() => import('../components/SingleEntry'));
+
 const EntryPrivateRoute = () => {
     const [loaded, setLoaded] = React.useState(false)
     const [entryOrigin , setEntryOrigin] = React.useState(0)
@@ -26,7 +30,7 @@ const EntryPrivateRoute = () => {
         if (user != null){
             const userApprovedCountires = user.approvedcountries
             const userApprovedCategories = user.approvedcategories
-                 return user.approved && userApprovedCategories.includes(parseInt(entryCategory)) && userApprovedCountires.includes(parseInt(entryOrigin)) ?  <SingleEntry id={params.entryId} /> : <Navigate to="/login" />
+                 return user.approved && userApprovedCategories.includes(parseInt(entryCategory)) && userApprovedCountires.includes(parseInt(entryOrigin)) ?  <Suspense fallback={<div>Loading...</div>}><SingleEntry id={params.entryId} /></Suspense> : <Navigate to="/login" />
         }
         else{
             return(
