@@ -1,11 +1,7 @@
 from .models import *
 from rest_framework import serializers
-from django_elasticsearch_dsl_drf.serializers import DocumentSerializer
-# from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-# from rest_framework_simplejwt.views import TokenObtainPairView
-# from.documents import EntryDocument
 
-from django.contrib.auth import get_user_model, authenticate
+
 class EntrySerializer(serializers.ModelSerializer):
     # entryauthor = serializers.SlugRelatedField(
     #     many=True,
@@ -19,7 +15,7 @@ class EntrySerializer(serializers.ModelSerializer):
     )
    
     class Meta:
-        model = entry
+        model = Entry
         fields = (
             'id',
             'title',
@@ -36,7 +32,7 @@ class EntrySerializer(serializers.ModelSerializer):
 
 class EntryBookSerializer(serializers.ModelSerializer):
     class Meta:
-        model = entry
+        model = Entry
         fields = (
             'id',
             'title',
@@ -47,7 +43,7 @@ class PartSerializer(serializers.ModelSerializer):
 
     relatedEntries = serializers.SerializerMethodField()
     class Meta:
-        model = part
+        model = Part
         fields = '__all__'
 
     def get_relatedEntries(self, instance):
@@ -59,7 +55,7 @@ class DoorSerializer(serializers.ModelSerializer):
     relatedParts = serializers.SerializerMethodField()
 
     class Meta:
-        model = door
+        model = Door
        
         fields = ('id', 'name', 'relatedParts')
     
@@ -102,7 +98,7 @@ class BookSerializer(serializers.ModelSerializer):
     )
     # relatedDoors = serializers.StringRelatedField(many=True, read_only=True)
     class Meta:
-        model = book
+        model = Book
         fields = '__all__'
 
     def get_relatedDoors(self, instance):
@@ -125,36 +121,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# UserModel = get_user_model()
-
-# class UserRegisterSerializer(serializers.ModelSerializer):
-# 	class Meta:
-# 		model = UserModel
-# 		fields = '__all__'
-# 	def create(self, clean_data):
-# 		user_obj = UserModel.objects.create_user(email=clean_data['email'], password=clean_data['password'])
-# 		user_obj.username = clean_data['username']
-# 		user_obj.save()
-# 		return user_obj
-
-# class UserLoginSerializer(serializers.Serializer):
-# 	email = serializers.EmailField()
-# 	password = serializers.CharField()
-# 	##
-# 	def check_user(self, clean_data):
-# 		user = authenticate(username=clean_data['email'], password=clean_data['password'])
-# 		if not user:
-# 			raise ValidationError('user not found')
-# 		return user
-
-# class UserSerializer(serializers.ModelSerializer):
-# 	class Meta:
-# 		model = UserModel
-# 		fields = ('email', 'username')
 
 class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
-        model = author
+        model = Author
         fields = ('id','name', 'picture', 'degree', 'about')
 
 
@@ -163,21 +133,21 @@ class AuthorSerializer(serializers.ModelSerializer):
 class DoorFormSerializer(serializers.ModelSerializer):
    
     class Meta:
-        model = door
+        model = Door
         fields = ('id', 'name', 'relatedParts')
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = categories
+        model = Category
         fields = '__all__'
 
 class CountriesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = countries
+        model = Country
         fields = '__all__'
 
 class ClassificationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = classification
+        model = Classification
         fields = '__all__'
 
 class EntryEditFormSerializer(serializers.ModelSerializer):
@@ -204,7 +174,7 @@ class EntryEditFormSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = entry
+        model = Entry
         fields = (
             'id',
             'title',
@@ -239,7 +209,7 @@ class EntryFavourtiesSerializer(serializers.ModelSerializer):
     # )
 
     class Meta:
-        model = entry
+        model = Entry
         fields = (
             'id',
             'title',
@@ -272,7 +242,7 @@ class BookFavourtiesSerializer(serializers.ModelSerializer):
     # )
 
     class Meta:
-        model = book
+        model = Book
         fields = '__all__'
         
 
@@ -332,13 +302,13 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
 
     class Meta:
-        model = userInfo
+        model = UserInfo
         fields = ['user', 'lastPaid', 'lastDatePayment', 'is_admin', 'approved', 'approvedcountries','approvedcategories','favouriteEntries','downloadedEntries', 'viewedEntries','submittedentries', 'submittedAuthors','submittedBooks']
 
 class UserInfoPutSerializer(serializers.ModelSerializer):
    
     class Meta:
-        model = userInfo
+        model = UserInfo
         fields = ['id','user', 'lastPaid', 'lastDatePayment', 'is_admin', 'approved', 'approvedcountries','approvedcategories','favouriteEntries','downloadedEntries', 'viewedEntries','submittedentries', 'submittedAuthors','submittedBooks']
 
 
@@ -346,7 +316,7 @@ class EntryFormSerializer(serializers.ModelSerializer):
     
     entryCover = serializers.ImageField(required=False)
     class Meta:
-        model = entry
+        model = Entry
         fields = ['id','title', 'body', 'entryauthor', 'entryOrigin', 'entryPubDate',  'entryCategory','bibiliography','entryCover', 'entryClassification', 'submittedUser']
     # def to_representation(self, instance):
     #     self.fields['submittedUser'] =  UserSerializer(read_only=True)
@@ -357,31 +327,12 @@ class AuthorFormSerializer(serializers.ModelSerializer):
     
     picture = serializers.ImageField(required=False)
     class Meta:
-        model = author
+        model = Author
         fields = ['id','name', 'degree', 'picture', 'about']
 
 class BookFormSerializer(serializers.ModelSerializer):
     cover = serializers.ImageField(required=False)
     class Meta:
-        model = book
+        model = Book
         fields = ['id','cover', 'name', 'author', 'containsParts', 'containsDoors', 'bookClassification','bookCategory','bookOrigin' ,'publicationDate', 'relatedChapters', 'relatedParts', 'relatedDoors' ]
 
-
-                                                                                            #     name = models.CharField(max_length=499)
-                                                                                                # author = models.ManyToManyField('author', blank=True, max_length=300)
-                                                                                                # containsParts = models.BooleanField(default=False)
-                                                                                                # containsDoors = models.BooleanField(default=False)
-                                                                                                # bookCategory = models.ForeignKey('categories', on_delete=models.CASCADE, default=None)
-                                                                                                # publicationDate = models.DateField()
-                                                                                                # cover = models.ImageField(upload_to='bookcover')
-                                                                                                # relatedChapters = models.ManyToManyField('entry',  blank=True)
-                                                                                                # relatedParts = models.ManyToManyField('part',  blank=Tr                                                                   # relatedDoors = models.ManyTo
-# class MyModelSerializer(serializers.ModelSerializer):
-
-#     creator = serializers.ReadOnlyField(source='creator.username')
-#     creator_id = serializers.ReadOnlyField(source='creator.id')
-#     image_url = serializers.ImageField(required=False)
-
-#     class Meta:
-#         model = MyModel
-#         fields = ['id', 'creator', 'creator_id', 'title', 'description', 'image_url']

@@ -40,6 +40,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'thesearchable',
+    'frontend',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,13 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-     'wkhtmltopdf',
      'django_elasticsearch_dsl',
      'django_elasticsearch_dsl_drf',
      'corsheaders',
-          'markdownify.apps.MarkdownifyConfig',
-    
-     'rest_framework_simplejwt.token_blacklist'
+     'markdownify.apps.MarkdownifyConfig',
+     'rest_framework_simplejwt.token_blacklist',
+     
 ]
 
 MIDDLEWARE = [
@@ -95,18 +95,7 @@ WSGI_APPLICATION = 'searchablebooks.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# DATABASES = {
-  
-#     'default': {
-#         "ENGINE": "django.db.backends.postgresql_psycopg2",
-#         "NAME": "lawalkafyweb",
-#         "USER": "lawalkafyweb",
-#         # "PASSWORD": "root",
-#         "HOST": "dab",  # set in docker-compose.yml
-#         "PORT": 5432,  # default postgres port
 
-#     }
-# }
 DATABASES = {
   
     'default': {
@@ -122,9 +111,9 @@ DATABASES = {
 }
 
 
-# AUTH_USER_MODEL = "thesearchable.User"
+AUTH_USER_MODEL = "thesearchable.User"
 
-AUTH_USER_MODEL = 'thesearchable.User'
+# AUTH_USER_MODEL = 'searchable_backend.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

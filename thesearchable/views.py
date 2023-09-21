@@ -1,30 +1,15 @@
 from django.shortcuts import render
-# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from .models import *
-import functools
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from django.template.loader import render_to_string
-from weasyprint import HTML
-import tempfile
 from django.conf import settings
-from django.views.generic import DetailView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from markdown2 import markdown
-from .utils import render_to_pdf
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import AllowAny
 # import markdown as md
-from django.contrib.auth import authenticate, login, logout
 # from django import template
-from django.template.defaultfilters import stringfilter
-from rest_framework import viewsets
-from rest_framework import permissions
 from .serializers import *
-from django.db import IntegrityError
-from django.urls import reverse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -32,30 +17,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, FileResponse
-# from .utils import render_to_pdf
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
-from reportlab.lib.pagesizes import letter
-import io
-import pytesseract
-# import  fitz
 import os
-from PIL import Image
 from docx import *
 from .forms import *
 from django.http import Http404
-
-
-import io
-from rest_framework.authentication import TokenAuthentication
-
-from django.template.loader import get_template
-from django.conf import settings
-
 import json
-from io import StringIO, BytesIO
-from wkhtmltopdf.views import PDFTemplateResponse 
 
 # Create your views here.
 
@@ -63,7 +29,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        theuserInfo = userInfo.objects.get(user = user)
+        theuserInfo = UserInfo.objects.get(user = user)
       
         countriesArray = []
         categoriesArray = []
@@ -88,88 +54,13 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-
-def get_generated_problems_in_pdf(request,id):
-
-    # queryset
-    theEntry = entry.objects.get(id = id)
-
-    # context passed in the template
-    # context = {'entry' : theEntry, 'entrybody': markdown(theEntry.body) }
-    context = {'entry' : theEntry, 'entrybody': theEntry.body }
-    # return render(request, "frontend/thepdf.html", context)
-
-    # render
-    html_string = render_to_string(
-        'frontend/thepdf.html',context)
-    html = HTML(string=html_string)
-    result = html.write_pdf()
-
-    # http response
-    response = HttpResponse(content_type='application/pdf;')
-    response['Content-Disposition'] = 'inline; filename=problem_list.pdf'
-    response['Content-Transfer-Encoding'] = 'binary'
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        output.write(result)
-        output.flush()
-        output = open(output.name, 'rb')
-        response.write(output.read())
-
-    return response
-
-
-
-
-def register(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-
-        # Ensure password matches confirmation
-        password = request.POST["password"]
-        confirmation = request.POST["confirmation"]
-        if password != confirmation:
-            return render(request, "frontend/register.html", {
-                "message": "Passwords must match."
-            })
-
-        # Attempt to create new user
-        try:
-            user = User.objects.create_user(username, email, password)
-            user.save()
-            userInfo.objects.create(user = user)
-        except IntegrityError:
-            return render(request, "frontend/register.html", {
-                "message": "Username already taken."
-            })
-        login(request, user)
-        return HttpResponseRedirect(reverse("landing"))
-    else:
-        return render(request, "frontend/register.html")
-
-def index(request, id):
-    return render(request, 'frontend/index.html')
-
-def landing(request):
-    return render(request, 'frontend/index.html')
-
-def results(request, stringvalue):
-    return render(request, 'frontend/index.html')
-
-def authordetails(request, theauthid):
-    return render(request, 'frontend/index.html')
-
-def category(request, catid):
-    return render(request, 'frontend/index.html')
-
-
     
 
 @api_view(['GET',  'DELETE'])
-def resultsPage(request):
+def results_page(request):
     if request.user.is_authenticated:
         theUser = request.user
-        theUserProfile = userInfo.objects.get(user = theUser.id)
+        theUserProfile = UserInfo.objects.get(user = theUser.id)
         if theUserProfile.approved:
             return Response({'approved': True})
             
@@ -177,92 +68,89 @@ def resultsPage(request):
             return Response({'approved': False})
     else:
         return Response({'approved': False})
-class EntryList(generics.ListCreateAPIView):
-    queryset = entry.objects.all()
+    
+class EntryListView(generics.ListCreateAPIView):
+    queryset = Entry.objects.all()
     serializer_class = EntrySerializer
 
-class AuthorList(generics.ListCreateAPIView):
-    queryset = author.objects.all()
+class AuthorListView(generics.ListCreateAPIView):
+    queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
-class BookList(generics.ListCreateAPIView):
-    queryset = book.objects.all()
+class BookListView(generics.ListCreateAPIView):
+    queryset = Book.objects.all()
     serializer_class = BookSerializer
 
-class CountriesList(generics.ListCreateAPIView):
-    queryset = countries.objects.all()
+class CountryListView(generics.ListCreateAPIView):
+    queryset = Country.objects.all()
     serializer_class = CountriesSerializer
 
-class CategoriesList(generics.ListCreateAPIView):
-    queryset = categories.objects.all()
+class CategoryListView(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-class UsersList(generics.ListCreateAPIView):
-    queryset = userInfo.objects.order_by('user__username')
+class UserListView(generics.ListCreateAPIView):
+    queryset = UserInfo.objects.order_by('user__username')
     serializer_class = UserInfoSerializer
 
-class FavouriteEntries(APIView):
+class FavouriteEntriesView(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request, format=None):
         requestedUser = request.user
-        desiredEntries =  entry.objects.filter(favouriteusers__in = [requestedUser.id])
+        desiredEntries =  Entry.objects.filter(favouriteusers__in = [requestedUser.id])
         serializer = EntryFavourtiesSerializer(desiredEntries, many=True)
         return Response(serializer.data)
     
-class FavouriteBooks(APIView):
+class FavouriteBooksView(APIView):
     permission_classes=[IsAuthenticated]
     def get(self, request, format=None):
         requestedUser = request.user
-        desiredBooks =  book.objects.filter(favouriteusers__in = [requestedUser.id])
+        desiredBooks =  Book.objects.filter(favouriteusers__in = [requestedUser.id])
         serializer = BookFavourtiesSerializer(desiredBooks, many=True)
         return Response(serializer.data)
 
-class ClassificationList(generics.ListCreateAPIView):
-    queryset = classification.objects.all()
+class ClassificationListView(generics.ListCreateAPIView):
+    queryset = Classification.objects.all()
     serializer_class = ClassificationSerializer
 
     
-class EntryDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = entry.objects.all()
+class EntryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Entry.objects.all()
     serializer_class = EntrySerializer
-    
 
-
-
-
-class AuthorDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = author.objects.all()
+class AuthorDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Author.objects.all()
     serializer_class = AuthorSerializer
 
-class BookDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = book.objects.all()
+class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Book.objects.all()
     serializer_class = BookSerializer
 
-class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = categories.objects.all()
+class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-class UserInfoDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = userInfo.objects.all()
+class UserInfoDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserInfo.objects.all()
     serializer_class = UserInfoSerializer
 
-class EntryEditDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = entry.objects.all()
+class EntryEditDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Entry.objects.all()
     serializer_class = EntryEditFormSerializer
 
 
-class EntryWithBookDetail(APIView):
+class EntryWithBookDetailView(APIView):
     # permission_classes = [IsAuthenticated]
     permission_classes = [AllowAny]
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     def get_entry(self, id):
         try:
-            return entry.objects.get(id = id)
-        except entry.DoesNotExist:
+            return Entry.objects.get(id = id)
+        except Entry.DoesNotExist:
             raise Http404
     
     def get_book(self, id):
-        thebook = book.objects.filter(relatedChapters = id).last()
+        thebook = Book.objects.filter(relatedChapters = id).last()
         return thebook
     
     def get(self, request,id, format=None):
@@ -273,10 +161,6 @@ class EntryWithBookDetail(APIView):
         # return Response({'entry': entry_serialzier.data, 'book': book_serializer})
         return Response({'entry': entry_serialzier.data, 'book': book_serializer.data})
         
-# serializer = BookSerializer(snippet)
-           
-#             serializer.data['relatedDoors'] = 0
-#             return Response(serializer.data)
     
 class EntryFormViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -285,7 +169,7 @@ class EntryFormViewSet(APIView):
     def post(self, request, format=None):
         data = request.data
         serializer = EntryFormSerializer(data=data)
-        theuserInfo = userInfo.objects.get(user = request.user)
+        theuserInfo = UserInfo.objects.get(user = request.user)
         if serializer.is_valid() and theuserInfo.is_admin is True:
             serializer.save(submittedUser = request.user)
             serializerData = serializer.data['id']
@@ -300,7 +184,7 @@ class AuthorFormViewSet(APIView):
     @csrf_exempt
     def post(self, request, format=None):
         serializer = AuthorFormSerializer(data=request.data)
-        theuserInfo = userInfo.objects.get(user = request.user)
+        theuserInfo = UserInfo.objects.get(user = request.user)
         if serializer.is_valid() and theuserInfo.is_admin is True:
             serializer.save(submittedUser = request.user)
             serializerData = serializer.data['id']
@@ -309,52 +193,7 @@ class AuthorFormViewSet(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# class EntryBookFormViewSet(APIView):
-#     permission_classes = [IsAuthenticated]
-#     parser_classes = [MultiPartParser, FormParser, JSONParser]
-#     @csrf_exempt
-#     def post(self, request, format=None):
-#         print('working')
-#         data = json.loads(request.body)
-#         theuserInfo = userInfo.objects.get(user = request.user)
-#         if theuserInfo.is_admin is True:
-#             title = data.get('title')
-#             body = data.get('body')
-#             bibliography = data.get('bibiliography')
-#             bookId = data.get('book')
-#             partId = data.get('part')
-#             theBook = book.objects.get(id = int(bookId))
-#             print(theBook.bookOrigin.id)
-#             theBookOrigin = theBook.bookOrigin
-#             theBookCategory = theBook.bookCategory
-#             theBookClassification = theBook.bookClassification.all()
-#             theBookCover = theBook.cover.url[6:]
-#             print (theBookCover[6:])
-#             theBookAuthors = theBook.author.all()
-#             # print(theBookAuthors)
-            
-#             # newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBook.bookOrigin, entryPubDate= theBook.publicationDate, entryauthor =theBook.author, entryCover = theBook.cover, entryClassification = theBook.bookClassification, entryCategory = theBook.bookCategory)
-#             newEntry = entry.objects.create(title = title, body=body, bibiliography = bibliography, entryOrigin = theBookOrigin, entryPubDate= theBook.publicationDate, entryCover=theBookCover,  entryCategory = theBookCategory, submittedUser=request.user)
-            
-#             # if newEntry.is_valid():
-#             # newEntry.save() 
-#             newEntry.entryauthor.set(theBookAuthors)
-#             # newEntry.entryCover = theBookCover
-#             newEntry.entryClassification.set(theBookClassification)
-#             newEntry.save()
-#             if int(partId) != 0:
-#                 thePart = part.objects.get(id = int(partId))
-#                 thePart.relatedEntries.add(newEntry)
-#                 thePart.save()
-#             theBook.relatedChapters.add(newEntry)
-#             theBook.save()
-#             print(newEntry.id)
-#             theuserInfo.submittedentries.add(int(newEntry.id))
-#             theuserInfo.save()
-#             data['id'] = int(newEntry.id)
-     
-#             return Response(data ,status=status.HTTP_201_CREATED)
-#         return Response(data,status=status.HTTP_400_BAD_REQUEST)
+
                                                                                                              
 class EntryBookFormViewSet(APIView):
     permission_classes = [IsAuthenticated]
@@ -365,7 +204,7 @@ class EntryBookFormViewSet(APIView):
         data = json.loads(request.body)
         serializer = EntryFormSerializer(data=data)
         if serializer.is_valid():
-            theuserInfo = userInfo.objects.get(user = request.user)
+            theuserInfo = UserInfo.objects.get(user = request.user)
             if theuserInfo.is_admin is True:
                 title = data.get('title')
                 body = data.get('body')
@@ -373,7 +212,7 @@ class EntryBookFormViewSet(APIView):
                 bookId = data.get('book')
                 partId = data.get('part')
                 source = data.get('source')
-                theBook = book.objects.get(id = int(bookId))
+                theBook = Book.objects.get(id = int(bookId))
               
                 theBookOrigin = theBook.bookOrigin
                 theBookCategory = theBook.bookCategory
@@ -393,7 +232,7 @@ class EntryBookFormViewSet(APIView):
                 newEntry.entryClassification.set(theBookClassification)
                 newEntry.save()
                 if int(partId) != 0:
-                    thePart = part.objects.get(id = int(partId))
+                    thePart = Part.objects.get(id = int(partId))
                     thePart.relatedEntries.add(newEntry)
                     thePart.save()
                 theBook.relatedChapters.add(newEntry)
@@ -417,7 +256,7 @@ class BookFormViewSet(APIView):
     def post(self, request, format=None):
      
         serializer = BookFormSerializer(data=request.data, partial=True)
-        theuserInfo = userInfo.objects.get(user = request.user)
+        theuserInfo = UserInfo.objects.get(user = request.user)
         if serializer.is_valid() and theuserInfo.is_admin is True:
             serializer.save(submittedUser = request.user, publisher = request.data['publisher'], isbn = request.data['isbn'])
             serializerData = serializer.data['id']
@@ -427,13 +266,13 @@ class BookFormViewSet(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
    
 
-class book_change(APIView):
+class BookChangeView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put (self, request, pk):
-        theuserInfo = userInfo.objects.get(user = request.user)
-        thebook = book.objects.get(pk =pk)
+        theuserInfo = UserInfo.objects.get(user = request.user)
+        thebook = Book.objects.get(pk =pk)
         thedata = request.data
         serializer = BookFormSerializer(thebook, data=thedata, partial=True)
         if serializer.is_valid() and theuserInfo.is_admin is True:
@@ -442,19 +281,21 @@ class book_change(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     @csrf_exempt
     def delete(self, request, pk, format=None):
-        theuserInfo = userInfo.objects.get(user = request.user)
+        theuserInfo = UserInfo.objects.get(user = request.user)
         if theuserInfo.is_admin is True:
-            thebook = book.objects.get(pk =pk)
+            thebook = Book.objects.get(pk =pk)
             thebook.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({'messege' : 'cannot delete it'})
-class Author_change(APIView):
+    
+
+class AuthorChangeView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put(self, request, pk):
-        theuserInfo = userInfo.objects.get(user = request.user)
-        theauthor = author.objects.get(pk = pk)
+        theuserInfo = UserInfo.objects.get(user = request.user)
+        theauthor = Author.objects.get(pk = pk)
         thedata = request.data
         serializer = AuthorFormSerializer(theauthor, data=thedata, partial=True)
         if serializer.is_valid() and theuserInfo.is_admin is True:
@@ -463,23 +304,23 @@ class Author_change(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     @csrf_exempt
     def delete(self, request, pk, format=None):
-        theuserInfo = userInfo.objects.get(user = request.user)
+        theuserInfo = UserInfo.objects.get(user = request.user)
         if theuserInfo.is_admin is True:
-            theauthor = author.objects.get(pk = pk)
+            theauthor = Author.objects.get(pk = pk)
             theauthor.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({'messege' : 'cannot delete it'})
         
 
-class Entry_change(APIView):
+class EntryChangeView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put(self, request, pk):
-        theentry = entry.objects.get(pk = pk)
+        theentry = Entry.objects.get(pk = pk)
         thedata = request.data
        
-        theuserInfo = userInfo.objects.get(user = request.user)
+        theuserInfo = UserInfo.objects.get(user = request.user)
         serializer = EntryFormSerializer(theentry, data= thedata, partial = True)
         if serializer.is_valid() and theuserInfo.is_admin is True:
             serializer.save()
@@ -487,8 +328,8 @@ class Entry_change(APIView):
         return Response(serializer.errors ,status=status.HTTP_400_BAD_REQUEST)
     @csrf_exempt
     def delete(self, request, pk, format=None):
-        theentry = entry.objects.get(pk = pk)
-        theuserInfo = userInfo.objects.get(user = request.user)
+        theentry = Entry.objects.get(pk = pk)
+        theuserInfo = UserInfo.objects.get(user = request.user)
         if theuserInfo.is_admin is True:
             theentry.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -498,11 +339,11 @@ class Entry_change(APIView):
 @api_view(['GET'])
 def required_book(request, id):
     snippet = 0
-    thechabpterbook = entry.objects.get(id = id)
-    for object in book.objects.all():
+    thechabpterbook = Entry.objects.get(id = id)
+    for object in Book.objects.all():
         for chapter in object.relatedChapters.all():
             if int(chapter.id) == int(id):
-                snippet = book.objects.get(id = object.id)
+                snippet = Book.objects.get(id = object.id)
                
 
     if request.method == 'GET':
@@ -519,8 +360,8 @@ def required_book(request, id):
 @api_view(['GET'])
 def required_door(request, idd):
     try:
-        thedoor = door.objects.get(id = idd)
-    except book.DoesNotExist:
+        thedoor = Door.objects.get(id = idd)
+    except Book.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -530,8 +371,8 @@ def required_door(request, idd):
 @api_view(['GET'])
 def required_part(request, iddd):
     try:
-        thepart = part.objects.get(id = iddd)
-    except part.DoesNotExist:
+        thepart = Part.objects.get(id = iddd)
+    except Part.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
@@ -541,7 +382,7 @@ def required_part(request, iddd):
 @api_view(['GET'])
 def required_chapter(request, idddd):
     try:
-        thechapter = entry.objects.get(id = idddd)
+        thechapter = Entry.objects.get(id = idddd)
     except thechapter.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -565,7 +406,7 @@ def required_chapter(request, idddd):
 #             return Response(serializer.data,status=status.HTTP_201_CREATED)
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
  
-class addpartViewSet(APIView):
+class AddPartViewSet(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
@@ -573,7 +414,7 @@ class addpartViewSet(APIView):
         serializer = PartSerializer(data=request.data, many=True)
         if serializer.is_valid():
             serializer.save()
-            relatedbook = book.objects.get(id=pk)
+            relatedbook = Book.objects.get(id=pk)
             for object in serializer.data: 
                 first_value = list(object.values())[0]
                 relatedbook.relatedParts.add(int(first_value))
@@ -582,7 +423,7 @@ class addpartViewSet(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class addDoorViewSet(APIView):
+class AddDoorViewSet(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
@@ -590,7 +431,7 @@ class addDoorViewSet(APIView):
         serializer = DoorFormSerializer(data=request.data, many =True)
         if serializer.is_valid():
             serializer.save()
-            relatedbook = book.objects.get(id=pk)
+            relatedbook = Book.objects.get(id=pk)
             for object in serializer.data: 
                 first_value = list(object.values())[0]
                 relatedbook.relatedDoors.add(int(first_value))
@@ -599,16 +440,16 @@ class addDoorViewSet(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
-wkhtml_to_pdf = os.path.join(settings.BASE_DIR,"wkhtmltopdf-0.9.9-static-amd64.tar.bz2")
+# wkhtml_to_pdf = os.path.join(settings.BASE_DIR,"wkhtmltopdf-0.9.9-static-amd64.tar.bz2")
 # wkhtml_to_pdf = 'C:/Users/mostafa mohamed/newsearch/searchablebooks/wkhtmltopdf.exe'
 
 
 
 @api_view(['GET'])
 def categoriezed_entries(request,  catid):
-    neededCategory = categories.objects.get(id = catid)
+    neededCategory = Category.objects.get(id = catid)
     if request.method == 'GET':
-        entrieslist = entry.objects.filter(entryCategory = neededCategory).order_by('-id')[:9]
+        entrieslist = Entry.objects.filter(entryCategory = neededCategory).order_by('-id')[:9]
         serializer = EntrySerializer(entrieslist, many=True)
         return Response(serializer.data,)
     
@@ -616,8 +457,8 @@ def categoriezed_entries(request,  catid):
 def author_info(request, authid):
     x = []
     y= []
-    theauthor = author.objects.get(id=authid)
-    theentries = entry.objects.filter(entryauthor = theauthor)
+    theauthor = Author.objects.get(id=authid)
+    theentries = Entry.objects.filter(entryauthor = theauthor)
     for oneentry in theentries:
    
         entrydata = {
@@ -649,20 +490,20 @@ def authentication_state(request):
     else:
         return Response ({"authentication" : False})
 
-class putFavourites(APIView):
+class PutFavouritesView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put(self, request, id):
         data = request.data
-        favouriteEntry = entry.objects.get(id= id)
+        favouriteEntry = Entry.objects.get(id= id)
         user = request.user
-        info = userInfo.objects.get(user= user)
+        info = UserInfo.objects.get(user= user)
         snippet = 0
-        for object in book.objects.all():
+        for object in Book.objects.all():
             for chapter in object.relatedChapters.all():
                 if int(chapter.id) == int(id):
-                    snippet = book.objects.get(id = object.id)
+                    snippet = Book.objects.get(id = object.id)
                   
         if data['fav'] == True:
             favouriteEntry.favouriteusers.remove(user)
@@ -677,15 +518,15 @@ class putFavourites(APIView):
         return Response({"message": "bid added successfully."}, status=201)
 
 
-class putBookFavourites(APIView):
+class PutBookFavouritesView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
     def put(self, request, id):
         data = request.data
-        favouriteBook = book.objects.get(id= id)
+        favouriteBook = Book.objects.get(id= id)
         user = request.user
-        info = userInfo.objects.get(user= user)
+        info = UserInfo.objects.get(user= user)
         if data['fav'] == True:
             favouriteBook.favouriteusers.remove(user)
             info.favouriteBooks.remove(favouriteBook)
@@ -700,21 +541,8 @@ class putBookFavourites(APIView):
 
 
 
-# @csrf_exempt
-# def userform(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         theUserInfo = userInfo.objects.get(id = data.get('id'))
-#         theUserInfo.lastPaid = data.get('lastPaid')
-#         theUserInfo.lastDatePayment = data.get('lastDatePayment')
-#         theUserInfo.approved = data.get('approved')
-#         theUserInfo.is_admin = data.get('is_admin')
-#         theUserInfo.approvedcountries.set(data.get('approvedcountries'))
-#         theUserInfo.approvedcategories.set(data.get('approvedcategories'))
-#         theUserInfo.save()
-#         return JsonResponse({"message": "User edited successfully."}, status=201)
     
-class userform(APIView):
+class UserFormView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser, JSONParser] 
     @csrf_exempt
@@ -723,7 +551,7 @@ class userform(APIView):
             data = request.data
             userid = data['id']
         
-            theUserInfo = userInfo.objects.get(user = userid)
+            theUserInfo = UserInfo.objects.get(user = userid)
             serializer = UserInfoPutSerializer(theUserInfo, data=data, partial=True)
             if serializer.is_valid():
                 serializer.save()

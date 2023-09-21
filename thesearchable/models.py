@@ -5,46 +5,14 @@ from django.core.validators import FileExtensionValidator
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
-
-# class AppUserManager(BaseUserManager):
-# 	def create_user(self, email, password=None):
-# 		if not email:
-# 			raise ValueError('An email is required.')
-# 		if not password:
-# 			raise ValueError('A password is required.')
-# 		email = self.normalize_email(email)
-# 		user = self.model(email=email)
-# 		user.set_password(password)
-# 		user.save()
-# 		return user
-# 	def create_superuser(self, email, password=None):
-# 		if not email:
-# 			raise ValueError('An email is required.')
-# 		if not password:
-# 			raise ValueError('A password is required.')
-# 		user = self.create_user(email, password)
-# 		user.is_superuser = True
-# 		user.save()
-# 		return user
-
-
-# class AppUser(AbstractBaseUser, PermissionsMixin):
-# 	user_id = models.AutoField(primary_key=True)
-# 	email = models.EmailField(max_length=50, unique=True)
-# 	username = models.CharField(max_length=50 )
-# 	USERNAME_FIELD = 'email'
-# 	REQUIRED_FIELDS = ['username']
-# 	objects = AppUserManager()
-# 	def __str__(self):
-# 		return self.username
-
 class User(AbstractUser):
     pass
     @property
     def user_dictionary(self):
         return{'id' : self.id, 'username':self.username, 'email':self.email}
+    
 
-class author(models.Model):
+class Author(models.Model):
     name = models.CharField(max_length=200)
     picture = models.ImageField(upload_to='authorimage/')
     degree = models.CharField(max_length=300)
@@ -60,7 +28,7 @@ class author(models.Model):
         return {'label':self.name , 'value': self.id}
 
 
-class categories(models.Model):
+class Category(models.Model):
     thecategory = models.CharField(max_length=200)
     def __str__ (self):
         return self.thecategory
@@ -72,7 +40,7 @@ class categories(models.Model):
         return {'label':self.thecategory , 'value': self.id}
 
 
-class classification(models.Model):
+class Classification(models.Model):
     theclass = models.CharField(max_length=200) 
     def __str__ (self):
         return self.theclass
@@ -81,13 +49,13 @@ class classification(models.Model):
         return {'label':self.theclass , 'value': self.id}
 
 
-class ocrbook(models.Model):
+class Ocrbook(models.Model):
     name= models.CharField(max_length=300)
     pdf = models.FileField(upload_to='books/',null=True, validators=[FileExtensionValidator(allowed_extensions=['pdf'])], blank=True)
 
    
 
-class countries(models.Model):
+class Country(models.Model):
     country = models.CharField(max_length=200)
     def __str__ (self):
         return self.country
@@ -98,26 +66,26 @@ class countries(models.Model):
     def countries_options_dictionary(self):
         return {'label': self.country, 'value':self.id}
     
-class rating(models.Model):
+class Rating(models.Model):
     ratedUser = models.ForeignKey('User', on_delete=models.CASCADE)
     rate = models.IntegerField()
     def __str__ (self):
         return self.rate
     
         
-class entry(models.Model):
+class Entry(models.Model):
     title = models.CharField(max_length=600)
     body = models.TextField()
-    entryauthor = models.ManyToManyField('author', blank=True)
+    entryauthor = models.ManyToManyField('Author', blank=True)
     chapterNumber = models.IntegerField( null=True, blank=True)
-    entryOrigin = models.ForeignKey('countries', null=True, blank=True, on_delete=models.CASCADE)
+    entryOrigin = models.ForeignKey('Country', null=True, blank=True, on_delete=models.CASCADE)
     entryPubDate = models.DateField(null=True, blank=True)
     submissionDate= models.DateTimeField(auto_now=True)
     entryCover = models.ImageField(upload_to='entrycover', blank=True, null=True)
-    relatedRatings = models.ManyToManyField('rating', blank=True)
+    relatedRatings = models.ManyToManyField('Rating', blank=True)
     bibiliography = models.TextField(blank=True, null=True)
-    entryCategory = models.ForeignKey('categories',blank=True, null=True, on_delete=models.CASCADE)
-    entryClassification = models.ManyToManyField('classification', blank=True)
+    entryCategory = models.ForeignKey('Category',blank=True, null=True, on_delete=models.CASCADE)
+    entryClassification = models.ManyToManyField('Classification', blank=True)
     submittedUser = models.ForeignKey('User',blank=True,null=True, on_delete=models.CASCADE, related_name='submitteduser')
     views = models.ManyToManyField('User', blank=True, related_name='views')
     favouriteusers = models.ManyToManyField('User', blank=True, related_name='favouriteusers')
@@ -130,9 +98,9 @@ class entry(models.Model):
     def entry_dictionary(self):
         return {'id': self.id, 'title':self.title, 'entryCover': self.entryCover.url}
     
-class part(models.Model):
+class Part(models.Model):
     name = models.CharField(max_length=500)
-    relatedEntries = models.ManyToManyField('entry',  blank=True)
+    relatedEntries = models.ManyToManyField('Entry',  blank=True)
     def __str__(self):
         return self.name
     @property
@@ -142,9 +110,9 @@ class part(models.Model):
     def part_related_dictionary(self):
         return {'id': self.id, 'name': self.name, 'relatedEntries': self.relatedEntries.all().values('id', 'title')}
     
-class door(models.Model):
+class Door(models.Model):
     name = models.CharField(max_length=500)
-    relatedParts = models.ManyToManyField('part', blank=True)
+    relatedParts = models.ManyToManyField('Part', blank=True)
     def __str__(self):
         return self.name
     @property
@@ -157,19 +125,19 @@ class door(models.Model):
     
     
 
-class book(models.Model):
+class Book(models.Model):
     name = models.CharField(max_length=499)
-    author = models.ManyToManyField('author', blank=True, max_length=300)
+    author = models.ManyToManyField('Author', blank=True, max_length=300)
     containsParts = models.BooleanField(default=False)
     containsDoors = models.BooleanField(default=False)
-    bookCategory = models.ForeignKey('categories', on_delete=models.CASCADE, default=None)
-    bookClassification = models.ManyToManyField('classification', blank=True)
-    bookOrigin = models.ForeignKey('countries', blank=True, null=True, on_delete=models.CASCADE)
+    bookCategory = models.ForeignKey('Category', on_delete=models.CASCADE, default=None)
+    bookClassification = models.ManyToManyField('Classification', blank=True)
+    bookOrigin = models.ForeignKey('Country', blank=True, null=True, on_delete=models.CASCADE)
     publicationDate = models.DateField()
     cover = models.ImageField(upload_to='bookcover')
-    relatedChapters = models.ManyToManyField('entry',  blank=True)
-    relatedParts = models.ManyToManyField('part',  blank=True)
-    relatedDoors = models.ManyToManyField('door', blank=True)
+    relatedChapters = models.ManyToManyField('Entry',  blank=True)
+    relatedParts = models.ManyToManyField('Part',  blank=True)
+    relatedDoors = models.ManyToManyField('Door', blank=True)
     submittedUser = models.ForeignKey('User', null=True, blank=True, related_name='submittedBookUser', on_delete=models.CASCADE)
     publisher = models.CharField(max_length=700, blank=True, null=True)
     favouriteusers = models.ManyToManyField('User', blank=True, related_name='bookfavouriteusers')
@@ -183,29 +151,21 @@ class book(models.Model):
     
 
 
-class userInfo(models.Model):
+class UserInfo(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     lastPaid = models.IntegerField(blank=True, null=True)
     lastDatePayment = models.DateField(blank=True, null=True)
     is_admin = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
-    approvedcountries = models.ManyToManyField('countries',  blank=True)
-    approvedcategories = models.ManyToManyField('categories', blank=True)
-    favouriteEntries = models.ManyToManyField('entry',  blank=True, related_name='favourites')
-    favouriteBooks = models.ManyToManyField('book', blank=True, related_name='favouriteBooks')
-    downloadedEntries = models.ManyToManyField('entry',blank=True, related_name='downloadedbooks')
-    viewedEntries = models.ManyToManyField('entry',  blank=True, related_name='viewedEntries')
-    submittedentries = models.ManyToManyField('entry',blank=True, related_name='submittedentries')
-    submittedBooks = models.ManyToManyField('book', blank=True, related_name='submittedBooks')
-    submittedAuthors = models.ManyToManyField('author', blank=True, related_name='submittedAuthors')
+    approvedcountries = models.ManyToManyField('Country',  blank=True)
+    approvedcategories = models.ManyToManyField('Category', blank=True)
+    favouriteEntries = models.ManyToManyField('Entry',  blank=True, related_name='favourites')
+    favouriteBooks = models.ManyToManyField('Book', blank=True, related_name='favouriteBooks')
+    downloadedEntries = models.ManyToManyField('Entry',blank=True, related_name='downloadedbooks')
+    viewedEntries = models.ManyToManyField('Entry',  blank=True, related_name='viewedEntries')
+    submittedentries = models.ManyToManyField('Entry',blank=True, related_name='submittedentries')
+    submittedBooks = models.ManyToManyField('Book', blank=True, related_name='submittedBooks')
+    submittedAuthors = models.ManyToManyField('Author', blank=True, related_name='submittedAuthors')
 
 def upload_to(instance, filename):
     return 'images/{filename}'.format(filename=filename)
-
-# class MyModel(models.Model):
-   
-#     title = models.CharField(
-#         max_length=80, blank=False, null=False)
-#     description = models.TextField()
-#     image_url = models.ImageField(upload_to='search', blank=True, null=True)
-

@@ -152,14 +152,8 @@ class EntryDocument(Document):
 
 
     class Django:
-        model = entry
+        model = Entry
         fields= []
-
-
-
-
-
-
 
 
 book_index=Index('books')
@@ -263,5 +257,5 @@ class BookDocument(Document):
 
 
     class Django:
-        model = book
+        model = Book
         fields= []
