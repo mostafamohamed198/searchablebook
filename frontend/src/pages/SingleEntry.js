@@ -49,6 +49,7 @@ export default function SingleEntry (props){
     const [headings, setHeadings] = React.useState([]);
     const [entryLoaded, setEntryLoaded] = React.useState(false)
     const [entryReLoaded, setEntryReLoaded] = React.useState(true)
+    const [firstEntry, setFirstEntry] = React.useState(true)
     const bookTitleElement = React.useRef();
     
     React.useEffect(function(){
@@ -80,40 +81,45 @@ export default function SingleEntry (props){
         .then(() => {
           setEntryLoaded(true);
           setEntryReLoaded(true)
+          setFirstEntry(true)
         })
 
 
     }
     ,[])
-    // const scrollToSection = (sectionId) => {
-    //   const section = document.getElementById(sectionId);
-    
-    //     if (section) {
-    //       section.scrollIntoView({ behavior: 'smooth' });
-  
-    //     }
-  
-    //   };
+    const scrollToSection = (sectionId) => {
+      const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth' });
+        }
+      };
 
     React.useEffect(() => {
-      function removeQuotesValue() {
-        return searchBoxValue.replace(/"/g, '');
+      if(firstEntry){
+        function removeQuotesValue() {
+          return searchBoxValue.replace(/"/g, '');
+        }
+        const searchValueWithoutQuotes = removeQuotesValue(searchBoxValue);
+        
+          if (searchValueWithoutQuotes != '') {
+            setValue(searchValueWithoutQuotes)
+            setList(list.concat(searchValueWithoutQuotes));
+            setSearched(true)
+          }
+          else{
+              setSearched(false)
+          }
+          
+          const ccc= reactStringReplace(theEntry, searchValueWithoutQuotes, (match, i) => (
+              `<mark><a href ="#mark-${i + 2}" id="mark-${i}" className="SE--mark--link">${match} <i class="fa-solid fa-arrow-left" className="SE--arrowLeft"></i> </a></mark>`
+            ));
+          setTheSearchedEntry(ccc.join(""));
+          
       }
-      const searchValueWithoutQuotes = removeQuotesValue(searchBoxValue);
-
-      if (searchValueWithoutQuotes != '') {
-        setValue(searchValueWithoutQuotes)
-        setList(list.concat(searchValueWithoutQuotes));
-        setSearched(true)
+      if (entryLoaded){
+        scrollToSection("mark-1")
       }
-      else{
-          setSearched(false)
-      }
-      const ccc= reactStringReplace(theEntry, searchValueWithoutQuotes, (match, i) => (
-          `<mark><a href ="#mark-${i + 2}" id="mark-${i}" className="SE--mark--link">${match} <i class="fa-solid fa-arrow-left" className="SE--arrowLeft"></i> </a></mark>`
-        ));
-      setTheSearchedEntry(ccc.join(""));
-    }, [theEntry])
+    }, [theEntry, entryLoaded])
 
     React.useEffect(()=>{
       const fetchData = async () =>{
@@ -158,6 +164,7 @@ export default function SingleEntry (props){
           setBibilography(data.bibiliography);
           setFavouriteUsers(data.favouriteusers);
           setEntryReLoaded(true);
+          setFirstEntry(false)
         } catch (error) {
           // Handle errors here
           console.error(error);

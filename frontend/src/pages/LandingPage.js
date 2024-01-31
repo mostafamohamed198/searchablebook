@@ -8,8 +8,11 @@ import SearchContext from "../ctx/SearchContext";
 export default function LandingPage(){
   const reactTags = useRef()
   const [displayTable, setDisplayTable] = React.useState(false)
-  let {tags, onAddition, onDelete, onInput, suggestions, searchFormSubmit} = useContext(SearchContext)
+  let {tags, onAddition, onDelete, onInput, suggestions, searchFormSubmit, resetSearch} = useContext(SearchContext)
 
+  React.useEffect(function(){
+    resetSearch()
+  }, [])
   const tableStyle = {
    
     display: displayTable ? 'block': 'none',

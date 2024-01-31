@@ -45,7 +45,6 @@ export default function SearchResults(){
     },
     search_settings: {
       highlight_attributes: ["title", 'body'],
-      
       snippet_attributes: ['title',"body"],
       search_attributes: [{ field: "title", weight: 3 }, "body", "bibiliography", "source"],
       // search_attributes: ["source"],
@@ -67,13 +66,12 @@ export default function SearchResults(){
     }
   }}, { debug: true });
 
-
   const { collapseSidebar, rtl } = useProSidebar();
   // const searchClient = Client(sk);
   const hitView = ({ hit }) => {
     const [inFavourites, setInFavourites] = React.useState(false)
-      const resultingAuthors = hit.entryauthor.map(author =>{
-   const authorid = `/authordetails/${author.id}`
+    const resultingAuthors = hit.entryauthor.map(author =>{
+    const authorid = `/authordetails/${author.id}`
       return(
         <Link to={authorid}><div>{author.name}،</div></Link>
       )
@@ -87,7 +85,7 @@ export default function SearchResults(){
     function theSnippetbody(){
       if( hit._snippetResult.body.matchLevel != 'none'){
         return(
-<p><Snippet hit={hit} attribute="body"/></p>    
+          <p><Snippet hit={hit} attribute="body"/></p>    
         )
       }
       else if(hit._snippetResult.title.matchLevel != 'none'){
@@ -100,9 +98,9 @@ export default function SearchResults(){
       if (hit.source != null){
         return(
           <div className="SR--pubdate">
-          <p className="SR--pubdate--title">المصدر:</p >
-          <div>{hit.source}</div>
-        </div>
+            <p className="SR--pubdate--title">المصدر:</p >
+            <div>{hit.source}</div>
+          </div>
         )
         
       }
