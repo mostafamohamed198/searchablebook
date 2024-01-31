@@ -7,6 +7,7 @@ import {
 
 } from "react-router-dom";
 
+import { SearchProvider } from "../ctx/SearchContext";
 import { AuthProvider } from "../authentication/AuthContext";
 
 import { ProSidebarProvider } from 'react-pro-sidebar';
@@ -21,13 +22,15 @@ export default class App extends Component {
     <div>
         <Router>
             <AuthProvider>
-                <React.StrictMode>
-                    <ProSidebarProvider>
-                          <div>
-                              <HomePage />
-                          </div>
-                    </ProSidebarProvider>
-                </React.StrictMode>
+              <SearchProvider>
+                  <React.StrictMode>
+                      <ProSidebarProvider>
+                            <div>
+                                <HomePage />
+                            </div>
+                      </ProSidebarProvider>
+                  </React.StrictMode>
+                </SearchProvider>
             </AuthProvider>
         </Router>
     </div>

@@ -30,10 +30,8 @@ input{
 @import url("https://fonts.googleapis.com/css2?family=Karla:wght@200;400&display=swap");
 @import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @font-face {
-  /* font-family: sakkal;
-  src: url('C:/Users/mostafa mohamed/newsearch/searchablebooks/alfont_com_majalla.ttf'); */
   font-family: sakkal;
-  src: url('C:/Users/mostafa mohamed/version-1/searchablebooks/alfont_com_majalla.ttf');
+  src: url('../../../alfont_com_majalla.ttf');
 }
 * {
   box-sizing: border-box;

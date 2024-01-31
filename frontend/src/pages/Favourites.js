@@ -737,6 +737,7 @@ import Searchkit from "searchkit";
 import {Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import {Configure,  Menu as MenuSearch, connectMenu, Pagination,Stats, Panel,InstantSearch,  Hits, RefinementList, Snippet } from "react-instantsearch-dom";
+import esHost from "../constants/esHost";
 
 import AuthContext from "../authentication/AuthContext";
 export default function Favourites(){
@@ -764,9 +765,7 @@ export default function Favourites(){
   
   const sk = new Searchkit({
     connection: {
-      host: "http://16.170.70.218:9200",
-      // host: "http://localhost:9200",
-  
+      host: esHost,
     },
     search_settings: {
       highlight_attributes: ["favouriteusers"],

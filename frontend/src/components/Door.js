@@ -1,5 +1,7 @@
 import React from "react";
-import Part from "./part";
+// import Part from "./part";
+// import Part
+import Part from "./Part";
 import {  SubMenu,  } from 'react-pro-sidebar';
 export default function Door(props){
     const returnedDoorParts = props.relatedParts.map(thepart => {

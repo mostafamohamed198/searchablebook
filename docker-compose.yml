@@ -29,7 +29,8 @@ services:
       xpack.security.enabled: false
       discovery.type: single-node
       http.cors.enabled: true
-      http.cors.allow-origin: "http://16.170.70.218"
+      # http.cors.allow-origin: "http://16.170.70.218"
+      http.cors.allow-origin: "http://localhost"
       http.cors.allow-methods: OPTIONS, HEAD, GET, POST, PUT, DELETE
       http.cors.allow-headers:  Authorization, X-Requested-With,X-Auth-Token,Content-Type, Content-Length
       http.cors.allow-credentials: true

@@ -5,7 +5,7 @@ import { useContext } from "react";
 import AuthContext from "../authentication/AuthContext";
 import {Link} from 'react-router-dom';
 
-import Part from "../components/part";
+import Part from "../components/Part";
 import Door from "../components/Door";
 import Chapter from "../components/Chapter";
 import Share from "../components/Share";
@@ -18,11 +18,15 @@ import {faArrowLeft ,faDownload, faPrint, faShare, faStar as fasolidstar } from 
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import ReactModal from 'react-modal';
+import SearchContext from "../ctx/SearchContext";
 import axios from "axios";
 
 // const EntryMarkdown = lazy(() => import('./EntryMarkdown'));
 
 export default function SingleEntry (props){
+
+    let {user, authTokens} = useContext(AuthContext)
+    let {searchBoxValue} = useContext(SearchContext)
     const [theEntryId, setTheEntryId] = React.useState(0)
     const [theEntry, setTheEntry] = React.useState()
     const [theSearchedEntry, setTheSearchedEntry] = React.useState()
@@ -45,8 +49,8 @@ export default function SingleEntry (props){
     const [headings, setHeadings] = React.useState([]);
     const [entryLoaded, setEntryLoaded] = React.useState(false)
     const [entryReLoaded, setEntryReLoaded] = React.useState(true)
-    let {user, authTokens} = useContext(AuthContext)
     const bookTitleElement = React.useRef();
+    
     React.useEffect(function(){
 
 
@@ -71,7 +75,6 @@ export default function SingleEntry (props){
         })
 
         .catch(error => {
-          // Handle errors here
           console.error('Error:', error);
         })
         .then(() => {
@@ -80,9 +83,37 @@ export default function SingleEntry (props){
         })
 
 
-
     }
     ,[])
+    // const scrollToSection = (sectionId) => {
+    //   const section = document.getElementById(sectionId);
+    
+    //     if (section) {
+    //       section.scrollIntoView({ behavior: 'smooth' });
+  
+    //     }
+  
+    //   };
+
+    React.useEffect(() => {
+      function removeQuotesValue() {
+        return searchBoxValue.replace(/"/g, '');
+      }
+      const searchValueWithoutQuotes = removeQuotesValue(searchBoxValue);
+
+      if (searchValueWithoutQuotes != '') {
+        setValue(searchValueWithoutQuotes)
+        setList(list.concat(searchValueWithoutQuotes));
+        setSearched(true)
+      }
+      else{
+          setSearched(false)
+      }
+      const ccc= reactStringReplace(theEntry, searchValueWithoutQuotes, (match, i) => (
+          `<mark><a href ="#mark-${i + 2}" id="mark-${i}" className="SE--mark--link">${match} <i class="fa-solid fa-arrow-left" className="SE--arrowLeft"></i> </a></mark>`
+        ));
+      setTheSearchedEntry(ccc.join(""));
+    }, [theEntry])
 
     React.useEffect(()=>{
       const fetchData = async () =>{
@@ -110,9 +141,6 @@ export default function SingleEntry (props){
           }
           ));
       setHeadings(elements);
-      // console.log(elements)
-      
-
     }
 
     }, [theEntry, entryReLoaded,entryLoaded])
@@ -139,9 +167,6 @@ export default function SingleEntry (props){
       fetchData();
     }, [props.id]);
 
-
-
-
     function chapterClicked(selected){
       // console.log(selected)
       if (selected != props.id){
@@ -149,7 +174,6 @@ export default function SingleEntry (props){
         setEntryReLoaded(false)
       } 
     }
-
 
     const returnedParts = parts.map(thepart => {
         return (
@@ -188,24 +212,24 @@ export default function SingleEntry (props){
         setValue(event.target.value);
       };
 
-      const handleSubmit = (event) => {
-        event.preventDefault();
-        if (value != '') {
-            
-          setList(list.concat(value));
-          setSearched(true)
-        }
-        else{
-            setSearched(false)
-        }
-      
-            const ccc= reactStringReplace(theEntry, value, (match, i) => (
-                `<mark><a href ="#mark-${i + 2}" id="mark-${i}" className="SE--mark--link">${match} <i class="fa-solid fa-arrow-left" className="SE--arrowLeft"></i> </a></mark>`
-              ));
-        setTheSearchedEntry(ccc.join(""));
-        setValue('')
-      
-      };
+    const handleSubmit = (event) => {
+      event.preventDefault();
+      if (value != '') {
+          
+        setList(list.concat(value));
+        setSearched(true)
+      }
+      else{
+          setSearched(false)
+      }
+    
+      const ccc= reactStringReplace(theEntry, value, (match, i) => (
+          `<mark><a href ="#mark-${i + 2}" id="mark-${i}" className="SE--mark--link">${match} <i class="fa-solid fa-arrow-left" className="SE--arrowLeft"></i> </a></mark>`
+        ));
+      setTheSearchedEntry(ccc.join(""));
+      // setValue('')
+    
+    };
 
     const { collapseSidebar, rtl } = useProSidebar();
 
@@ -282,7 +306,7 @@ export default function SingleEntry (props){
 
  
     if (!entryLoaded) {
-      return <div>...</div>; // You can replace this with your loading indicator
+      return <div>...</div>;
     }
 
     return (
@@ -344,11 +368,6 @@ export default function SingleEntry (props){
                   </div>
               </div>
               
-              {/* <Suspense fallback={<div>Loading...</div>}>
-                <EntryMarkdown content={searched ? theSearchedEntry : theEntry} />
-              </Suspense> */}
-              {/* <div  onBlur = {() => setLoaded(!loaded)}> */}
-              
               {entryReLoaded && <ReactMarkdown 
           components={{
             h2: ({ node, ...props }) => (
@@ -369,7 +388,6 @@ export default function SingleEntry (props){
           }} 
           className="SE--markdown--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={searched ? theSearchedEntry : theEntry}  remarkPlugins={[remarkGfm]} style={{scrollMarginTop: '10rem'}}/>
         }
-              {/* {entryLoaded && <div>{theEntry}</div>} */}
           </div>
           </div>
       

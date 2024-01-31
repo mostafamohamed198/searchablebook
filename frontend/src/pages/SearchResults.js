@@ -1,111 +1,45 @@
-import React, { Component ,useRef, useCallback, useState } from "react";
-import {Route, Link, Routes, useParams} from 'react-router-dom';
+import React, { useRef, useContext } from "react";
+import { Link, useParams} from 'react-router-dom';
 import Client from "@searchkit/instantsearch-client";
 import Searchkit from "searchkit";
-import {ProSidebarProvider, Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
+import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Menu as MenuSearch, connectMenu,  Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet , Configure} from "react-instantsearch-dom";
 import ReactTags from 'react-tag-autocomplete'
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
+import esHost from "../constants/esHost";
+import SearchContext from "../ctx/SearchContext";
+
 export default function SearchResults(){
   const [displayTable, setDisplayTable] = React.useState(false)
-  const [tags, setTags] = useState([])
-  const [suggestions, setSuggestions] = useState([])
   const reactTags = useRef()
   const params = useParams();
-  const [searchBoxValue, setSearchBoxValue] = React.useState(params.resultvalue)
-
+  let {tags, onAddition, onDelete, onInput, suggestions, searchFormSubmit, searchBoxValue} = useContext(SearchContext)
 
   const tableStyle = {
     display: displayTable ? 'block': 'none'
   }
 
-  
-
   function collapsedWidth(){
     const windowWidth = React.useRef(window.innerWidth);
     if (windowWidth.current >= 390){
-            return(
-              false
-            )
+      return(
+        false
+      )
     }
     else{
-            return(
-              true
-            )
+      return(
+        true
+      )
     }
    
   }
-
-  const onDelete = useCallback((tagIndex) => {
-    setTags(tags.filter((_, i) => i !== tagIndex))
-  }, [tags])
-
-  const onAddition = useCallback((newTag) => {
-
-    if (tags[tags.length - 1] != null){
-      if(newTag.name != 'AND' && newTag.name != 'OR' && newTag.name != 'NOT'){
-
-          if(tags[tags.length - 1].name != 'AND' && tags[tags.length - 1].name != 'OR' && tags[tags.length - 1].name != 'NOT'){
-       
-          setTags([...tags, {id: null , name: 'AND'}, newTag])
-      
-        }
-        else{
-          setTags([...tags, newTag])
-        }
-      }
-      else{
-        setTags([...tags, newTag])
-      }
-    }
-    else{
-      setTags([...tags, newTag])
-    }
-
-
-    setSuggestions([])
-  }, [tags])
-
-  function onInput (query) {
-   
-    
-    axios.post('http://16.170.70.218:9200/entries/_search', {
-      
-    query: {
-      multi_match: {
-          query: query,
-          type: "bool_prefix",
-          fields: [
-              "title",
-              "title._2gram",
-              "title._3gram"
-          ],
-          // sort: ['_score', { createdDate: 'desc' }]
-      }
-  },
-           
-          })
-          .then(res => {
-           setSuggestions([])
-            res.data.hits.hits.map(hit => {
-              
-              let newHit = {id: hit._source.id, name: hit._source.title }
-              setSuggestions(oldArray => [...oldArray, newHit])
-            })
-       
-          })
-
-  }
-
-  
 
   const sk = new Searchkit({
     connection: {
-      host: "http://16.170.70.218:9200",
-      // host: "http://localhost:9200",
+      host: esHost,
       
   
     },
@@ -174,7 +108,6 @@ export default function SearchResults(){
       }
     }
    
-    
     return (
       <div  className="SR--container">
        <div>
@@ -202,48 +135,20 @@ export default function SearchResults(){
   
   }
 
-  function searchFormSubmit(event){
-    event.preventDefault()
- 
-    let thestring = ''
-    tags.map(tag => {
-     
- 
-      if(tag.name != 'AND' && tag.name != 'OR' && tag.name != 'NOT'){
-      thestring = `${thestring} (${tag.name})`
-      }
-      else{
-        thestring = `${thestring} ${tag.name}`
-      }
-
-    })
-    setSearchBoxValue(thestring)
- 
-  }
-
-    
 
 
-const TheMenu = ({ items, isFromSearch, refine, searchForItems, createURL }) => {
-const selectedStyle = {list: {
-  borderBottom: 'solid rgb(103, 103, 103)',
-  fontWeight: '700',
-},
-// number:{
-//   backgroundColor: 'rgb(103, 103, 103)',
-//   color: 'white'
-// }
-}
+    const TheMenu = ({ items, isFromSearch, refine, searchForItems, createURL }) => {
+    const selectedStyle = {list: {
+      borderBottom: 'solid rgb(103, 103, 103)',
+      fontWeight: '700',
+    },
+    }
 
-const nonSelectedStyle = {list: {
-  borderBottom: 'none',
-  fontWeight: '500',
+    const nonSelectedStyle = {list: {
+      borderBottom: 'none',
+      fontWeight: '500',
 
-},
-// number:{
-//   backgroundColor: 'none',
-//   color: 'rgb(103, 103, 103)'
-// }
+    },
 }
 let allCount = 0
 items.map(item =>{
@@ -252,12 +157,7 @@ items.map(item =>{
 const [allHits, setAllHits] = React.useState(true)
   return (
   <ul className="SR--categories--Menu">
-    {/* <li>
-    <button onClick={() => refine("")}>الكل {allCount}{items.map(item =>{
-      
-    })}</button>
-    
-    </li> */}
+
     
 <li key= '0' className="SR--categories--Menu--li">
 <a

@@ -1,105 +1,20 @@
-import React, { useRef,useCallback, useContext,useState } from "react";
-import {Link, Routes, Route, useNavigate} from 'react-router-dom';
+import React, { useRef, useContext } from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons' 
 import SimpleSlider from "../components/SimpleSlider";
 import ReactTags from 'react-tag-autocomplete';
-import axios from "axios";
+import SearchContext from "../ctx/SearchContext";
 
 export default function LandingPage(){
-  const [searchBoxValue, setSearchBoxValue] = React.useState('')
-  const [tags, setTags] = useState([])
-  const [suggestions, setSuggestions] = useState([])
   const reactTags = useRef()
   const [displayTable, setDisplayTable] = React.useState(false)
+  let {tags, onAddition, onDelete, onInput, suggestions, searchFormSubmit} = useContext(SearchContext)
+
   const tableStyle = {
    
     display: displayTable ? 'block': 'none',
 
   }
-  const navigate = useNavigate();
-  const onDelete = useCallback((tagIndex) => {
-    setTags(tags.filter((_, i) => i !== tagIndex))
-  }, [tags])
-
-  const onAddition = useCallback((newTag) => {
-
-    if (tags[tags.length - 1] != null){
-      if(newTag.name != 'AND' && newTag.name != 'OR' && newTag.name != 'NOT'){
-
-          if(tags[tags.length - 1].name != 'AND' && tags[tags.length - 1].name != 'OR' && tags[tags.length - 1].name != 'NOT'){
-       
-            setTags([...tags, {id: null , name: 'AND'}, newTag])
-      
-          }
-          else{
-            setTags([...tags, newTag])
-          }
-      }
-      else{
-        setTags([...tags, newTag])
-      }
-    }
-    else{
-      setTags([...tags, newTag])
-    }
-
-
-    setSuggestions([])
-  }, [tags])
-
-
-  function onInput (query) {
-   
-    
-    axios.post('http://16.170.70.218:9200/entries/_search', {
-      
-    query: {
-      multi_match: {
-          query: query,
-          type: "bool_prefix",
-          fields: [
-              "title",
-              "title._2gram",
-              "title._3gram"
-          ],
-          // sort: ['_score', { createdDate: 'desc' }]
-      }
-  },
-           
-          })
-          .then(res => {
-           setSuggestions([])
-            res.data.hits.hits.map(hit => {
-              
-              let newHit = {id: hit._source.id, name: hit._source.title }
-              setSuggestions(oldArray => [...oldArray, newHit])
-            })
-       
-          })
-   
-  }
-
-  function searchFormSubmit(event){
-    event.preventDefault()
- 
-    let thestring = ''
-    tags.map(tag => { 
-      if(tag.name != 'AND' && tag.name != 'OR' && tag.name != 'NOT'){
-          thestring = `${thestring} (${tag.name})`
-      }
-      else{
-        thestring = `${thestring} ${tag.name}`
-      }
-
-    })
-    setSearchBoxValue(thestring)
-    const al = `${tags}`
-    navigate(`/results/${thestring}`);
-
-  }
-
-
     return (
         <div className="LP">
             <div  className="SR--searchbox">
@@ -139,7 +54,7 @@ export default function LandingPage(){
                           onAddition={onAddition}
                           onInput= {onInput}
                           onFocus={() => setDisplayTable(true)}
-                            onBlur={() => setDisplayTable(false)}
+                          onBlur={() => setDisplayTable(false)}
                           placeholderText = 'ابحث عن المصطلحات ، اسماء المؤلفين، المنشورات...'
                         />
                     <button className="SR--searchBox--button" type="submit"><FontAwesomeIcon icon={faMagnifyingGlass} rotation={90} /></button>

@@ -6,6 +6,7 @@ import Searchkit from "searchkit";
 import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sidebar';
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import {Configure, Pagination, Panel,InstantSearch,  RefinementList, Snippet, Hits, SortBy, SearchBox } from "react-instantsearch-dom";
+import esHost from "../constants/esHost";
 
 export default function Category(props){
   // const params = useParams();
@@ -21,8 +22,7 @@ export default function Category(props){
 
   const sk = new Searchkit({
     connection: {
-      host: "http://16.170.70.218:9200",
-      // host: "http://localhost:9200",
+      host: esHost,
   
     },
     search_settings: {

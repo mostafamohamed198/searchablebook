@@ -27,7 +27,7 @@ import Favourites from "./Favourites";
 import EditLinks from "../administration/EditLinks";
 import Users from "./Users";
 import FormsPrivateRoute from "../utils/FormsPrivateRoute";
-import FormEdit from "../forms/editForms/formedit";
+import FormEdit from "../forms/editForms/FormEdit";
 import BookForm from "../forms/submitforms/BookForm";
 import EntryBookForm from "../forms/submitforms/EntryBookForm";
 import BookEditForm from "../forms/editForms/BookEditForm";

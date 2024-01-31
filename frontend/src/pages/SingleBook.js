@@ -2,7 +2,7 @@ import React, { Component, useRef }from "react";
 import { useContext } from "react";
 import AuthContext from "../authentication/AuthContext";
 import {Link,} from 'react-router-dom';
-import Part from "../components/part";
+import Part from "../components/Part";
 import Door from "../components/Door";
 import Chapter from "../components/Chapter";
 import Share from "../components/Share";
