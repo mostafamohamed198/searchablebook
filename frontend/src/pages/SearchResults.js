@@ -6,7 +6,6 @@ import { Sidebar, Menu, MenuItem, SubMenu, useProSidebar } from 'react-pro-sideb
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { Menu as MenuSearch, connectMenu,  Pagination,Stats, Panel,InstantSearch, SearchBox, Hits, RefinementList, Snippet , Configure} from "react-instantsearch-dom";
 import ReactTags from 'react-tag-autocomplete'
-import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
 import esHost from "../constants/esHost";
@@ -15,7 +14,6 @@ import SearchContext from "../ctx/SearchContext";
 export default function SearchResults(){
   const [displayTable, setDisplayTable] = React.useState(false)
   const reactTags = useRef()
-  const params = useParams();
   let {tags, onAddition, onDelete, onInput, suggestions, searchFormSubmit, searchBoxValue} = useContext(SearchContext)
 
   const tableStyle = {
@@ -36,7 +34,6 @@ export default function SearchResults(){
     }
    
   }
-
   const sk = new Searchkit({
     connection: {
       host: esHost,
@@ -47,10 +44,8 @@ export default function SearchResults(){
       highlight_attributes: ["title", 'body'],
       snippet_attributes: ['title',"body"],
       search_attributes: [{ field: "title", weight: 3 }, "body", "bibiliography", "source"],
-      // search_attributes: ["source"],
       result_attributes: ['id',"title", "body", "bibiliography", 'entryCover', 'entryauthor', 'entryPubDate','entryCategory', 'viewsCounts', 'favouriteusers','source'],
       facet_attributes: ['title.key',  'entryOrigin.country.raw', 'entryClassification.theclass.key', 'entryauthor.name.key', 'entryCategory.thecategory.key'],
-      // facet_attributes: ['title.key',  'entryOrigin.country.raw', 'entryClassification.theclass.key', 'entryauthor.name.key', {attribute: 'category_lvl1', field:'entryCategory.thecategory.key', type:'string'}],
       filter_attributes: [  { attribute: 'title', field: 'title.key', type: 'string' }]
     },
   })
@@ -59,7 +54,7 @@ export default function SearchResults(){
       return {
         query_string: {
           fields:["title", "body", "title.raw", "body.raw", "bibiliography","source", "entryauthor.name"],
-          query: query
+          query: query ,
        }
   
   
@@ -132,9 +127,6 @@ export default function SearchResults(){
     )
   
   }
-
-
-
     const TheMenu = ({ items, isFromSearch, refine, searchForItems, createURL }) => {
     const selectedStyle = {list: {
       borderBottom: 'solid rgb(103, 103, 103)',
@@ -147,18 +139,16 @@ export default function SearchResults(){
       fontWeight: '500',
 
     },
-}
-let allCount = 0
-items.map(item =>{
-  allCount = allCount + item.count
-})
-const [allHits, setAllHits] = React.useState(true)
+  }
+  let allCount = 0
+  items.map(item =>{
+    allCount = allCount + item.count
+  })
+  const [allHits, setAllHits] = React.useState(true)
   return (
-  <ul className="SR--categories--Menu">
-
-    
-<li key= '0' className="SR--categories--Menu--li">
-<a
+    <ul className="SR--categories--Menu">
+      <li key= '0' className="SR--categories--Menu--li">
+        <a
           href=""
           style={allHits ? selectedStyle.list : nonSelectedStyle.list}
           onClick={event => {
@@ -171,9 +161,7 @@ const [allHits, setAllHits] = React.useState(true)
    
           الكل
           <span className="SR--categories--Menu--count" >({allCount})</span>
-       
-      
-      </a>
+        </a>
       </li>
     {items.map(item => (
       <li className="SR--categories--Menu--li" key={item.value}>
@@ -202,154 +190,110 @@ const [allHits, setAllHits] = React.useState(true)
 const CustomMenu = connectMenu(TheMenu);
 
     return (
-      
-      // <div className="LP">
-        <div className="ais-InstantSearch">
-         
-          {/* onSearchStateChange={false} */}
-        
-      <div>
-        <div  className="SR--searchbox">
- <div style={{width:'95%', textAlign:'right', fontSize:'30px', fontWeight:'700'}}>ابحث في المكتبة القانونية الإلكترونية:</div>
- 
- <form className="SR--searchBox-form" onSubmit={searchFormSubmit}>
- <div style={tableStyle} className="SR--table--div">
-      <table>
-        <tr>
-          <td className="SR--td">AND</td>
-          <td className="SR--td">كل الكلمات يجب أن تكون في النتيجه </td>
+      <div className="ais-InstantSearch">
+        <div>
+          <div  className="SR--searchbox">
+            <div style={{width:'95%', textAlign:'right', fontSize:'30px', fontWeight:'700'}}>ابحث في المكتبة القانونية الإلكترونية:</div>
+            <form className="SR--searchBox-form" onSubmit={searchFormSubmit}>
+              <div style={tableStyle} className="SR--table--div">
+                <table>
+                  <tr>
+                    <td className="SR--td">AND</td>
+                    <td className="SR--td">كل الكلمات يجب أن تكون في النتيجه </td>
 
-        </tr>
-        <tr>
-          <td className="SR--td">OR</td>
-          <td className="SR--td"> النتائج يجب أن تحتوي علي أي كلمه من كلمات البحث </td>
-      
-        </tr>
-        <tr>
-          <td className="SR--td">NOT</td>
-          <td className="SR--td"> النتائج يمكن أن تحتوي علي أي كلمه ماعدا الكلمة التي تلي NOT </td>
-   
-        </tr>
-        <tr>
-          <td className="SR--td">*</td>
-          <td className="SR--td"> يمكن استبدال أي حرف أو رقم مكان العلامة  </td>
-  
-        </tr>
-       
-      </table>
-    </div>
- <ReactTags
-      ref={reactTags}
-      tags={tags}
-      allowNew={true}
-      suggestions={suggestions}
-      onDelete={onDelete}
-      onAddition={onAddition}
-      onInput= {onInput}
-      onFocus={() => setDisplayTable(true)}
-        onBlur={() => setDisplayTable(false)}
-      placeholderText = 'ابحث عن المصطلحات ، اسماء المؤلفين، المنشورات...'
-    />
-    {/* <input type="submit" /> */}
-    <button className="SR--searchBox--button" type="submit"><FontAwesomeIcon icon={faMagnifyingGlass} rotation={90} /></button>
-    </form>
-    </div>
-    
-    <div >
-    <InstantSearch indexName="entries" searchClient={searchClient}>
-      <div style={{'display': 'none'}}>
-      {/* <div> */}
-      <SearchBox
-      // value='تسمية'
-
-       defaultRefinement={searchBoxValue}
-      translations={{ placeholder: 'ابحث هنا' }}
-        searchAsYouType={false}
-        onFocus={() => setDisplayTable(true)}
-        onBlur={() => setDisplayTable(false)}
-          />
-</div>
-
-    <div className="SR--pandel--div">
-
-{/* 
-       <div className="left-panel"> */}
-       <Sidebar defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
-     <Menu>
-       <MenuItem
-            icon={<MenuOutlinedIcon />}
-            onClick={() => {
-              collapseSidebar();
-            }}
-            style={{ textAlign: "center" }}
-          >
-            {" "}
-         
-          </MenuItem>
-    
-        {/* </Menu>
- 
- 
-     <Menu style={{width:'350px'}}> */}
-     <SubMenu icon='' defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}}label='الدولة:'>
-        <Panel>
-     
-      <RefinementList translations={{ placeholder: 'ادحل اسم البلد' }} attribute='entryOrigin.country.raw' searchable={true} limit={20} />
- 
-      </Panel>
-      </SubMenu>
-    
-      <SubMenu icon='' defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='التصنيف:'>
-      <Panel>
-      
-      <RefinementList translations={{ placeholder: "ادخل اسم التصنيف" }} attribute='entryClassification.theclass.key' searchable={true} limit={20} />
-      </Panel>
-      </SubMenu>
-      <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='الفئة:'>
-      <Panel>
-
-        <RefinementList translations={{ placeholder: "ادخل اسم الفئة" }} attribute='entryCategory.thecategory.key' searchable={true} limit={20} />
-      </Panel>
-      </SubMenu>
-    
-      <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='المؤلف:'>
-      <Panel>
-
-        <RefinementList translations={{ placeholder: "ادخل اسم المؤلف" }} attribute='entryauthor.name.key' searchable={true} limit={20} />
-      </Panel>
-      </SubMenu>
-        </Menu> 
-        
-   
-      </Sidebar>
-
-      {/* </div> */}
-      <div className="right-panel">
-        
-      <CustomMenu attribute="entryCategory.thecategory.key" searchable />
-    
-      <Configure
-
-hitsPerPage={15}
-/>
+                  </tr>
+                  <tr>
+                    <td className="SR--td">OR</td>
+                    <td className="SR--td"> النتائج يجب أن تحتوي علي أي كلمه من كلمات البحث </td>
+                
+                  </tr>
+                  <tr>
+                    <td className="SR--td">NOT</td>
+                    <td className="SR--td"> النتائج يمكن أن تحتوي علي أي كلمه ماعدا الكلمة التي تلي NOT </td>
+            
+                  </tr>
+                  <tr>
+                    <td className="SR--td">*</td>
+                    <td className="SR--td"> يمكن استبدال أي حرف أو رقم مكان العلامة  </td>
+            
+                  </tr>
+                
+                </table>
+              </div>
+              <ReactTags
+                    ref={reactTags}
+                    tags={tags}
+                    allowNew={true}
+                    suggestions={suggestions}
+                    onDelete={onDelete}
+                    onAddition={onAddition}
+                    onInput= {onInput}
+                    onFocus={() => setDisplayTable(true)}
+                      onBlur={() => setDisplayTable(false)}
+                    placeholderText = 'ابحث عن المصطلحات ، اسماء المؤلفين، المنشورات...'
+                  />
+              <button className="SR--searchBox--button" type="submit"><FontAwesomeIcon icon={faMagnifyingGlass} rotation={90} /></button>
+            </form>
+          </div>
+          <div>
+            <InstantSearch indexName="entries" searchClient={searchClient}>
+              <div style={{'display': 'none'}}>
+                <SearchBox
+                defaultRefinement={searchBoxValue}
+                translations={{ placeholder: 'ابحث هنا' }}
+                  searchAsYouType={false}
+                  onFocus={() => setDisplayTable(true)}
+                  onBlur={() => setDisplayTable(false)}
+                    />
+              </div>
+              <div className="SR--pandel--div">
+                <Sidebar defaultCollapsed={collapsedWidth()} rtl={true} style={{  zIndex:0}}>
+                  <Menu>
+                    <MenuItem
+                          icon={<MenuOutlinedIcon />}
+                          onClick={() => {
+                            collapseSidebar();
+                          }}
+                          style={{ textAlign: "center" }}
+                        >
+                          {" "}
+                    </MenuItem>
+                  <SubMenu icon='' defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}}label='الدولة:'>
+                      <Panel>
+                        <RefinementList translations={{ placeholder: 'ادحل اسم البلد' }} attribute='entryOrigin.country.raw' searchable={true} limit={20} />
+                    </Panel>
+                  </SubMenu>
+                  <SubMenu icon='' defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='التصنيف:'>
+                    <Panel>
+                    <RefinementList translations={{ placeholder: "ادخل اسم التصنيف" }} attribute='entryClassification.theclass.key' searchable={true} limit={20} />
+                    </Panel>
+                  </SubMenu>
+                  <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='الفئة:'>
+                    <Panel>
+                      <RefinementList translations={{ placeholder: "ادخل اسم الفئة" }} attribute='entryCategory.thecategory.key' searchable={true} limit={20} />
+                    </Panel>
+                  </SubMenu>
+                  <SubMenu defaultOpen={true} style={{fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='المؤلف:'>
+                    <Panel>
+                      <RefinementList translations={{ placeholder: "ادخل اسم المؤلف" }} attribute='entryauthor.name.key' searchable={true} limit={20} />
+                    </Panel>
+                  </SubMenu>
+                  </Menu> 
+                </Sidebar>
+                <div className="right-panel">
+                  <CustomMenu attribute="entryCategory.thecategory.key" searchable />
+                  <Configure
+                    hitsPerPage={15}
+                    />
                   <Stats />
-      <Hits hitComponent={hitView} /> 
-      <Pagination />
+                  <Hits hitComponent={hitView} /> 
+                  <Pagination />
+                </div>
+              </div>
+            </InstantSearch>
+          </div>
+        </div>
       </div>
-      </div>
-        </InstantSearch>
-
-
-      </div>
-    
-      </div>
-
-  
-
-  
-</div>
-      
-    // </div>
     
     )
 }

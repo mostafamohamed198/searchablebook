@@ -108,22 +108,18 @@ export default function Category(props){
   function collapsedWidth(){
     const windowWidth = React.useRef(window.innerWidth);
     if (windowWidth.current >= 390){
-            return(
-              false
-            )
+        return(
+          false
+        )
     }
     else{
-            return(
-              true
-            )
+        return(
+          true
+        )
     }
    
   }
-
-
     return (
-      
-      // <div className="LP">
       <div className="ais-InstantSearch">
       <InstantSearch indexName="books" searchClient={searchClient}>
         <div className="SR--pandel--div">
@@ -172,11 +168,6 @@ export default function Category(props){
                 </Panel>
               </SubMenu>
               <div style={{ 'display': 'none' }}>
-                {/* <SubMenu style={{display: 'hidden',fontSize:'18px',fontWeight:'700',color:'#087cc4',overflow: 'hidden', borderBottom:'solid rgb(220, 220, 220)', borderWidth:'2px'}} label='الفئة:'>
-                <Panel>
-                  <RefinementList attribute='bookCategory.thecategory.key'  defaultRefinement={[`${categoryName}`]} searchable={true} limit={20} />
-                </Panel>
-                </SubMenu> */}
               </div>
               <SubMenu
                 defaultOpen={true}
@@ -206,14 +197,6 @@ export default function Category(props){
                 
               />
             </div>
-            {/* <SortBy
-              indexName='books'
-              items={[
-                // { label: 'publicationDate', value: 'books' },
-                { label: 'name (asc)', value: 'books_name_asc' },
-                { label: 'name (desc)', value: 'books_name_desc' },
-              ]}
-            /> */}
             <Configure filters={`bookCategory.thecategory.key:${categoryName}`} hitsPerPage={15} />
             <Hits hitComponent={hitView} />
             <Pagination />
