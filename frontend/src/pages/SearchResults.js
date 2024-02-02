@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons'
 import esHost from "../constants/esHost";
 import SearchContext from "../ctx/SearchContext";
+import CustomTag from "../components/CustomTag"
 
 export default function SearchResults(){
   const [displayTable, setDisplayTable] = React.useState(false)
@@ -229,14 +230,15 @@ const CustomMenu = connectMenu(TheMenu);
                     onAddition={onAddition}
                     onInput= {onInput}
                     onFocus={() => setDisplayTable(true)}
-                      onBlur={() => setDisplayTable(false)}
+                    onBlur={() => setDisplayTable(false)}
+                    tagComponent={CustomTag}
                     placeholderText = 'ابحث عن المصطلحات ، اسماء المؤلفين، المنشورات...'
                   />
               <button className="SR--searchBox--button" type="submit"><FontAwesomeIcon icon={faMagnifyingGlass} rotation={90} /></button>
             </form>
           </div>
           <div>
-            <InstantSearch indexName="entries" searchClient={searchClient}>
+            <InstantSearch indexName="entries" searchClient={searchClient} attributesToSnippet={['*:800']}>
               <div style={{'display': 'none'}}>
                 <SearchBox
                 defaultRefinement={searchBoxValue}

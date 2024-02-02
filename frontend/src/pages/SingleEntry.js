@@ -314,7 +314,6 @@ export default function SingleEntry (props){
           <Link to={redirect} style={{textDecoration:'none', color:'#087cc4'}}><div className="SE--author">{author.name}</div></Link>
       )
     })
-    console.log(`value is ${searchValue}`)
     if (!entryLoaded) {
       return <div>...</div>;
     }

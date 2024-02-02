@@ -19,16 +19,13 @@ export const SearchProvider = ({children}) => {
         var operatorRegex = /\b(OR|NOT|AND)\b/gi
         var result = inputString.split(operatorRegex)
         result = result.map(function (item) {
-          setTags(prevTags => [...prevTags, {"name": item}]);
+          setTags(prevTags => [...prevTags, {"name": item, id:Math.floor(Math.random() * (1000 - 0 + 1)) + 0}]);
         });
       }
-  
     const onDelete = useCallback((tagIndex) => {
       setTags(tags.filter((_, i) => i !== tagIndex))
     }, [tags])
-
     const onAddition = useCallback((newTag) => {
-      
       if (tags[tags.length - 1] != null){
         if(newTag.name != 'AND' && newTag.name != 'OR' && newTag.name != 'NOT'){
           if (newTag.name.includes('AND') || newTag.name.includes('OR') || newTag.name.includes('NOT')){
@@ -36,20 +33,25 @@ export const SearchProvider = ({children}) => {
           }
           else {
             if(tags[tags.length - 1].name != 'AND' && tags[tags.length - 1].name != 'OR' && tags[tags.length - 1].name != 'NOT'){
-              setTags([...tags, {id: null , name: 'AND'}, newTag])
+              setTags([...tags, {id: Math.floor(Math.random() * (1000 - 0 + 1)) + 0 , name: 'AND'}, newTag])
             }
             else{
-              setTags([...tags, newTag])
+              setTags([...tags, {"name": newTag.name, id:Math.floor(Math.random() * (1000 - 0 + 1)) + 0}])
             }
           }
             
         }
         else{
-          setTags([...tags, newTag])
+          setTags([...tags,  {"name": newTag.name, id:Math.floor(Math.random() * (1000 - 0 + 1)) + 0}])
         }
       }
       else{
-        setTags([...tags, newTag])
+        if (newTag.name.includes('AND') || newTag.name.includes('OR') || newTag.name.includes('NOT')){
+          splitStringWithOperators(newTag.name)
+        }
+        else{
+        setTags([...tags, {"name": newTag.name, id:Math.floor(Math.random() * (1000 - 0 + 1)) + 0}])
+        }
       }
       navigate(`/results/working`);
     
@@ -117,6 +119,10 @@ export const SearchProvider = ({children}) => {
       setSearchBoxValue('')
     }
 
+    function changeOperator(tagId, newOperator){
+      let tag = tags.find(obj => obj.id === tagId);
+      tag.name = newOperator
+    }
 
 
     let contextData = {
@@ -127,9 +133,11 @@ export const SearchProvider = ({children}) => {
         suggestions: suggestions,
         searchFormSubmit: searchFormSubmit,
         searchBoxValue: searchBoxValue,
-        resetSearch: resetSearch
+        resetSearch: resetSearch,
+        changeOperator: changeOperator
 
     }
+
     return(
         <SearchContext.Provider value={contextData} >
             {children}
