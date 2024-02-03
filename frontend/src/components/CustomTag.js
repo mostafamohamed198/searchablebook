@@ -1,6 +1,7 @@
 import React from "react";
 import SearchContext from "../ctx/SearchContext";
 export default function CustomTag({ classNames, tag, ...tagProps }) {
+    console.log(tag)
     const operators = ['AND', 'OR', 'NOT']
     let {changeOperator, onDelete} = React.useContext(SearchContext)
     function menuItems(){

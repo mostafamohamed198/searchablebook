@@ -38,12 +38,11 @@ export default function SearchResults(){
   const sk = new Searchkit({
     connection: {
       host: esHost,
-      
   
     },
     search_settings: {
       highlight_attributes: ["title", 'body'],
-      snippet_attributes: ['title',"body"],
+      snippet_attributes: ['title',"body:500"],
       search_attributes: [{ field: "title", weight: 3 }, "body", "bibiliography", "source"],
       result_attributes: ['id',"title", "body", "bibiliography", 'entryCover', 'entryauthor', 'entryPubDate','entryCategory', 'viewsCounts', 'favouriteusers','source'],
       facet_attributes: ['title.key',  'entryOrigin.country.raw', 'entryClassification.theclass.key', 'entryauthor.name.key', 'entryCategory.thecategory.key'],
@@ -63,9 +62,7 @@ export default function SearchResults(){
   }}, { debug: true });
 
   const { collapseSidebar, rtl } = useProSidebar();
-  // const searchClient = Client(sk);
   const hitView = ({ hit }) => {
-    const [inFavourites, setInFavourites] = React.useState(false)
     const resultingAuthors = hit.entryauthor.map(author =>{
     const authorid = `/authordetails/${author.id}`
       return(
@@ -101,7 +98,6 @@ export default function SearchResults(){
         
       }
     }
-   
     return (
       <div  className="SR--container">
        <div>
@@ -159,7 +155,6 @@ export default function SearchResults(){
           }}
           className="SR--categories--Menu--a"
         >
-   
           الكل
           <span className="SR--categories--Menu--count" >({allCount})</span>
         </a>

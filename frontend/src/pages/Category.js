@@ -9,7 +9,6 @@ import {Configure, Pagination, Panel,InstantSearch,  RefinementList, Snippet, Hi
 import esHost from "../constants/esHost";
 
 export default function Category(props){
-  // const params = useParams();
   const [categoryName, setCategoryName] = React.useState('')
 
   React.useEffect(function(){

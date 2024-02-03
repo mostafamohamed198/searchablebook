@@ -14,17 +14,6 @@ export const ComponentToPrint = React.forwardRef((props, ref) => {
                 <div className="DP--logo">العنوان , اللوجو</div>
                 <hr />
                 <div className="DP--container">
-                    <div className="DP--TC">
-                      <div className="DP--title">{props.title}</div>
-                      <ReactMarkdown
-                        components={{
-                          li: ({ node, ...props }) => (
-                            <li {...props} id='printingid'></li>
-                          ),
-                      
-                        }} 
-                        className="DP--content" rehypePlugins={[rehypeRaw, remarkGfm]} children={props.content}  remarkPlugins={[remarkGfm]} />
-                    </div>
                     <div className="DP--bibilography">
                         <div className="DP--doc--info">
                             معلومات عن المقال: 
@@ -34,6 +23,22 @@ export const ComponentToPrint = React.forwardRef((props, ref) => {
                             <div className="DP--bib--content">{props.bibilography}</div>
                         </div>
                     </div>
+                    <div className="DP--TC">
+                      <div className="DP--title">{props.title}</div>
+                      {/* {props.content} */}
+                      <ReactMarkdown
+                        components={{
+                          li: ({ node, ...props }) => (
+                            <li {...props} id='printingid'></li>
+                          ),
+                      
+                        }} 
+                        className="DP--content" 
+                        rehypePlugins={[rehypeRaw, remarkGfm]} 
+                        children={props.content}  
+                        remarkPlugins={[remarkGfm]} />
+                    </div>
+                    
                 </div>
             </div>
           </div>

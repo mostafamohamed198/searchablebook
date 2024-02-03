@@ -13,6 +13,7 @@ export const SearchProvider = ({children}) => {
     const [suggestions, setSuggestions] = useState([])
     const [searchBoxValue, setSearchBoxValue] = React.useState('')
     const [query, setQuery] = React.useState('')
+    const [operatorChanged, setOperatorChanged] = React.useState(false)
 
     const navigate = useNavigate();
       function splitStringWithOperators(inputString) {
@@ -22,9 +23,14 @@ export const SearchProvider = ({children}) => {
           setTags(prevTags => [...prevTags, {"name": item, id:Math.floor(Math.random() * (1000 - 0 + 1)) + 0}]);
         });
       }
-    const onDelete = useCallback((tagIndex) => {
-      setTags(tags.filter((_, i) => i !== tagIndex))
+
+
+    const onDelete = useCallback((tagId) => {
+      // setTags(tags.filter((_, i) => i !== tagIndex))
+      setTags(tags.filter(tag => tag.id !== tagId))
     }, [tags])
+
+
     const onAddition = useCallback((newTag) => {
       if (tags[tags.length - 1] != null){
         if(newTag.name != 'AND' && newTag.name != 'OR' && newTag.name != 'NOT'){
@@ -58,6 +64,7 @@ export const SearchProvider = ({children}) => {
     }, [tags])
 
     React.useEffect(function(){
+      console.log(tags)
       setSearchBoxValue('')
       tags.map((tag, index) => {
         if (tag.name == 'AND' || tag.name == 'OR' || tag.name == 'NOT'){
@@ -69,7 +76,7 @@ export const SearchProvider = ({children}) => {
         }
       })
 
-    }, [tags])
+    }, [tags, operatorChanged])
       
 
     function onInput (query) {
@@ -122,6 +129,7 @@ export const SearchProvider = ({children}) => {
     function changeOperator(tagId, newOperator){
       let tag = tags.find(obj => obj.id === tagId);
       tag.name = newOperator
+      setOperatorChanged(!operatorChanged)
     }
 
 
