@@ -324,7 +324,7 @@ export default function SingleEntry (props){
         ref={sidebarRef}
         className="app-sidebar-x"
         style={{ width: sidebarWidth }}
-        // onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={isResizing ? (e) => e.preventDefault() : null}
       >
         <div className="app-sidebar-content-x" >
         <Sidebar  toggled={false} rtl={true} style={{ width: sidebarWidth, maxWidth: '500px', minHeight: '100%',height:'calc(100vh - 172px)',maxHeight:'calc(100vh - 172px)', position:'sticky', top:'170px', right:'0px', alignSelf:'flex-start', zIndex:0, overflow: 'hidden' }} >
@@ -369,7 +369,19 @@ export default function SingleEntry (props){
                  trigger={() => <a><FontAwesomeIcon icon={faPrint} /></a>}
                  content={() => componentRef.current}
                />
-               <ComponentToPrint className='SE--printing' ref={componentRef} title={theTitle} content={theEntry} bibilography={bibilography}/>
+               <ComponentToPrint className='SE--printing' ref={componentRef} title={theTitle} content={theEntry} bibilography={bibilography}>
+                      <ReactMarkdown
+                        // components={{
+                        //   li: ({ node, ...props }) => (
+                        //     <li {...props} id='printingid'></li>
+                        //   ),
+                      
+                        // }} 
+                        className="" 
+                        rehypePlugins={[rehypeRaw, remarkGfm]} 
+                        children={theEntry}  
+                        remarkPlugins={[remarkGfm]} />
+                </ComponentToPrint>
            </div>
            <a>{iconStar()}</a>
        </div>}
